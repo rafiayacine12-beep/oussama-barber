@@ -383,6 +383,10 @@ html[lang=ar] .how h3{font-family:"Noto Kufi Arabic",sans-serif;letter-spacing:0
 .ticket{position:relative;background:#fff;color:var(--ink);border-radius:16px;margin:20px auto 24px;width:100%;max-width:360px;text-align:start;box-shadow:var(--shadow);overflow:visible;animation:print .6s cubic-bezier(.2,.8,.2,1)}
 @keyframes print{from{transform:translateY(-24px);opacity:0;clip-path:inset(0 0 100% 0)}to{transform:none;opacity:1;clip-path:inset(0 0 0 0)}}
 
+.img-ov{position:fixed;inset:0;z-index:210;background:rgba(15,10,5,.75);display:flex;align-items:center;justify-content:center;padding:20px}
+.img-box{width:100%;max-width:360px;max-height:94vh;overflow:auto;text-align:center;color:#fff}
+.img-box img{width:100%;border-radius:14px;display:block;-webkit-touch-callout:default;user-select:auto}
+.img-box p{margin:12px 0;font-weight:700;font-size:14px}
 /* ===== imprimante dyal t-ticket ===== */
 .prn{position:relative;width:100%;max-width:380px;margin:18px auto 22px;display:flex;flex-direction:column;align-items:center;isolation:isolate}
 .prn-mach{position:relative;z-index:3;width:100%;border-radius:24px;padding:12px 12px 30px;background:linear-gradient(180deg,#2A251E 0%,#1B1712 100%);border:1px solid #0E0B08;box-shadow:0 22px 38px -20px rgba(23,20,15,.6),0 6px 14px -8px rgba(23,20,15,.3),inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1px 0 rgba(0,0,0,.5)}
@@ -804,7 +808,7 @@ const I18N = {
     followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
     tkBarber:"Coiffeur dyalek", tkS1:"Tsjjlat", tkS2:"Confirmation", tkS3:"Nhar r-rendez-vous", tkIn:"Ba9i {x}", tkNow:"Daba! 💈", tkPast:"Daz", tkD:"nhar", tkH:"sa3a", tkM:"dq",
     tkTipsT:"Bach kolchi ydouz mzyan", tkTip1:"Ji 5 dqaye9 9bel l-wa9t dyalek.", tkTip2:"Ila ma t9derch tji, lghi men hna bach t3ti l-blassa l chi wa7ed akhor.", tkTip3:"Werri had t-ticket f s-salon ila tsowlti.",
-    tkCal:"Calendrier", tkImg:"Sjjel tswira", tkShare:"Partager", tkCopied:"Réf tcopiat ✓", tkDisc:"Remise", tkSaved:"Tswira tsjjlat ✓",
+    tkCal:"Calendrier", tkImg:"Sjjel tswira", tkShare:"Partager", tkCopied:"Réf tcopiat ✓", tkDisc:"Remise", tkSaved:"Tswira tsjjlat f l-galerie ✓", close:"Sedd", imgHold:"Brek mtwel 3la tswira → \"Ajouter à Photos\"",
     tkConfirmedToast:"🎉 R-rendez-vous dyalek tconfirma!", tkRefusedToast:"Smh lina, had l-blassa ma b9atch. Réservi wa9t akhor.", tkView:"Chouf t-ticket", tkLive:"Kantsennaw l-confirmation…",
     tkShareTxt:"3endi rendez-vous f {salon} · {when}",
     waMsg:"Salam 👋 3endi réservation f {salon}", calAlarm:"Rendez-vous f {salon}"
@@ -861,7 +865,7 @@ const I18N = {
     followT:"Suivez-nous", mapRow:"Comment venir au salon",
     tkBarber:"Votre coiffeur", tkS1:"Envoyée", tkS2:"Confirmation", tkS3:"Jour du rendez-vous", tkIn:"Dans {x}", tkNow:"C'est maintenant ! 💈", tkPast:"Passé", tkD:"j", tkH:"h", tkM:"min",
     tkTipsT:"Pour que tout se passe bien", tkTip1:"Arrivez 5 minutes avant l'heure.", tkTip2:"Un empêchement ? Annulez ici pour libérer la place.", tkTip3:"Montrez ce ticket au salon si on vous le demande.",
-    tkCal:"Calendrier", tkImg:"Enregistrer", tkShare:"Partager", tkCopied:"Réf copiée ✓", tkDisc:"Remise", tkSaved:"Image enregistrée ✓",
+    tkCal:"Calendrier", tkImg:"Enregistrer", tkShare:"Partager", tkCopied:"Réf copiée ✓", tkDisc:"Remise", tkSaved:"Image enregistrée ✓", close:"Fermer", imgHold:"Appuie longuement sur l\u2019image → « Ajouter à Photos »",
     tkConfirmedToast:"🎉 Votre rendez-vous est confirmé !", tkRefusedToast:"Désolé, ce créneau n'est plus disponible. Choisissez un autre horaire.", tkView:"Voir le ticket", tkLive:"En attente de confirmation…",
     tkShareTxt:"J'ai rendez-vous chez {salon} · {when}",
     waMsg:"Bonjour 👋 j'ai une réservation chez {salon}", calAlarm:"Rendez-vous chez {salon}"
@@ -918,7 +922,7 @@ const I18N = {
     followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
     tkBarber:"حلاقك", tkS1:"تم الإرسال", tkS2:"التأكيد", tkS3:"يوم الموعد", tkIn:"بعد {x}", tkNow:"حان الوقت! 💈", tkPast:"انتهى", tkD:"يوم", tkH:"س", tkM:"د",
     tkTipsT:"لكي يمر كل شيء بسلاسة", tkTip1:"احضر قبل موعدك بـ 5 دقائق.", tkTip2:"إذا لم تستطع الحضور، ألغِ من هنا لتترك المكان لغيرك.", tkTip3:"أظهر هذه التذكرة في المحل إن طُلب منك.",
-    tkCal:"التقويم", tkImg:"حفظ كصورة", tkShare:"مشاركة", tkCopied:"تم نسخ الرقم ✓", tkDisc:"تخفيض", tkSaved:"تم حفظ الصورة ✓",
+    tkCal:"التقويم", tkImg:"حفظ كصورة", tkShare:"مشاركة", tkCopied:"تم نسخ الرقم ✓", tkDisc:"تخفيض", tkSaved:"تم حفظ الصورة ✓", close:"إغلاق", imgHold:"ضغط مطوّل على الصورة ← «إضافة إلى الصور»",
     tkConfirmedToast:"🎉 تم تأكيد موعدك!", tkRefusedToast:"عذرًا، هذا الموعد لم يعد متاحًا. اختر وقتًا آخر.", tkView:"عرض التذكرة", tkLive:"في انتظار التأكيد…",
     tkShareTxt:"لدي موعد في {salon} · {when}",
     waMsg:"السلام عليكم 👋 لدي حجز في {salon}", calAlarm:"موعد في {salon}"
@@ -1630,14 +1634,44 @@ async function ticketPng(tk){
   x.direction = rtl ? "rtl" : "ltr"; x.fillStyle = "#8A847A"; x.font = `600 30px ${body}`; x.fillText("📍 " + CONFIG.adresse, cx, H - top - 50);
   return await new Promise(res => c.toBlob(res, "image/png"));
 }
+const UA = navigator.userAgent || "";
+const IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/i.test(UA);
+function saveBlob(blob, name){ const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 8000); }
+function imgSheet(blob){
+  const url = URL.createObjectURL(blob), ov = document.createElement("div"); ov.className = "img-ov";
+  ov.innerHTML = `<div class="img-box"><img alt="" src="${url}"><p>${esc(t("imgHold"))}</p><button type="button" class="cta block-btn">${esc(t("close"))}</button></div>`;
+  const close = () => { ov.remove(); URL.revokeObjectURL(url); };
+  ov.addEventListener("click", e => { if (e.target === ov || e.target.closest("button")) close(); });
+  document.body.appendChild(ov);
+}
 $("#imgBtn").addEventListener("click", async () => {
   if (!TK) return; const btn = $("#imgBtn"); btn.disabled = true;
   try {
     const blob = await ticketPng(TK), name = "ticket-" + TK.id + ".png", file = new File([blob], name, { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: CONFIG.salon }); } catch(e){} }
-    else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toastMsg(t("tkSaved")); }
+    if (IS_IOS){
+      // iPhone: l-web ma y9derch ykteb f Photos nichan — share sheet fih "Enregistrer l'image" (brek wa7da).
+      if (navigator.canShare && navigator.canShare({ files: [file] })){ try { await navigator.share({ files: [file] }); } catch(e){} }
+      else imgSheet(blob);
+    } else {
+      // Android / PC: telechargement nichan → katban f l-galerie (Download).
+      saveBlob(blob, name); toastMsg(t("tkSaved"));
+    }
   } catch(e){}
   btn.disabled = false;
+});
+function calParts(tk){
+  const d = iso(fromIso(tk.date)).replace(/-/g, ""), f = m => d + "T" + pad(Math.floor(m/60)) + pad(m%60) + "00";
+  return { s: f(tk.start), e: f(tk.start + tk.dur), t: CONFIG.salon + " – " + tk.items.map(i => i.n).join(" + "),
+    l: CONFIG.adresse, d: t("tBarber") + ": " + tk.barber + " · #" + tk.id, a: t("calAlarm", { salon: CONFIG.salon }), id: tk.id };
+}
+$("#calBtn").addEventListener("click", e => {
+  if (!TK) return; const c = calParts(TK);
+  if (IS_IOS){ e.preventDefault(); location.href = "/api/ics?" + new URLSearchParams(c).toString(); return; }
+  if (IS_ANDROID){ e.preventDefault();
+    const g = "https://calendar.google.com/calendar/render?" + new URLSearchParams({ action: "TEMPLATE", text: c.t, dates: c.s + "/" + c.e, ctz: "Africa/Casablanca", location: c.l, details: c.d }).toString();
+    window.open(g, "_blank", "noopener"); return; }
+  // PC: kaybqa telechargement dyal .ics (href deja m9ad).
 });
 $("#shareBtn").addEventListener("click", async () => {
   if (!TK) return;
