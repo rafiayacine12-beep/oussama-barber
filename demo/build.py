@@ -54,7 +54,7 @@ def build_index():
     bar = BANNER_CSS + """
 <div class="dm-bar" id="dmBar"><span>🎬 <b>Démo</b> · Jrreb dir réservation</span>
   <button type="button" onclick="DEMO_RESET()">↺ Réinitialiser</button></div>
-<a class="dm-fab" href="admin.html" target="_blank" rel="noopener">🔐 Chouf l-admin</a>
+<a class="dm-fab" href="admin.html">🔐 Chouf l-admin</a>
 """
     s = sub(s, '<body>', '<body>' + bar)
     return s
@@ -71,9 +71,11 @@ def build_admin():
     s = s.replace('"Tabriquet, Salé"', '"Votre adresse"').replace('placeholder="Salé"', 'placeholder="Votre ville"').replace('|| "Salé"', '|| "Votre ville"')
     s = sub(s, 'placeholder="Oussama Barber"', 'placeholder="Votre Salon"', required=False)
     s = s.replace("https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9", "https://maps.google.com/")
+    # nefs l-onglet: f WhatsApp, onglet jdid kayt7el f navigateur akhor w l-data ma katbanch
+    s = s.replace('href="./" target="_blank" rel="noopener"', 'href="./"')
     bar = BANNER_CSS + """
 <div class="dm-bar"><span>🎬 <b>Admin démo</b></span>
-  <a href="./" target="_blank" rel="noopener">👀 Chouf s-site</a>
+  <a href="./">👀 Chouf s-site</a>
   <button type="button" onclick="DEMO_RESET()">↺ Réinitialiser</button></div>
 """
     s = sub(s, '<body>', '<body>' + bar)
