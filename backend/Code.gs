@@ -14,7 +14,7 @@
  *
  * ⚙️ RÉGLAGES — beddel hna
  */
-const ADMIN_PIN = '2468';                 // code dyal page admin (beddlo!)
+const ADMIN_PIN = 'CHANGE_MOI';          // ⚠️ code dyal l-admin: beddlo GHIR f Apps Script, ma t7ottouch hna (repo public)
 const NOTIFY_EMAIL = '';                  // khawi = email dyal compte Google li dar déploiement
 const TELEGRAM_TOKEN = '';                // optionnel: token dyal bot Telegram (@BotFather)
 const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal Oussama
