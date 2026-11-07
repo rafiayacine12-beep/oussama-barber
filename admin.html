@@ -321,6 +321,17 @@ h2{font-size:32px;margin:14px 0 4px}
 .kp span{font-size:12px;color:var(--mute);font-weight:600}
 .kp.main{background:var(--ink);color:#fff}
 .kp.main span{color:#B9B3A9}
+.rem{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.rem summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:15px;cursor:pointer}
+.rem summary::-webkit-details-marker{display:none}
+.rem summary small{font-weight:700;color:var(--or);font-size:13px}
+.rem .rl{display:grid;gap:8px;margin-top:12px}
+.rem .ri{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#FAF8F5}
+.rem .ri .tm{font-weight:900;font-size:16px;min-width:48px}
+.rem .ri .nm{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.25}
+.rem .ri .nm small{display:block;font-weight:600;color:#7A736A;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rem .ri a{flex:0 0 auto;padding:9px 12px;border-radius:999px;background:#25D366;color:#fff;font-weight:800;font-size:13px;text-decoration:none}
+.rem .ri.sent a{background:#E8E4DE;color:#5B554C}
 .nextc{display:flex;flex-wrap:wrap;gap:14px;background:linear-gradient(135deg,var(--or),#F07A2E);color:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 12px 28px rgba(226,86,10,.25)}
 .nl{flex:0 0 auto;border-inline-end:1px solid rgba(255,255,255,.3);padding-inline-end:14px;display:flex;flex-direction:column;justify-content:center}
 .nl small{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#FFE3D1;white-space:nowrap}
@@ -435,6 +446,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
       <div class="hello"><small id="todayLbl"></small><h2 id="helloT"></h2></div>
       <div class="kpis3" id="daySum"></div>
       <div id="nextBox"></div>
+      <div id="remBox"></div>
       <div class="pend" id="pendBox" hidden>
         <h3>Khasshom validation <i id="pendN"></i></h3>
         <div class="list" id="pendList"></div>
@@ -965,8 +977,36 @@ function setHello(){
   $("#helloT").textContent = (H < 12 ? "Sba7 l-khir" : H < 18 ? "Mbrouk l-3chiya" : "Msa l-khir") + " 👋";
   $("#todayLbl").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
 }
+/* ---------- rappels dyal ghedda ---------- */
+function remMsg(r){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return {
+    da: `Salam ${r.nom} 👋 kanfekrouk b rendez-vous dyalek f ${SN()} ghedda:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nIla ma t9derch tji, golha lina 🙏 Ntsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 petit rappel de votre rendez-vous chez ${SN()} demain :\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nSi vous ne pouvez pas venir, prévenez-nous 🙏 À demain !`,
+    ar: `مرحبا ${r.nom} 👋 كنفكروك بالموعد ديالك في ${SN()} غدا:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nإلا ما تقدرش تجي، علمنا 🙏 في انتظارك!` }[lg];
+}
+async function loadReminders(){
+  const box = $("#remBox"); if (!box) return;
+  if (day !== today()){ box.innerHTML = ""; return; }
+  const d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
+  try {
+    const j = await call("list", { from: tmr, to: tmr });
+    const list = (j.list || []).filter(r => !String(r.statut).startsWith("annul") && !String(r.statut).startsWith("absent")).sort((a,b) => a.heure.localeCompare(b.heure));
+    if (!list.length){ box.innerHTML = ""; return; }
+    const sent = id => { try { return localStorage.getItem("rem_" + id) === "1"; } catch(e){ return false; } };
+    const left = list.filter(r => !sent(r.id)).length;
+    box.innerHTML = `<details class="rem" ${left ? "open" : ""}><summary>🔔 Rappels dyal ghedda (${list.length})<small>${left ? left + " mazal" : "Kolchi tsifet ✓"}</small></summary>
+      <div class="rl">${list.map(r => `<div class="ri ${sent(r.id) ? "sent" : ""}" data-id="${esc(r.id)}"><span class="tm">${esc(r.heure)}</span>
+        <span class="nm">${esc(r.nom)}<small>${esc(r.services)} · ${esc(r.barber)}</small></span>
+        <a href="https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(remMsg(r))}" target="_blank" rel="noopener">${sent(r.id) ? "✓ Tsifet" : "💬 Sift rappel"}</a></div>`).join("")}</div></details>`;
+    box.querySelectorAll(".ri a").forEach(a => a.addEventListener("click", () => {
+      const row = a.closest(".ri"); try { localStorage.setItem("rem_" + row.dataset.id, "1"); } catch(e){}
+      setTimeout(() => { row.classList.add("sent"); a.textContent = "✓ Tsifet"; const n = box.querySelectorAll(".ri:not(.sent)").length; box.querySelector("summary small").textContent = n ? n + " mazal" : "Kolchi tsifet ✓"; }, 400);
+    }));
+  } catch(e){ box.innerHTML = ""; }
+}
 async function loadRdv(skipPending){
-  setHello(); renderStrip(); loadWait(); if (skipPending !== true) loadPending();
+  setHello(); renderStrip(); loadWait(); loadReminders(); if (skipPending !== true) loadPending();
   $("#rdvList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`; $("#daySum").innerHTML = "";
   try {
     const j = await call("list", { from: day, to: day });

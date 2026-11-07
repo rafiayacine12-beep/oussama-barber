@@ -387,6 +387,24 @@ html[lang=ar] .how h3{font-family:"Noto Kufi Arabic",sans-serif;letter-spacing:0
 .img-box{width:100%;max-width:360px;max-height:94vh;overflow:auto;text-align:center;color:#fff}
 .img-box img{width:100%;border-radius:14px;display:block;-webkit-touch-callout:default;user-select:auto}
 .img-box p{margin:12px 0;font-weight:700;font-size:14px}
+.flow-note{margin:0 0 14px;padding:11px 14px;border-radius:12px;background:var(--orsoft);color:var(--or2);font-weight:700;font-size:13.5px;line-height:1.35}
+.next .fast{position:relative;display:inline-flex;align-items:center;gap:6px;margin:-8px 0 14px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:13.5px}
+.next .fast:hover{background:rgba(255,255,255,.28)}
+.again-c .v{display:flex;align-items:center;gap:8px}
+.ly{margin-top:18px;border:2px solid var(--or);border-radius:var(--r-l);padding:16px 16px 14px;background:var(--bg)}
+.ly h3{font-family:var(--display);font-weight:800;font-size:24px}
+.ly p{font-size:14px;color:var(--mute);margin:4px 0 12px}
+.ly .times{display:flex;flex-wrap:wrap;gap:8px}
+.ly .times button{min-width:72px;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);font-weight:800;font-size:16px;background:var(--bg)}
+.ly .times button:first-child{border-color:var(--or);background:var(--orsoft);color:var(--or2)}
+.inst{margin:18px auto 0;max-width:380px;display:flex;gap:12px;align-items:flex-start;text-align:start;padding:14px;border-radius:var(--r-l);background:var(--s1);border:1px solid var(--line)}
+.inst img{width:44px;height:44px;border-radius:11px;flex:0 0 44px}
+.inst b{display:block;font-size:15px}
+.inst p{font-size:13px;color:var(--mute);margin:2px 0 10px;line-height:1.35}
+.inst .hint{color:var(--ink);font-weight:700}
+.inst .row{display:flex;gap:8px;flex-wrap:wrap}
+.inst .row button{padding:9px 14px;border-radius:999px;font-weight:800;font-size:13.5px}
+.inst .yes{background:var(--or);color:#fff}.inst .no{color:var(--mute)}
 /* ===== imprimante dyal t-ticket ===== */
 .prn{position:relative;width:100%;max-width:380px;margin:18px auto 22px;display:flex;flex-direction:column;align-items:center;isolation:isolate}
 .prn-mach{position:relative;z-index:3;width:100%;border-radius:24px;padding:12px 12px 30px;background:linear-gradient(180deg,#2A251E 0%,#1B1712 100%);border:1px solid #0E0B08;box-shadow:0 22px 38px -20px rgba(23,20,15,.6),0 6px 14px -8px rgba(23,20,15,.3),inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1px 0 rgba(0,0,0,.5)}
@@ -609,9 +627,11 @@ html[lang=ar] .block h3{font-size:21px}
     </div>
     <div class="demo" id="demo" data-t="demo" hidden></div>
 
+    <div id="lyBox" hidden></div>
     <div class="next" id="nextBox" aria-live="polite">
       <div class="k"><i class="dot" aria-hidden="true"></i><span id="nextK"></span></div>
       <div class="v load" id="nextV">— : —</div>
+      <button type="button" class="fast" id="fastBtn" hidden></button>
       <button class="cta block-btn" type="button" data-go="1" data-t="cta"></button>
     </div>
 
@@ -656,6 +676,7 @@ html[lang=ar] .block h3{font-size:21px}
 
   <!-- ============ 1. SERVICE ============ -->
   <section class="screen" id="s1" aria-labelledby="h1t">
+    <div class="flow-note" id="note1" hidden></div>
     <h2 id="h1t" data-t="s1h"></h2>
     <p class="sub" data-t="s1s"></p>
     <div class="svc" id="services"></div>
@@ -684,6 +705,7 @@ html[lang=ar] .block h3{font-size:21px}
 
   <!-- ============ 5. INFOS ============ -->
   <section class="screen" id="s5" aria-labelledby="h5t">
+    <div class="flow-note" id="note5" hidden></div>
     <h2 id="h5t" data-t="s5h"></h2>
     <p class="sub" data-t="s5s"></p>
     <div class="recap" id="recap"></div>
@@ -724,10 +746,12 @@ html[lang=ar] .block h3{font-size:21px}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
         <span data-t="waBtn"></span>
       </a>
+      <button class="btn ghost" id="reschBtn" type="button" data-t="reschB"></button>
       <button class="btn ghost" id="again" type="button" data-t="again"></button>
       <button class="btn danger" id="ticketCancel" type="button" data-t="cancelTicket"></button>
     </div>
     <div id="ticketMsg"></div>
+    <div id="instBox"></div>
     <p class="small"><span data-t="changeQ"></span> <a id="waChange" href="#" target="_blank" rel="noopener" data-t="changeL"></a></p>
   </section>
 
@@ -803,7 +827,7 @@ const I18N = {
     stPending:"Kaytsenna l-confirmation", stConfirmed:"Mconfirmé ✅", stRefused:"Tlghat",
     errBlocked:"Ma ymkench tréservi b had n-numéro. Tsel b salon f WhatsApp.", errLimit:"3endek deja réservation jaya b had n-numéro. Lghiha 9bel ma tdir wa7da jdida.",
     welcomeT:"Mrehba bik 👋", welcomeS:"Réservi l-blassa dyalek f 30 seconde, bla ma t3ayet wla ttsenna f s-salon.",
-    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal", prnProc:"Kansjlo réservation dyalek…", prnPrint:"Kantb3o l-ticket dyalek…", prnDone:"Ticket dyalek wajed", prnPend:"Ticket wajed · f-ntidar confirmation", howT:"Kifach treservi? 4 khotawat sahlin", how1:"Khtar l-service", how1s:"Coupe, dégradé, barbe… l-prix bayn 9bel ma tkhtar.", how2:"Khtar l-coiffeur", how2s:"Wla khtar \"Ay wa7ed\" bach takhod asra3 blassa.", how3:"Khtar n-nhar w s-sa3a", how3s:"Kayban lik ghir l-wa9t l-khawi.", how4:"Kteb smiytek w raqmek", how4s:"Katjik confirmation f WhatsApp. Tkhelles f s-salon.", howCta:"Yallah, bda daba",
+    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal", againT:"Nefs l-merra li fatet?", againB:"Réservi nefs l-7aja", fastB:"⚡ Khod had l-blassa", fastNote:"Khtar l-service, w ndiwk nichan l {when}.", fastMiss:"Had l-wa9t ma b9ach khawi l had service — khtar wa9t akhor.", reschB:"Beddel l-wa9t", reschNote:"Katbeddel réservation #{id}. L-9dima katlgha wa7dha mlli tconfirmi.", reschOk:"Tbeddel l-wa9t ✓", reschFail:"Ma qdernach nbeddlo l-wa9t. B9at réservation l-9dima.", reschLost:"Ma qdernach nbeddlo l-wa9t. Tsel bina f WhatsApp.", instT:"Zid {salon} l téléphone dyalek", instS:"L-merra l-jaya treservi b brek wa7da, b7al application.", instB:"Zid daba", instNo:"Ma bghitch", instIos:"Brek 3la ⬆️ (Partager) l-te7t, mn ba3d \"Sur l\u2019écran d\u2019accueil\".", instAnd:"Brek 3la ⋮ l-fo9, mn ba3d \"Ajouter à l\u2019écran d\u2019accueil\".", lyT:"Mrehba f s-salon 👋", lyS:"Lyoum, had l-wa9t khawi — khtar wa7ed:", lyFull:"Lyoum 3amer. Dkhel l liste d\u2019attente w n3iyto lik ila t7llat blassa.", lyWait:"Dkhel l liste d\u2019attente", lyLoad:"Kanchoufo l-wa9t l-khawi…", lyClosed:"S-salon msdod lyoum. Réservi l nhar akhor.", prnProc:"Kansjlo réservation dyalek…", prnPrint:"Kantb3o l-ticket dyalek…", prnDone:"Ticket dyalek wajed", prnPend:"Ticket wajed · f-ntidar confirmation", howT:"Kifach treservi? 4 khotawat sahlin", how1:"Khtar l-service", how1s:"Coupe, dégradé, barbe… l-prix bayn 9bel ma tkhtar.", how2:"Khtar l-coiffeur", how2s:"Wla khtar \"Ay wa7ed\" bach takhod asra3 blassa.", how3:"Khtar n-nhar w s-sa3a", how3s:"Kayban lik ghir l-wa9t l-khawi.", how4:"Kteb smiytek w raqmek", how4s:"Katjik confirmation f WhatsApp. Tkhelles f s-salon.", howCta:"Yallah, bda daba",
     qMap:"Kifach nwsel", qCall:"3ayet", svcT:"Les services w l-prix", seeAll:"Réservi",
     followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
     tkBarber:"Coiffeur dyalek", tkS1:"Tsjjlat", tkS2:"Confirmation", tkS3:"Nhar r-rendez-vous", tkIn:"Ba9i {x}", tkNow:"Daba! 💈", tkPast:"Daz", tkD:"nhar", tkH:"sa3a", tkM:"dq",
@@ -860,7 +884,7 @@ const I18N = {
     stPending:"En attente de confirmation", stConfirmed:"Confirmé ✅", stRefused:"Annulée",
     errBlocked:"Impossible de réserver avec ce numéro. Contactez le salon sur WhatsApp.", errLimit:"Vous avez déjà une réservation à venir avec ce numéro. Annulez-la avant d'en faire une autre.",
     welcomeT:"Bienvenue 👋", welcomeS:"Réservez votre place en 30 secondes, sans appeler ni attendre au salon.",
-    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon", prnProc:"Enregistrement de ta réservation…", prnPrint:"Impression de ton ticket…", prnDone:"Ton ticket est prêt", prnPend:"Ticket prêt · en attente de confirmation", howT:"Comment réserver ? 4 étapes simples", how1:"Choisis le service", how1s:"Coupe, dégradé, barbe… le prix est affiché.", how2:"Choisis le coiffeur", how2s:"Ou « Peu importe » pour la place la plus rapide.", how3:"Choisis le jour et l\u2019heure", how3s:"Seuls les créneaux libres sont affichés.", how4:"Ton prénom et ton numéro", how4s:"Confirmation sur WhatsApp. Paiement au salon.", howCta:"Commencer maintenant",
+    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon", againT:"Comme la dernière fois ?", againB:"Réserver la même chose", fastB:"⚡ Prendre ce créneau", fastNote:"Choisis le service, on t\u2019emmène directement à {when}.", fastMiss:"Ce créneau n\u2019est plus libre pour ce service — choisis-en un autre.", reschB:"Changer l\u2019heure", reschNote:"Tu modifies la réservation #{id}. L\u2019ancienne sera annulée automatiquement.", reschOk:"Heure modifiée ✓", reschFail:"Impossible de changer l\u2019heure. Ton ancienne réservation est gardée.", reschLost:"Impossible de changer l\u2019heure. Contacte-nous sur WhatsApp.", instT:"Ajoute {salon} à ton téléphone", instS:"La prochaine fois, tu réserves en un clic, comme une appli.", instB:"Ajouter", instNo:"Non merci", instIos:"Touche ⬆️ (Partager) en bas, puis « Sur l\u2019écran d\u2019accueil ».", instAnd:"Touche ⋮ en haut, puis « Ajouter à l\u2019écran d\u2019accueil ».", lyT:"Bienvenue au salon 👋", lyS:"Aujourd\u2019hui, ces créneaux sont libres — choisis-en un :", lyFull:"Complet aujourd\u2019hui. Rejoins la liste d\u2019attente, on t\u2019appelle si une place se libère.", lyWait:"Rejoindre la liste d\u2019attente", lyLoad:"Recherche des créneaux libres…", lyClosed:"Le salon est fermé aujourd\u2019hui. Réserve pour un autre jour.", prnProc:"Enregistrement de ta réservation…", prnPrint:"Impression de ton ticket…", prnDone:"Ton ticket est prêt", prnPend:"Ticket prêt · en attente de confirmation", howT:"Comment réserver ? 4 étapes simples", how1:"Choisis le service", how1s:"Coupe, dégradé, barbe… le prix est affiché.", how2:"Choisis le coiffeur", how2s:"Ou « Peu importe » pour la place la plus rapide.", how3:"Choisis le jour et l\u2019heure", how3s:"Seuls les créneaux libres sont affichés.", how4:"Ton prénom et ton numéro", how4s:"Confirmation sur WhatsApp. Paiement au salon.", howCta:"Commencer maintenant",
     qMap:"Itinéraire", qCall:"Appeler", svcT:"Services & prix", seeAll:"Réserver",
     followT:"Suivez-nous", mapRow:"Comment venir au salon",
     tkBarber:"Votre coiffeur", tkS1:"Envoyée", tkS2:"Confirmation", tkS3:"Jour du rendez-vous", tkIn:"Dans {x}", tkNow:"C'est maintenant ! 💈", tkPast:"Passé", tkD:"j", tkH:"h", tkM:"min",
@@ -917,7 +941,7 @@ const I18N = {
     stPending:"في انتظار التأكيد", stConfirmed:"مؤكد ✅", stRefused:"ملغى",
     errBlocked:"لا يمكن الحجز بهذا الرقم. تواصل مع الصالون عبر واتساب.", errLimit:"لديك حجز قادم بهذا الرقم. ألغه قبل أن تحجز موعدًا جديدًا.",
     welcomeT:"مرحبا بك 👋", welcomeS:"احجز مكانك في 30 ثانية، بدون اتصال ولا انتظار في الصالون.",
-    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل", prnProc:"كنسجلو الحجز ديالك…", prnPrint:"كنطبعو التيكي ديالك…", prnDone:"التيكي ديالك واجد", prnPend:"التيكي واجد · فانتظار التأكيد", howT:"كيفاش تحجز؟ 4 خطوات ساهلين", how1:"اختر الخدمة", how1s:"حلاقة، ديگرادي، لحية… الثمن ظاهر.", how2:"اختر الحلاق", how2s:"ولا اختر «أي حلاق» باش تاخد أسرع موعد.", how3:"اختر اليوم والساعة", how3s:"غير المواعيد الخاوية اللي كتبان.", how4:"اكتب سميتك ونمرتك", how4s:"كيوصلك التأكيد فواتساب. الخلاص فالمحل.", howCta:"يالاه، بدا دابا",
+    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل", againT:"نفس المرة الفايتة؟", againB:"احجز نفس الشي", fastB:"⚡ خود هاد الموعد", fastNote:"اختار الخدمة، ونديوك نيشان ل {when}.", fastMiss:"هاد الوقت ما بقاش خاوي لهاد الخدمة — اختار وقت آخر.", reschB:"بدّل الوقت", reschNote:"كتبدّل الحجز #{id}. القديم كيتلغى بوحدو ملي تأكد.", reschOk:"تبدّل الوقت ✓", reschFail:"ما قدرناش نبدلو الوقت. بقى الحجز القديم.", reschLost:"ما قدرناش نبدلو الوقت. تواصل معنا فواتساب.", instT:"زيد {salon} لتيليفونك", instS:"المرة الجاية تحجز بضغطة وحدة، بحال تطبيق.", instB:"زيد دابا", instNo:"لا شكرا", instIos:"ضغط على ⬆️ (مشاركة) لتحت، ومن بعد «إضافة إلى الشاشة الرئيسية».", instAnd:"ضغط على ⋮ لفوق، ومن بعد «إضافة إلى الشاشة الرئيسية».", lyT:"مرحبا بك فالصالون 👋", lyS:"اليوم، هاد الأوقات خاوية — اختار واحد:", lyFull:"اليوم عامر. دخل للائحة الانتظار ونعيطو ليك إلا تحلات بلاصة.", lyWait:"دخل للائحة الانتظار", lyLoad:"كنقلبو على الأوقات الخاوية…", lyClosed:"الصالون مسدود اليوم. احجز ليوم آخر.", prnProc:"كنسجلو الحجز ديالك…", prnPrint:"كنطبعو التيكي ديالك…", prnDone:"التيكي ديالك واجد", prnPend:"التيكي واجد · فانتظار التأكيد", howT:"كيفاش تحجز؟ 4 خطوات ساهلين", how1:"اختر الخدمة", how1s:"حلاقة، ديگرادي، لحية… الثمن ظاهر.", how2:"اختر الحلاق", how2s:"ولا اختر «أي حلاق» باش تاخد أسرع موعد.", how3:"اختر اليوم والساعة", how3s:"غير المواعيد الخاوية اللي كتبان.", how4:"اكتب سميتك ونمرتك", how4s:"كيوصلك التأكيد فواتساب. الخلاص فالمحل.", howCta:"يالاه، بدا دابا",
     qMap:"الطريق", qCall:"اتصل", svcT:"الخدمات والأسعار", seeAll:"احجز",
     followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
     tkBarber:"حلاقك", tkS1:"تم الإرسال", tkS2:"التأكيد", tkS3:"يوم الموعد", tkIn:"بعد {x}", tkNow:"حان الوقت! 💈", tkPast:"انتهى", tkD:"يوم", tkH:"س", tkM:"د",
@@ -969,7 +993,7 @@ const price = n => lang === "ar" ? n + " " + t("dh") : n + " DH";
 const mins = n => n + " " + t("min");
 
 const DEMO = !CONFIG.apiUrl;
-const st = { step:1, maxStep:1, services:[], barber:ANY, date:null, start:null, bookings:{}, result:null, next:null };
+const st = { step:1, maxStep:1, services:[], barber:ANY, date:null, start:null, bookings:{}, result:null, next:null, fast:null, resched:null };
 
 /* ---------- data ---------- */
 const demoKey = "ob_demo";
@@ -1177,8 +1201,9 @@ function renderHeroNext(){
     const h = hoursFor(new Date()), m = nowMin(), open = h && m >= toMin(h[0]) && m < toMin(h[1]);
     el.classList.toggle("closed", !open);
     k.textContent = t("nextDefault");
-  } else if (n.type === "full"){ v.textContent = t("nextFull"); k.textContent = t("nextDefault"); }
-  else { v.textContent = t("nextFallback"); k.textContent = CONFIG.salon; }
+    const fb = $("#fastBtn"); fb.hidden = false; fb.textContent = t("fastB");
+  } else if (n.type === "full"){ v.textContent = t("nextFull"); k.textContent = t("nextDefault"); $("#fastBtn").hidden = true; }
+  else { v.textContent = t("nextFallback"); k.textContent = CONFIG.salon; $("#fastBtn").hidden = true; }
 }
 async function heroNext(){
   try {
@@ -1411,7 +1436,11 @@ function show(n, opts = {}){
     $("#count").innerHTML = `<b>${esc(t("stepNames")[n-1])}</b> · ${esc(t("stepCount", { n }))}`;
     document.querySelectorAll("#steps li").forEach((li, i) => li.classList.toggle("on", i < n));
   }
-  if (n === 0) renderHomeCards();
+  if (n === 0){ st.fast = null; st.resched = null; renderHomeCards(); }
+  $("#note1").hidden = !(n === 1 && st.fast && st.fast.m != null);
+  if (st.fast && st.fast.m != null) $("#note1").textContent = t("fastNote", { when: relDay(st.fast.date) + " " + hhmm(st.fast.m) });
+  $("#note5").hidden = !(n === 5 && st.resched);
+  if (st.resched) $("#note5").textContent = t("reschNote", { id: st.resched.tk.id });
   if (n === 7){ $("#mMsg").innerHTML = ""; $("#mCancel").disabled = false; const me = store.get("ob_me", null); if (me && !$("#mPhone").value) $("#mPhone").value = me.phone || ""; }
   if (n === 1) renderServices();
   if (n === 2) renderTeam();
@@ -1458,22 +1487,62 @@ function update(){
   btn.textContent = n === 5 ? t("confirm") : t("next");
 }
 
+function quickBook(fast){ resetFlow(); st.fast = fast; go(1); }
+async function slotFree(date, m, fresh){
+  if (fresh) delete st.bookings[date];
+  const list = await fetchDay(date);
+  return slotsFor(date, list, duration(), candidates()).some(x => x.m === m && x.free);
+}
+function bookPayload(name, phone){
+  return { date: st.date, start: st.start, dur: duration(), candidates: candidates().filter(c => worksAt(c, st.date, st.start, duration())),
+    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: finalTotal(), discount: promoAmount() + loyalAmount(), lang, name, phone, hp: $("#hp").value };
+}
+function oldPayload(tk){
+  const svc = tk.items.map(i => SERVICES.find(s => s.id === i.id)).filter(Boolean);
+  return { date: tk.date, start: tk.start, dur: tk.dur, candidates: [tk.barber], services: svc.length ? svc.map(s => Lfr(s.nom)).join(" + ") : tk.items.map(i => i.n).join(" + "),
+    price: tk.final, discount: tk.disc || 0, lang, name: tk.name, phone: tk.phone, hp: "" };
+}
 $("#next").addEventListener("click", async () => {
   if (st.step === 1) track("InitiateCheckout", { value: total(), currency: "MAD" });
-  if (st.step < 5) return go(st.step + 1);
   const btn = $("#next");
+  // ⚡ akrab blassa / lyoum: mn l-service nichan l l-wa9t
+  if (st.step === 1 && st.fast){
+    const f = st.fast; st.barber = ANY; st.date = f.date; st.start = null;
+    if (f.m == null){ st.fast = null; st.maxStep = 4; return go(4); }
+    btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${t("loading")}`;
+    let ok = false; try { ok = await slotFree(f.date, f.m, false); } catch(e){}
+    if (ok){ st.start = f.m; st.maxStep = 5; return go(5); }
+    st.fast = null; st.maxStep = 4; toastMsg(t("fastMiss")); return go(4);
+  }
+  if (st.step < 5) return go(st.step + 1);
   btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${t("saving")}`;
   const name = $("#name").value.trim(), phone = $("#phone").value.trim();
-  const payload = { date: st.date, start: st.start, dur: duration(), candidates: candidates().filter(c => worksAt(c, st.date, st.start, duration())),
-    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: finalTotal(), discount: promoAmount() + loyalAmount(), lang, name, phone, hp: $("#hp").value };
+  const payload = bookPayload(name, phone);
+  const rs = st.resched;
   try {
+    if (rs){
+      // beddel l-wa9t: nt2akdo l-blassa khawya, nlghiw l-9dima (1 réservation l kol numéro), 3ad nsjjlo l-jdida
+      if (!(await slotFree(st.date, st.start, true))){ $("#formErr").textContent = t("errTaken"); st.start = null; setTimeout(() => go(4), 1400); update(); return; }
+      const c = await cancelBooking(rs.tk.id, rs.tk.phone);
+      if (!c.ok && c.error !== "notfound"){ $("#formErr").textContent = t("reschFail"); update(); return; }
+      forgetLast(rs.tk.id);
+    }
     const r = await book(payload);
     if (r.ok){
       store.set("ob_me", { name, phone });
       store.set("ob_last", { id: r.id, phone, date: st.date, start: st.start, dur: duration(), barber: r.barber, services: svcNames(), reviewed: false, statut: r.statut || "confirmé" });
       track("Schedule", { value: finalTotal(), currency: "MAD", content_name: payload.services });
       delete st.bookings[st.date];
-      st.result = { ...r, name, phone }; showTicket(); heroNext(); return;
+      st.result = { ...r, name, phone }; st.resched = null; st.fast = null; showTicket(); heroNext();
+      if (rs) setTimeout(() => toastMsg(t("reschOk")), 3200);
+      return;
+    }
+    if (rs){
+      // l-jdida ma tsjjlatch: nrj3o l-9dima
+      let back = null; try { back = await book(oldPayload(rs.tk)); } catch(e){}
+      if (back && back.ok){ const tk = { ...rs.tk, id: back.id, barber: back.barber || rs.tk.barber, statut: back.statut || rs.tk.statut };
+        st.resched = null; $("#formErr").textContent = t("reschFail"); setTimeout(() => showTicket(false, tk), 1600); update(); return; }
+      st.resched = null; $("#formErr").textContent = t("reschLost"); update(); return;
     }
     if (r.error === "taken"){
       $("#formErr").textContent = t("errTaken");
@@ -1483,6 +1552,65 @@ $("#next").addEventListener("click", async () => {
   } catch(e){ $("#formErr").textContent = t("errNet"); }
   update();
 });
+$("#fastBtn").addEventListener("click", () => { const n = st.next; if (n && n.type === "slot") quickBook({ date: n.date, m: n.m }); });
+
+/* ---------- beddel l-wa9t ---------- */
+function startResched(tk){
+  if (!tk) return;
+  resetFlow();
+  st.resched = { tk: { ...tk } };
+  st.services = (tk.items || []).map(i => i.id).filter(id => SERVICES.some(s => s.id === id));
+  st.barber = (TEAM || []).some(c => c.nom === tk.barber) ? tk.barber : ANY;
+  $("#name").value = tk.name || ""; $("#phone").value = tk.phone || "";
+  if (!st.services.length){ st.maxStep = 1; return go(1); }
+  st.maxStep = 3; go(3);
+}
+$("#reschBtn").addEventListener("click", () => startResched(TK));
+
+/* ---------- nefs l-merra ---------- */
+function startAgain(tk){
+  resetFlow();
+  st.services = (tk.items || []).map(i => i.id).filter(id => SERVICES.some(s => s.id === id));
+  if (!st.services.length) return go(1);
+  st.barber = (TEAM || []).some(c => c.nom === tk.barber) ? tk.barber : ANY;
+  st.maxStep = 3; go(3);
+}
+
+/* ---------- zid l-site l téléphone ---------- */
+let instEvt = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); instEvt = e; if (st.step === 6) renderInstall(); });
+window.addEventListener("appinstalled", () => { store.set("ob_inst", 1); $("#instBox").innerHTML = ""; });
+const isStandalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+function renderInstall(){
+  const box = $("#instBox"); if (!box) return;
+  if (isStandalone() || store.get("ob_inst", 0)){ box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="inst"><img src="icons/icon-192.png" alt=""><div><b>${esc(t("instT", { salon: CONFIG.salon }))}</b>
+    <p id="instP">${esc(t("instS"))}</p><div class="row"><button type="button" class="yes" id="instYes">📲 ${esc(t("instB"))}</button><button type="button" class="no" id="instNo">${esc(t("instNo"))}</button></div></div></div>`;
+  $("#instNo").onclick = () => { store.set("ob_inst", 1); box.innerHTML = ""; };
+  $("#instYes").onclick = async () => {
+    if (instEvt){ instEvt.prompt(); try { const c = await instEvt.userChoice; if (c && c.outcome === "accepted"){ store.set("ob_inst", 1); box.innerHTML = ""; } } catch(e){} instEvt = null; return; }
+    const p = $("#instP"); p.className = "hint"; p.textContent = IS_IOS ? t("instIos") : t("instAnd");
+  };
+}
+
+/* ---------- QR f s-salon: ?lyoum ---------- */
+async function renderLyoum(){
+  const box = $("#lyBox"); box.hidden = false;
+  const date = todayIso();
+  box.innerHTML = `<div class="ly"><h3>${esc(t("lyT"))}</h3><p>${esc(t("lyLoad"))}</p></div>`;
+  if (!hoursFor(new Date())){ box.innerHTML = `<div class="ly"><h3>${esc(t("lyT"))}</h3><p>${esc(t("lyClosed"))}</p><button type="button" class="cta block-btn" id="lyGo">${esc(t("cta"))}</button></div>`; $("#lyGo").onclick = () => { resetFlow(); go(1); }; return; }
+  try {
+    const list = await fetchDay(date);
+    const free = slotsFor(date, list, CONFIG.creneau, workers(date)).filter(x => x.free).slice(0, 8);
+    if (free.length){
+      box.innerHTML = `<div class="ly"><h3>${esc(t("lyT"))}</h3><p>${esc(t("lyS"))}</p><div class="times" dir="ltr">${free.map(x => `<button type="button" data-lm="${x.m}">${hhmm(x.m)}</button>`).join("")}</div></div>`;
+      box.querySelectorAll("[data-lm]").forEach(b => b.onclick = () => quickBook({ date, m: +b.dataset.lm }));
+    } else {
+      box.innerHTML = `<div class="ly"><h3>${esc(t("lyT"))}</h3><p>${esc(t("lyFull"))}</p><button type="button" class="cta block-btn" id="lyWaitB">${esc(t("lyWait"))}</button></div>`;
+      $("#lyWaitB").onclick = () => quickBook({ date, m: null });
+    }
+  } catch(e){ box.hidden = true; }
+}
 
 /* ---------- 6. ticket ---------- */
 function icsData(tk){
@@ -1555,6 +1683,8 @@ function renderTicket(tk){
   $("#tkCopy").onclick = () => { try { navigator.clipboard.writeText("#" + tk.id); } catch(e){} toastMsg(t("tkCopied")); };
   $("#tkTips").innerHTML = sx === "x" ? "" : `<b>💡 ${t("tkTipsT")}</b><ul>${[t("tkTip1"), t("tkTip2"), t("tkTip3")].map((x, i) => `<li><em>${i + 1}</em><span>${esc(x)}</span></li>`).join("")}</ul>`;
   $("#tkTools").hidden = sx === "x";
+  $("#reschBtn").hidden = sx === "x" || String(tk.statut || "").startsWith("annul");
+  renderInstall();
   $("#h6t").textContent = sx === "p" ? t("doneHPending") : sx === "x" ? t("stRefused") : t("doneH");
   $("#doneSub").textContent = sx === "p" ? t("pendingNote") : sx === "x" ? t("tkRefusedToast") : "";
 }
@@ -1722,7 +1852,7 @@ function showTicket(stay, snap){
   prnRun(fresh);
   startTicketLive();
 }
-function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1, loyal:null }); }
+function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1, loyal:null, fast:null, resched:null }); }
 $("#again").addEventListener("click", () => { resetFlow(); go(1); });
 
 /* ---------- lghi ---------- */
@@ -1789,7 +1919,8 @@ function renderHomeCards(){
       <div class="v">${esc(relDay(l.date))} ${num(hhmm(l.start))} · ${esc(l.barber)}</div>
       <div class="s">${esc(l.services)} · ${num("#" + esc(l.id))}</div>
       <div id="homeStat">${statPill(l.statut)}</div>
-      <div class="acts2">${l.tk ? `<button class="btn ghost" type="button" id="homeTicket">🎟️ ${t("tkView")}</button>` : ""}<button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+      <div class="acts2">${l.tk ? `<button class="btn ghost" type="button" id="homeTicket">🎟️ ${t("tkView")}</button><button class="btn ghost" type="button" id="homeResch">🕒 ${t("reschB")}</button>` : ""}<button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+    if (l.tk && $("#homeResch")) $("#homeResch").onclick = () => { const s = store.get("ob_last", null); if (s && s.tk) startResched({ ...s.tk, statut: s.statut || s.tk.statut }); };
     if (l.tk && $("#homeTicket")) $("#homeTicket").onclick = () => { const s = store.get("ob_last", null); if (s && s.tk){ s.tk.statut = s.statut || s.tk.statut; showTicket(false, s.tk); } };
     refreshStatus(l);
     $("#homeCancel").onclick = async e => {
@@ -1799,11 +1930,17 @@ function renderHomeCards(){
         if (r.ok){ forgetLast(l.id); btn.remove(); st.bookings = {}; heroNext(); } else btn.disabled = false;
       } catch(err){ $("#homeMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
     };
-  } else if (CONFIG.avisGoogle && !l.reviewed){
-    box.innerHTML = `<div class="card"><div class="v">${t("reviewT")}</div><div class="s">${esc(l.services)} · ${esc(l.barber)}</div>
+  } else {
+    const again = l.tk && (l.tk.items || []).length ? `<div class="card again-c"><div class="k">${esc(t("againT"))}</div>
+      <div class="v">✂️ ${esc(l.services)}</div><div class="s">💈 ${esc(l.barber)}</div>
+      <div class="acts2"><button class="btn" type="button" id="againBtn" style="background:var(--or);color:#fff">🔁 ${esc(t("againB"))}</button></div></div>` : "";
+    let rev = "";
+    if (CONFIG.avisGoogle && !l.reviewed) rev = `<div class="card"><div class="v">${t("reviewT")}</div><div class="s">${esc(l.services)} · ${esc(l.barber)}</div>
       <div class="acts2"><a class="btn ghost" id="reviewBtn" href="${esc(CONFIG.avisGoogle)}" target="_blank" rel="noopener">⭐ ${t("reviewB")}</a></div></div>`;
-    $("#reviewBtn").onclick = () => { l.reviewed = true; store.set("ob_last", l); setTimeout(renderHomeCards, 500); };
-  } else box.innerHTML = "";
+    box.innerHTML = again + rev;
+    if ($("#againBtn")) $("#againBtn").onclick = () => startAgain(l.tk);
+    if ($("#reviewBtn")) $("#reviewBtn").onclick = () => { l.reviewed = true; store.set("ob_last", l); setTimeout(renderHomeCards, 500); };
+  }
 }
 function renderGallery(){
   if (!$("#galBlock")) return;
@@ -1831,6 +1968,7 @@ renderStatic(); renderGallery(); renderTeamStrip(); heroBg();
 try { history.replaceState({ s:0 }, ""); } catch(e){}
 show(0, { noFocus:true });
 heroNext();
+if (/[?&](lyoum|salon)\b/.test(location.search)) renderLyoum();
 loadConfig();
 })();
 </script>
