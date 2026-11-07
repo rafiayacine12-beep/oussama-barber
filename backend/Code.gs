@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v2
+ * BACKEND — Oussama Barber (Google Apps Script) · v3
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -18,6 +18,10 @@ const NOTIFY_EMAIL = '';                  // khawi = email dyal compte Google li
 const TELEGRAM_TOKEN = '';                // optionnel: token dyal bot Telegram (@BotFather)
 const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal Oussama
 const SALON = 'Oussama Barber';
+// Équipe par défaut (mra lowla). Mn b3d kolchi katbeddlo men page admin → onglet "Équipe".
+const DEFAULT_TEAM = ['Oussama', 'Yassine', 'Aymane'];
+const DEFAULT_HOURS = ['11:00', '21:00'];
+const DAYKEYS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
 const SITE_URL = 'https://oussama-barber.vercel.app';
 
 const SHEETS = {
@@ -85,6 +89,45 @@ function busyFor_(date) {
 }
 function overlaps_(l, b, s, d) { return l.some(x => (x.barber === '*' || x.barber === b) && s < x.start + x.dur && x.start < s + d); }
 
+/* ---------------- config (équipe + galerie) ---------------- */
+function config_() {
+  const raw = PropertiesService.getScriptProperties().getProperty('config');
+  let c = null; try { c = raw ? JSON.parse(raw) : null; } catch (e) {}
+  if (!c) c = { coiffeurs: DEFAULT_TEAM.map((n, i) => ({ id: 'c' + (i + 1), nom: n, actif: true, photo: '', de: DEFAULT_HOURS[0], a: DEFAULT_HOURS[1], repos: [] })), galerie: [] };
+  c.coiffeurs = c.coiffeurs || []; c.galerie = c.galerie || [];
+  return c;
+}
+function saveConfig_(c) { PropertiesService.getScriptProperties().setProperty('config', JSON.stringify(c)); }
+function publicConfig_() {
+  const c = config_();
+  return { ok: true, coiffeurs: c.coiffeurs.filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, photo: x.photo || '', de: x.de, a: x.a, repos: x.repos || [] })),
+    galerie: c.galerie.map(g => g.url) };
+}
+function worksAt_(name, date, start, dur) {
+  const c = config_().coiffeurs.find(x => x.nom === name);
+  if (!c) return true;                                   // coiffeur ma kaynch f config → ma nmn3ouch
+  if (!c.actif) return false;
+  const p = date.split('-').map(Number), day = DAYKEYS[new Date(p[0], p[1] - 1, p[2]).getDay()];
+  if ((c.repos || []).indexOf(day) >= 0) return false;
+  return start >= toMin_(c.de || DEFAULT_HOURS[0]) && start + dur <= toMin_(c.a || DEFAULT_HOURS[1]);
+}
+function photosFolder_() {
+  const props = PropertiesService.getScriptProperties(), id = props.getProperty('folder');
+  if (id) { try { return DriveApp.getFolderById(id); } catch (e) {} }
+  const f = DriveApp.createFolder(SALON + ' — Photos du site');
+  props.setProperty('folder', f.getId());
+  return f;
+}
+function imgUrl_(id) { return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1200'; }
+function upload_(b) {
+  const data = String(b.data || ''), mime = String(b.mime || 'image/jpeg');
+  if (!/^image\/(jpeg|png|webp)$/.test(mime) || !data || data.length > 8 * 1024 * 1024) return null;
+  const blob = Utilities.newBlob(Utilities.base64Decode(data), mime, (b.name || 'photo') + '.' + mime.split('/')[1]);
+  const file = photosFolder_().createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { id: file.getId(), url: imgUrl_(file.getId()) };
+}
+
 /* ---------------- notifications ---------------- */
 function notify_(subject, lines) {
   const body = lines.join('\n');
@@ -106,6 +149,7 @@ function notify_(subject, lines) {
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'loyalty') return json_(loyalty_(p.phone));
+  if (p.action === 'config') return json_(publicConfig_());
   if (!isDate_(p.date)) return json_({ ok: false, error: 'date' });
   return json_({ ok: true, bookings: busyFor_(p.date) });
 }
@@ -140,7 +184,7 @@ function book_(b) {
     String(b.name || '').trim() && phone_(b.phone).length >= 9 && Array.isArray(b.candidates) && b.candidates.length;
   if (!valid) return { ok: false, error: 'invalid' };
   const busy = busyFor_(b.date);
-  const barber = b.candidates.find(c => !overlaps_(busy, String(c), b.start, b.dur));
+  const barber = b.candidates.find(c => worksAt_(String(c), b.date, b.start, b.dur) && !overlaps_(busy, String(c), b.start, b.dur));
   if (!barber) return { ok: false, error: 'taken' };
   const id = id_(), hh = hh_(b.start);
   sh_('Reservations').appendRow([txt_(b.date), txt_(hh), b.start, b.dur, String(barber), String(b.services || '').slice(0, 300),
@@ -247,6 +291,44 @@ function admin_(b) {
         clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
         services: svc, barbers: brb, days: days } };
     }
+    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie }; }
+    case 'saveteam': {
+      if (!Array.isArray(b.coiffeurs)) return { ok: false, error: 'team' };
+      const hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
+      const team = b.coiffeurs.slice(0, 20).map((x, i) => ({
+        id: String(x.id || ('c' + Date.now() + i)).slice(0, 40), nom: String(x.nom || '').trim().slice(0, 40),
+        actif: x.actif !== false, photo: String(x.photo || '').slice(0, 300),
+        de: hm(x.de) ? x.de : DEFAULT_HOURS[0], a: hm(x.a) ? x.a : DEFAULT_HOURS[1],
+        repos: (Array.isArray(x.repos) ? x.repos : []).filter(d => DAYKEYS.indexOf(d) >= 0)
+      })).filter(x => x.nom);
+      if (team.some(x => toMin_(x.a) <= toMin_(x.de))) return { ok: false, error: 'hours' };
+      const names = team.map(x => x.nom.toLowerCase());
+      if (new Set(names).size !== names.length) return { ok: false, error: 'dup' };
+      const c = config_(); c.coiffeurs = team; saveConfig_(c);
+      return { ok: true, coiffeurs: team };
+    }
+    case 'upload': {
+      const r = upload_(b);
+      return r ? { ok: true, id: r.id, url: r.url } : { ok: false, error: 'image' };
+    }
+    case 'addphoto': {
+      const r = upload_(b); if (!r) return { ok: false, error: 'image' };
+      const c = config_(); c.galerie.unshift({ id: r.id, url: r.url }); c.galerie = c.galerie.slice(0, 60); saveConfig_(c);
+      return { ok: true, galerie: c.galerie };
+    }
+    case 'delphoto': {
+      const c = config_(), g = c.galerie.find(x => x.id === String(b.id));
+      if (!g) return { ok: false, error: 'notfound' };
+      c.galerie = c.galerie.filter(x => x.id !== g.id); saveConfig_(c);
+      try { DriveApp.getFileById(g.id).setTrashed(true); } catch (e) {}
+      return { ok: true, galerie: c.galerie };
+    }
+    case 'movephoto': {
+      const c = config_(), i = c.galerie.findIndex(x => x.id === String(b.id)), j = i + (b.dir === 'up' ? -1 : 1);
+      if (i < 0 || j < 0 || j >= c.galerie.length) return { ok: true, galerie: c.galerie };
+      const t = c.galerie[i]; c.galerie[i] = c.galerie[j]; c.galerie[j] = t; saveConfig_(c);
+      return { ok: true, galerie: c.galerie };
+    }
     default: return { ok: false, error: 'op' };
   }
 }
@@ -255,4 +337,6 @@ function admin_(b) {
 function setup() {
   Object.keys(SHEETS).forEach(sh_);
   MailApp.getRemainingDailyQuota();
+  photosFolder_();
+  if (!PropertiesService.getScriptProperties().getProperty('config')) saveConfig_(config_());
 }
