@@ -63,9 +63,10 @@ def build_index():
 def build_admin():
     s = open(os.path.join(ROOT, "admin.html"), encoding="utf-8").read()
     s = common(s)
-    s = sub(s, '<title>Admin · Oussama Barber</title>', '<title>Admin · Votre Salon (démo)</title>')
-    s = sub(s, '<h1>Oussama<small>Barber · Admin</small></h1>', '<h1>Votre<small>Salon · Admin</small></h1>')
-    s = sub(s, '<span>Oussama<small>Admin</small></span>', '<span>Démo<small>Admin</small></span>')
+    s = sub(s, '<title>Admin · Barber Junior</title>', '<title>Admin · Votre Salon (démo)</title>')
+    s = sub(s, '<h1><span id="lgName">Barber Junior</span><small>Admin</small></h1>', '<h1><span id="lgName">Votre Salon</span><small>Admin</small></h1>')
+    s = sub(s, '<span>Barber<small>Admin</small></span>', '<span>Démo<small>Admin</small></span>')
+    s = s.replace('"Barber Junior"', '"Votre Salon"')
     s = sub(s, '<p>Dkhel l-code dyalek</p>', '<p>Dkhel l-code dyalek</p>\n    <div class="dm-hint">🎬 Démo · Code: <b>1234</b></div>')
     s = s.replace('"Oussama Barber"', '"Votre Salon"').replace("Admin · Oussama Barber", "Admin · Votre Salon")
     s = s.replace('"Tabriquet, Salé"', '"Votre adresse"').replace('placeholder="Salé"', 'placeholder="Votre ville"').replace('|| "Salé"', '|| "Votre ville"')

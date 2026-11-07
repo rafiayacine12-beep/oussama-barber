@@ -183,18 +183,43 @@
     return { ok: true, id };
   }
 
+  const BARBER_OPS = ['login', 'list', 'pending', 'status', 'reschedule', 'getconfig', 'stats', 'blocks', 'block', 'unblock', 'waitlist', 'waitdone', 'add', 'price'];
+  const safeTeam_ = l => l.map(x => { const o = clone(x); o.hasPin = !!o.pin; delete o.pin; return o; });
+  function who_(pin){
+    pin = String(pin || ''); if (!pin) return null;
+    if (pin === PIN) return { role: 'owner', barber: '' };
+    const c = config_().coiffeurs.find(x => x.actif && x.pin && String(x.pin) === pin);
+    return c ? { role: 'barber', barber: c.nom } : null;
+  }
   function admin_(b){
-    if (String(b.pin || '') !== PIN) return { ok: false, error: 'pin' };
+    const me = who_(b.pin);
+    if (!me) return { ok: false, error: 'pin' };
+    const isB = me.role === 'barber', mine = r => !isB || r.barber === me.barber;
+    if (isB && BARBER_OPS.indexOf(b.op) < 0) return { ok: false, error: 'forbidden' };
     const t = today_();
     switch (b.op){
-      case 'login': return { ok: true, salon: config_().salon.nom || SALON };
+      case 'login': return { ok: true, salon: config_().salon.nom || SALON, role: me.role, barber: me.barber, v: 11 };
       case 'list': {
         const from = isDate_(b.from) ? b.from : t, to = isDate_(b.to) ? b.to : from;
-        return { ok: true, list: DB.res.filter(r => r.date >= from && r.date <= to).sort(byTime).map(row) };
+        return { ok: true, list: DB.res.filter(r => r.date >= from && r.date <= to && mine(r)).sort(byTime).map(row) };
+      }
+      case 'price': {
+        const r = DB.res.find(x => x.id === String(b.id)); if (!r || !mine(r)) return { ok: false, error: 'notfound' };
+        const prix = Math.round(Number(b.prix)); if (!(prix >= 0 && prix <= 100000)) return { ok: false, error: 'prix' };
+        r.prix = prix; save(); return { ok: true, prix };
+      }
+      case 'add': {
+        const barber = isB ? me.barber : String(b.barber || '').trim(), start = Number(b.start), dur = Math.round(Number(b.dur));
+        if (!isDate_(b.date) || !(start >= 0 && start < 1440) || !(dur > 0 && dur <= 480) || !barber) return { ok: false, error: 'invalid' };
+        if (!b.force && overlaps_(busyFor_(b.date), barber, start, dur)) return { ok: false, error: 'taken' };
+        const id = id_();
+        DB.res.push({ date: b.date, start, dur, barber, services: String(b.services || '').slice(0, 300), prix: Math.max(0, Math.round(Number(b.prix) || 0)),
+          nom: String(b.nom || '').trim().slice(0, 80) || 'Client', tel: String(b.tel || '').slice(0, 30), statut: ['confirmé', 'venu'].indexOf(b.statut) >= 0 ? b.statut : 'confirmé', id, remise: 0, langue: 'da' });
+        save(); return { ok: true, id };
       }
       case 'reschedule': {
         const r = DB.res.find(x => x.id === String(b.id));
-        if (!r) return { ok: false, error: 'notfound' };
+        if (!r || !mine(r)) return { ok: false, error: 'notfound' };
         if (cancelled_(r.statut)) return { ok: false, error: 'cancelled' };
         const start = Number(b.start);
         if (!isDate_(b.date) || !(start >= 0) || b.date < t) return { ok: false, error: 'invalid' };
@@ -205,7 +230,7 @@
         r.date = b.date; r.start = start; if (pending_(r.statut)) r.statut = 'confirmé'; save();
         return { ok: true, date: b.date, heure: hh_(start) };
       }
-      case 'pending': return { ok: true, list: DB.res.filter(r => r.date >= t && pending_(r.statut)).sort(byTime).map(row) };
+      case 'pending': return { ok: true, list: DB.res.filter(r => r.date >= t && pending_(r.statut) && mine(r)).sort(byTime).map(row) };
       case 'blocked': return { ok: true, list: DB.blocked.map(x => ({ tel: x.tel, raison: x.raison })) };
       case 'blockphone': {
         const ph = phone_(b.tel); if (ph.length < 9) return { ok: false, error: 'phone' };
@@ -220,20 +245,20 @@
       }
       case 'status': {
         if (['en attente', 'confirmé', 'venu', 'absent', 'annulé'].indexOf(b.statut) < 0) return { ok: false, error: 'statut' };
-        const r = DB.res.find(x => x.id === String(b.id)); if (!r) return { ok: false, error: 'notfound' };
+        const r = DB.res.find(x => x.id === String(b.id)); if (!r || !mine(r)) return { ok: false, error: 'notfound' };
         r.statut = b.statut; save(); return { ok: true };
       }
-      case 'blocks': return { ok: true, list: blocks_().filter(x => x.date >= t).sort((x, y) => (x.date + (x.de || '')).localeCompare(y.date + (y.de || '')))
+      case 'blocks': return { ok: true, list: blocks_().filter(x => x.date >= t && (!isB || x.barber === me.barber || x.barber === '*')).sort((x, y) => (x.date + (x.de || '')).localeCompare(y.date + (y.de || '')))
         .map(x => ({ id: x.id, date: x.date, de: x.de || '', a: x.a || '', coiffeur: x.barber === '*' ? 'tous' : x.barber, raison: x.raison })) };
       case 'block': {
         if (!isDate_(b.date)) return { ok: false, error: 'date' };
         const de = hm_(b.de), a = hm_(b.a);
         if ((de && !a) || (!de && a) || (de && a && toMin_(a) <= toMin_(de))) return { ok: false, error: 'time' };
-        const id = id_(); DB.blocks.push({ date: b.date, de, a, coiffeur: String(b.coiffeur || 'tous'), raison: String(b.raison || '').slice(0, 120), id }); save();
+        const id = id_(); DB.blocks.push({ date: b.date, de, a, coiffeur: isB ? me.barber : String(b.coiffeur || 'tous'), raison: String(b.raison || '').slice(0, 120), id }); save();
         return { ok: true, id };
       }
       case 'unblock': {
-        const i = DB.blocks.findIndex(k => k.id === String(b.id)); if (i < 0) return { ok: false, error: 'notfound' };
+        const i = DB.blocks.findIndex(k => k.id === String(b.id) && (!isB || k.coiffeur === me.barber)); if (i < 0) return { ok: false, error: 'notfound' };
         DB.blocks.splice(i, 1); save(); return { ok: true };
       }
       case 'waitlist': return { ok: true, list: DB.wait.filter(w => w.date >= t).sort((x, y) => x.date.localeCompare(y.date)).map(w => clone(w)) };
@@ -243,12 +268,20 @@
       }
       case 'stats': {
         const from = isDate_(b.from) ? b.from : t, to = isDate_(b.to) ? b.to : t;
-        const all = DB.res.filter(r => r.date >= from && r.date <= to), live = all.filter(r => !cancelled_(r.statut));
-        const done = live.filter(r => !absent_(r.statut) && !pending_(r.statut)), svc = {}, brb = {}, days = {};
-        done.forEach(r => { r.services.split(' + ').forEach(s => svc[s] = (svc[s] || 0) + 1); brb[r.barber] = (brb[r.barber] || 0) + 1; days[r.date] = (days[r.date] || 0) + r.prix; });
+        const every = DB.res.filter(mine), ok_ = r => !cancelled_(r.statut) && !absent_(r.statut) && !pending_(r.statut);
+        const all = every.filter(r => r.date >= from && r.date <= to), live = all.filter(r => !cancelled_(r.statut));
+        const done = live.filter(r => !absent_(r.statut) && !pending_(r.statut)), svc = {}, brb = {}, days = {}, team = {}, hours = {};
+        done.forEach(r => { r.services.split(' + ').forEach(s => svc[s] = (svc[s] || 0) + 1); brb[r.barber] = (brb[r.barber] || 0) + 1; days[r.date] = (days[r.date] || 0) + r.prix;
+          const h = Math.floor(r.start / 60); hours[h] = (hours[h] || 0) + 1; });
+        live.forEach(r => { const k = team[r.barber] = team[r.barber] || { n: 0, venu: 0, ca: 0, encaisse: 0, absent: 0 };
+          if (absent_(r.statut)) { k.absent++; return; } if (pending_(r.statut)) return; k.n++; k.ca += r.prix; if (r.statut === 'venu') { k.venu++; k.encaisse += r.prix; } });
+        const first = {}; every.filter(ok_).forEach(r => { const p = phone_(r.tel); if (p && (!first[p] || r.date < first[p])) first[p] = r.date; });
+        const phones = Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {}));
+        const prev = isDate_(b.prevFrom) && isDate_(b.prevTo) ? every.filter(r => r.date >= b.prevFrom && r.date <= b.prevTo && ok_(r)).reduce((a, r) => a + r.prix, 0) : null;
         return { ok: true, stats: { total: all.length, confirmed: live.filter(r => !pending_(r.statut)).length, cancelled: all.length - live.length,
           absent: live.filter(r => absent_(r.statut)).length, pending: live.filter(r => pending_(r.statut)).length, revenue: done.reduce((a, r) => a + r.prix, 0),
-          clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length, services: svc, barbers: brb, days } };
+          encaisse: done.filter(r => r.statut === 'venu').reduce((a, r) => a + r.prix, 0),
+          clients: phones.length, newClients: phones.filter(p => first[p] >= from && first[p] <= to).length, services: svc, barbers: brb, days, team, hours, prev, shop: isB ? null : 0 } };
       }
       case 'getnotif': { const n = DB.notif || {}; return { ok: true, phone: n.phone || '', hasKey: !!n.apikey, book: n.book !== false, cancel: n.cancel !== false, wait: n.wait !== false }; }
       case 'savenotif': case 'testnotif': {
@@ -259,7 +292,7 @@
         DB.notif = { phone: ph, apikey: key, book: b.book !== false, cancel: b.cancel !== false, wait: b.wait !== false }; save();
         return { ok: true, phone: ph, hasKey: true };
       }
-      case 'getconfig': { const c = config_(); return { ok: true, v: 9, coiffeurs: clone(c.coiffeurs), galerie: clone(c.galerie), services: clone(c.services), salon: clone(c.salon) }; }
+      case 'getconfig': { const c = config_(); return { ok: true, v: 11, role: me.role, barber: me.barber, coiffeurs: safeTeam_(c.coiffeurs), galerie: clone(c.galerie), services: clone(c.services), salon: clone(c.salon) }; }
       case 'savesalon': {
         const url = v => { v = String(v || '').trim().slice(0, 300); return /^https:\/\//.test(v) ? v : ''; };
         const str = (v, n) => String(v || '').trim().slice(0, n), hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
@@ -290,18 +323,22 @@
       case 'saveteam': {
         if (!Array.isArray(b.coiffeurs)) return { ok: false, error: 'team' };
         const hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
+        const oldPins = {}; config_().coiffeurs.forEach(x => { if (x.pin) oldPins[x.id] = String(x.pin); });
         const team = b.coiffeurs.slice(0, 20).map((x, i) => ({ id: String(x.id || ('c' + Date.now() + i)).slice(0, 40), nom: String(x.nom || '').trim().slice(0, 40),
+          pin: /^\d{4,8}$/.test(String(x.pin || '')) ? String(x.pin) : (x.clearPin ? '' : (oldPins[String(x.id)] || '')),
           actif: x.actif !== false, photo: String(x.photo || ''), de: hm(x.de) ? x.de : HOURS[0], a: hm(x.a) ? x.a : HOURS[1],
           repos: (Array.isArray(x.repos) ? x.repos : []).filter(d => DAYKEYS.indexOf(d) >= 0) })).filter(x => x.nom);
         if (team.some(x => toMin_(x.a) <= toMin_(x.de))) return { ok: false, error: 'hours' };
         const names = team.map(x => x.nom.toLowerCase());
         if (new Set(names).size !== names.length) return { ok: false, error: 'dup' };
+        const pins = team.map(x => x.pin).filter(Boolean);
+        if (new Set(pins).size !== pins.length || pins.indexOf(PIN) >= 0) return { ok: false, error: 'pindup' };
         const c = config_(), old = {}, ren = {}; let renamed = 0;
         c.coiffeurs.forEach(x => old[x.id] = x.nom);
         team.forEach(x => { if (old[x.id] && old[x.id] !== x.nom) ren[old[x.id]] = x.nom; });
         [DB.res, DB.wait].forEach(l => l.forEach(r => { if (ren.hasOwnProperty(r.barber)) { r.barber = ren[r.barber]; renamed++; } }));
         DB.blocks.forEach(k => { if (ren.hasOwnProperty(k.coiffeur)) { k.coiffeur = ren[k.coiffeur]; renamed++; } });
-        c.coiffeurs = team; save(); return { ok: true, coiffeurs: clone(team), renamed };
+        c.coiffeurs = team; save(); return { ok: true, coiffeurs: safeTeam_(team), renamed };
       }
       case 'upload': { const r = upload_(b); return r ? { ok: true, id: r.id, url: r.url } : { ok: false, error: 'image' }; }
       case 'addphoto': {

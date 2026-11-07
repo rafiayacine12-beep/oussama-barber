@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v10 (Boutique)
+ * BACKEND — Barber Junior (Google Apps Script) · v11 (comptes coiffeurs + caisse)
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente · Produits · Commandes
@@ -14,7 +14,8 @@
  *
  * ⚙️ RÉGLAGES — beddel hna
  */
-const ADMIN_PIN = 'CHANGE_MOI';          // ⚠️ code dyal l-admin: beddlo GHIR f Apps Script, ma t7ottouch hna (repo public)
+const ADMIN_PIN = 'CHANGE_MOI';          // ⚠️ code dyal mol s-salon: beddlo GHIR f Apps Script, ma t7ottouch hna (repo public)
+// (Codes dyal les coiffeurs kaytsjjlo men l-admin → Salon → L-équipe)
 const NOTIFY_EMAIL = '';                  // khawi = email dyal compte Google li dar déploiement
 const TELEGRAM_TOKEN = '';                // optionnel: token dyal bot Telegram (@BotFather)
 const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal Oussama
@@ -375,24 +376,39 @@ function waitlist_(b) {
 }
 
 /* ---------------- ADMIN ---------------- */
+/* Chkoun dkhel: mol s-salon (ADMIN_PIN) wla coiffeur (code dyalo) */
+function who_(pin) {
+  pin = String(pin || '');
+  if (!pin) return null;
+  if (pin === ADMIN_PIN) return { role: 'owner', barber: '' };
+  const c = config_().coiffeurs.find(x => x.actif && x.pin && String(x.pin) === pin);
+  return c ? { role: 'barber', barber: c.nom } : null;
+}
+// Chno y9der ydir l-coiffeur (ghir l-khdma dyalo)
+const BARBER_OPS = ['login', 'list', 'pending', 'status', 'reschedule', 'getconfig', 'stats', 'blocks', 'block', 'unblock', 'waitlist', 'waitdone', 'add', 'price'];
+function safeTeam_(list) { return list.map(x => { const o = Object.assign({}, x); o.hasPin = !!o.pin; delete o.pin; return o; }); }
+function rowOut_(r) { return { id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue }; }
+
 function admin_(b) {
   const cache = CacheService.getScriptCache(), fails = Number(cache.get('pinfails') || 0);
   if (fails >= 8) return { ok: false, error: 'locked' };
-  if (String(b.pin || '') !== ADMIN_PIN) { cache.put('pinfails', String(fails + 1), 900); return { ok: false, error: 'pin' }; }
+  const me = who_(b.pin);
+  if (!me) { cache.put('pinfails', String(fails + 1), 900); return { ok: false, error: 'pin' }; }
   cache.remove('pinfails');
+  const isB = me.role === 'barber', mine = r => !isB || r.barber === me.barber;
+  if (isB && BARBER_OPS.indexOf(b.op) < 0) return { ok: false, error: 'forbidden' };
 
   switch (b.op) {
-    case 'login': return { ok: true, salon: SALON };
+    case 'login': return { ok: true, salon: config_().salon.nom || SALON, role: me.role, barber: me.barber, v: 11 };
     case 'list': {
       const from = isDate_(b.from) ? b.from : today_(), to = isDate_(b.to) ? b.to : from;
-      const list = reservations_().filter(r => r.date >= from && r.date <= to)
-        .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start)))
-        .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue }));
+      const list = reservations_().filter(r => r.date >= from && r.date <= to && mine(r))
+        .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start))).map(rowOut_);
       return { ok: true, list: list };
     }
     case 'reschedule': {
       const r = reservations_().find(x => x.id === String(b.id));
-      if (!r) return { ok: false, error: 'notfound' };
+      if (!r || !mine(r)) return { ok: false, error: 'notfound' };
       if (cancelled_(r.statut)) return { ok: false, error: 'cancelled' };
       const start = Number(b.start);
       if (!isDate_(b.date) || !(start >= 0) || b.date < today_()) return { ok: false, error: 'invalid' };
@@ -407,9 +423,8 @@ function admin_(b) {
     }
     case 'pending': {
       const t = today_();
-      return { ok: true, list: reservations_().filter(r => r.date >= t && pending_(r.statut))
-        .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start)))
-        .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue })) };
+      return { ok: true, list: reservations_().filter(r => r.date >= t && pending_(r.statut) && mine(r))
+        .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start))).map(rowOut_) };
     }
     case 'blocked': return { ok: true, list: blockedPhones_().map(x => ({ tel: x.tel, raison: x.raison })) };
     case 'blockphone': {
@@ -429,13 +444,32 @@ function admin_(b) {
       const ok = ['en attente', 'confirmé', 'venu', 'absent', 'annulé'];
       if (ok.indexOf(b.statut) < 0) return { ok: false, error: 'statut' };
       const r = reservations_().find(x => x.id === String(b.id));
-      if (!r) return { ok: false, error: 'notfound' };
+      if (!r || !mine(r)) return { ok: false, error: 'notfound' };
       sh_('Reservations').getRange(r.row, 10).setValue(b.statut);
       return { ok: true };
     }
+    case 'price': {   // l-flous li khelless l-client b-sa7 (ila tbeddel)
+      const r = reservations_().find(x => x.id === String(b.id));
+      if (!r || !mine(r)) return { ok: false, error: 'notfound' };
+      const prix = Math.round(Number(b.prix));
+      if (!(prix >= 0 && prix <= 100000)) return { ok: false, error: 'prix' };
+      sh_('Reservations').getRange(r.row, 7).setValue(prix);
+      return { ok: true, prix: prix };
+    }
+    case 'add': {     // rendez-vous men l-admin (client f s-salon, telephone…)
+      const barber = isB ? me.barber : String(b.barber || '').trim();
+      const start = Number(b.start), dur = Math.round(Number(b.dur));
+      const name = String(b.nom || '').trim().slice(0, 80) || 'Client';
+      if (!isDate_(b.date) || !(start >= 0 && start < 24 * 60) || !(dur > 0 && dur <= 480) || !barber) return { ok: false, error: 'invalid' };
+      if (!b.force && overlaps_(busyFor_(b.date), barber, start, dur)) return { ok: false, error: 'taken' };
+      const statut = ['confirmé', 'venu'].indexOf(b.statut) >= 0 ? b.statut : 'confirmé', id = id_();
+      sh_('Reservations').appendRow([txt_(b.date), txt_(hh_(start)), start, dur, barber, String(b.services || '').slice(0, 300),
+        Math.max(0, Math.round(Number(b.prix) || 0)), name, txt_(String(b.tel || '').slice(0, 30)), statut, new Date(), id, 0, 'da']);
+      return { ok: true, id: id };
+    }
     case 'blocks': {
       const t = today_();
-      return { ok: true, list: blocks_().filter(x => x.date >= t).sort((x, y) => (x.date + x.de).localeCompare(y.date + y.de))
+      return { ok: true, list: blocks_().filter(x => x.date >= t && (!isB || x.barber === me.barber || x.barber === '*')).sort((x, y) => (x.date + x.de).localeCompare(y.date + y.de))
         .map(x => ({ id: x.id || ('row' + x.row), date: x.date, de: x.de, a: x.a, coiffeur: x.barber === '*' ? 'tous' : x.barber, raison: x.raison })) };
     }
     case 'block': {
@@ -443,12 +477,12 @@ function admin_(b) {
       const de = hm_(b.de || ''), a = hm_(b.a || '');
       if ((de && !a) || (!de && a) || (de && a && toMin_(a) <= toMin_(de))) return { ok: false, error: 'time' };
       const id = id_();
-      sh_('Blocages').appendRow([txt_(b.date), de ? txt_(de) : '', a ? txt_(a) : '', String(b.coiffeur || 'tous'), String(b.raison || '').slice(0, 120), id, new Date()]);
+      sh_('Blocages').appendRow([txt_(b.date), de ? txt_(de) : '', a ? txt_(a) : '', isB ? me.barber : String(b.coiffeur || 'tous'), String(b.raison || '').slice(0, 120), id, new Date()]);
       return { ok: true, id: id };
     }
     case 'unblock': {
       const x = blocks_().find(k => k.id === String(b.id) || ('row' + k.row) === String(b.id));
-      if (!x) return { ok: false, error: 'notfound' };
+      if (!x || (isB && x.barber !== me.barber)) return { ok: false, error: 'notfound' };
       sh_('Blocages').deleteRow(x.row);
       return { ok: true };
     }
@@ -466,20 +500,40 @@ function admin_(b) {
     }
     case 'stats': {
       const from = isDate_(b.from) ? b.from : today_(), to = isDate_(b.to) ? b.to : today_();
-      const all = reservations_().filter(r => r.date >= from && r.date <= to);
+      const every = reservations_().filter(mine);
+      const all = every.filter(r => r.date >= from && r.date <= to);
       const live = all.filter(r => !cancelled_(r.statut));
       const done = live.filter(r => !absent_(r.statut) && !pending_(r.statut));
-      const svc = {}, brb = {}, days = {};
+      const svc = {}, brb = {}, days = {}, team = {}, hours = {};
       done.forEach(r => {
         r.services.split(' + ').forEach(s => svc[s] = (svc[s] || 0) + 1);
         brb[r.barber] = (brb[r.barber] || 0) + 1;
         days[r.date] = (days[r.date] || 0) + r.prix;
+        const h = Math.floor(r.start / 60); hours[h] = (hours[h] || 0) + 1;
       });
+      live.forEach(r => {
+        const k = team[r.barber] = team[r.barber] || { n: 0, venu: 0, ca: 0, encaisse: 0, absent: 0 };
+        if (absent_(r.statut)) { k.absent++; return; }
+        if (pending_(r.statut)) return;
+        k.n++; k.ca += r.prix;
+        if (String(r.statut).toLowerCase() === 'venu') { k.venu++; k.encaisse += r.prix; }
+      });
+      // clients jdad: awel merra jaw f had l-periode
+      const first = {};
+      every.filter(r => !cancelled_(r.statut) && !absent_(r.statut) && !pending_(r.statut)).forEach(r => { const p = phone_(r.tel); if (p && (!first[p] || r.date < first[p])) first[p] = r.date; });
+      const phones = Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {}));
+      // l-periode li 9bel (bach nqarno)
+      let prev = null;
+      if (isDate_(b.prevFrom) && isDate_(b.prevTo))
+        prev = every.filter(r => r.date >= b.prevFrom && r.date <= b.prevTo && !cancelled_(r.statut) && !absent_(r.statut) && !pending_(r.statut)).reduce((a, r) => a + r.prix, 0);
+      let shopCa = null;
+      if (!isB) { try { shopCa = orders_().filter(o => o.statut === 'livrée' && o.date.slice(0, 10) >= from && o.date.slice(0, 10) <= to).reduce((a, o) => a + o.total, 0); } catch (e) {} }
       return { ok: true, stats: {
         total: all.length, confirmed: live.filter(r => !pending_(r.statut)).length, cancelled: all.length - live.length,
         absent: live.filter(r => absent_(r.statut)).length, pending: live.filter(r => pending_(r.statut)).length, revenue: done.reduce((a, r) => a + r.prix, 0),
-        clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
-        services: svc, barbers: brb, days: days } };
+        encaisse: done.filter(r => String(r.statut).toLowerCase() === 'venu').reduce((a, r) => a + r.prix, 0),
+        clients: phones.length, newClients: phones.filter(p => first[p] >= from && first[p] <= to).length,
+        services: svc, barbers: brb, days: days, team: team, hours: hours, prev: prev, shop: shopCa } };
     }
     case 'getnotif': { const n = notif_(); return { ok: true, phone: n.phone || '', hasKey: !!n.apikey, book: n.book, cancel: n.cancel, wait: n.wait }; }
     case 'savenotif': case 'testnotif': {
@@ -497,7 +551,7 @@ function admin_(b) {
       PropertiesService.getScriptProperties().setProperty('notif', JSON.stringify(n));
       return { ok: true, phone: ph, hasKey: true };
     }
-    case 'getconfig': { const c = config_(); return { ok: true, v: 9, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services, salon: c.salon }; }
+    case 'getconfig': { const c = config_(); return { ok: true, v: 11, role: me.role, barber: me.barber, coiffeurs: safeTeam_(c.coiffeurs), galerie: isB ? [] : c.galerie, services: c.services, salon: c.salon }; }
     case 'savesalon': {
       const url = v => { v = String(v || '').trim().slice(0, 300); return /^https:\/\//.test(v) ? v : ''; };
       const ig = String(b.instagram || '').trim().replace(/^@/, '').slice(0, 300);
@@ -537,8 +591,10 @@ function admin_(b) {
     case 'saveteam': {
       if (!Array.isArray(b.coiffeurs)) return { ok: false, error: 'team' };
       const hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
+      const oldPins = {}; config_().coiffeurs.forEach(x => { if (x.pin) oldPins[x.id] = String(x.pin); });
       const team = b.coiffeurs.slice(0, 20).map((x, i) => ({
         id: String(x.id || ('c' + Date.now() + i)).slice(0, 40), nom: String(x.nom || '').trim().slice(0, 40),
+        pin: /^\d{4,8}$/.test(String(x.pin || '')) ? String(x.pin) : (x.clearPin ? '' : (oldPins[String(x.id)] || '')),
         actif: x.actif !== false, photo: String(x.photo || '').slice(0, 300),
         de: hm(x.de) ? x.de : DEFAULT_HOURS[0], a: hm(x.a) ? x.a : DEFAULT_HOURS[1],
         repos: (Array.isArray(x.repos) ? x.repos : []).filter(d => DAYKEYS.indexOf(d) >= 0)
@@ -546,6 +602,8 @@ function admin_(b) {
       if (team.some(x => toMin_(x.a) <= toMin_(x.de))) return { ok: false, error: 'hours' };
       const names = team.map(x => x.nom.toLowerCase());
       if (new Set(names).size !== names.length) return { ok: false, error: 'dup' };
+      const pins = team.map(x => x.pin).filter(Boolean);
+      if (new Set(pins).size !== pins.length || pins.indexOf(String(ADMIN_PIN)) >= 0) return { ok: false, error: 'pindup' };
       const c = config_(), old = {};
       c.coiffeurs.forEach(x => old[x.id] = x.nom);
       // smiya tbeddlat → beddelha ta f les rendez-vous, blocages w liste d'attente
@@ -563,7 +621,7 @@ function admin_(b) {
         });
       }
       c.coiffeurs = team; saveConfig_(c);
-      return { ok: true, coiffeurs: team, renamed: renamed };
+      return { ok: true, coiffeurs: safeTeam_(team), renamed: renamed };
     }
     case 'upload': {
       const r = upload_(b);

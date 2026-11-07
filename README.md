@@ -1,4 +1,4 @@
-# Oussama Barber — Réservation en ligne
+# Barber Junior — Réservation en ligne
 
 Site de réservation (une seule page) pour Oussama Barber, Tabriquet, Salé.
 

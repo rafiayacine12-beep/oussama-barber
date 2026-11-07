@@ -19,6 +19,19 @@ const ADMIN = {
   apiUrl: "https://demo.api/exec"
 };
 </script>
+<script>
+/* Lon w smiya dyal l-ma7al men l-cache: kaytbeddlo 9bel ma tban l-page (bla ma ntsennaw Google ~5s) */
+(() => { try {
+  const s = JSON.parse(localStorage.getItem("dm_admin_salon") || "null"); if (!s) return;
+  const c = s.couleur, st = document.documentElement.style;
+  if (/^#[0-9a-fA-F]{6}$/.test(c || "")){
+    const sh = (h, a) => { const n = parseInt(h.slice(1), 16); const f = v => Math.round(a < 0 ? v * (1 + a) : v + (255 - v) * a);
+      return "#" + [n >> 16, (n >> 8) & 255, n & 255].map(f).map(x => x.toString(16).padStart(2, "0")).join(""); };
+    st.setProperty("--or", c); st.setProperty("--or2", sh(c, -0.16)); st.setProperty("--orsoft", sh(c, 0.92)); st.setProperty("--orline", sh(c, 0.65));
+  }
+  if (s.nom) document.title = "Admin · " + s.nom;
+} catch(e){} })();
+</script>
 <style>
 :root{
   --bg:#FFFFFF; --s1:#F6F5F3; --s2:#EEECE8; --line:#E4E1DB; --ink:#17140F; --ink2:#3B362E; --mute:#716B62;
@@ -436,6 +449,213 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .steps a{color:var(--or2);font-weight:700}.steps code{background:#fff;border:1px dashed var(--orline);padding:2px 6px;border-radius:6px;font-size:12.5px;display:inline-block;margin-top:4px}
 .nchk{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:4px 0 8px}.nchk label{display:flex;align-items:center;gap:6px;font-weight:600}
 .nchk input{width:18px;height:18px;accent-color:var(--or)}
+
+/* ================= PRO v2 — design jdid ================= */
+:root{--bg2:#F5F5F3;--card:#fff;--bd:#EAE8E3;--sh:0 1px 2px rgba(17,17,17,.04),0 4px 14px rgba(17,17,17,.05)}
+body{background:var(--bg2)}
+.wrap{max-width:760px}
+header{background:rgba(245,245,243,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);position:sticky;top:0;z-index:20;border-bottom:1px solid transparent}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hdr-r{display:flex;gap:8px;align-items:center}
+.rolechip{font-size:12px;font-weight:800;padding:7px 11px;border-radius:999px;background:#fff;border:1px solid var(--bd);white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.is-barber .rolechip{background:var(--orsoft);border-color:var(--orline);color:var(--or2)}
+.iconbtn{border-color:var(--bd)}
+h2{font-size:30px;letter-spacing:.01em}
+.section-t{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:22px 2px 10px}
+.section-t.warn{color:var(--red)}
+.back{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--mute);font-size:14px;margin:8px 0 -4px;padding:6px 0}
+.lg-hint{font-size:12.5px;color:var(--mute);margin:-8px 0 14px}
+
+/* kpis */
+.kpis4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:620px){.kpis4{grid-template-columns:repeat(4,1fr)}}
+.kp{border:1px solid var(--bd);box-shadow:none;border-radius:18px;padding:14px}
+.kp .k4{background:#FEF3C7;color:#B45309}
+.kp.main{border-color:var(--ink)}
+.kp b{font-size:30px}
+
+/* quick actions */
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 16px}
+.quick button{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:12px;color:var(--ink2);transition:transform .08s}
+.quick button:active{transform:scale(.96)}
+.quick i{font-style:normal;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--orsoft);color:var(--or2);font-weight:900;font-size:17px}
+.quick button:first-child i{background:var(--or);color:#fff;font-size:22px}
+.closebar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;border-radius:16px;padding:13px 14px;font-weight:700;font-size:14px;margin-bottom:14px;text-align:start}
+.closebar i{font-style:normal;font-weight:800;white-space:nowrap}
+.nextc{background:linear-gradient(135deg,var(--or),var(--or2));box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.nl small,.ns{color:rgba(255,255,255,.82)}
+.na button{color:var(--or2)}
+
+/* équipe lyoum */
+.tt{display:grid;gap:8px}
+@media(min-width:620px){.tt{grid-template-columns:1fr 1fr}}
+.ttc{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--bd);border-radius:16px;padding:12px 14px}
+.ttx{flex:1;min-width:0}.ttx b{display:block;font-size:15px}.ttx small{display:block;color:var(--mute);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttn{text-align:end}.ttn b{display:block;font-family:var(--display);font-size:24px;line-height:1}.ttn small{color:var(--ok);font-weight:700;font-size:12px}
+.ava{overflow:hidden}.ava img{width:100%;height:100%;object-fit:cover}
+
+/* planning */
+.ptitle{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vseg{display:flex;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:3px;margin-top:10px}
+.vseg button{padding:7px 12px;border-radius:9px;font-weight:700;font-size:13px;color:var(--mute)}
+.vseg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.bfilter{display:flex;gap:8px;overflow-x:auto;margin:-4px -16px 10px;padding:2px 16px;scrollbar-width:none}
+.bfilter:empty{display:none}
+.bfilter button{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid var(--bd);font-weight:700;font-size:13px}
+.bfilter button i{width:9px;height:9px;border-radius:50%}
+.bfilter button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pg{background:#fff;border:1px solid var(--bd);border-radius:18px;overflow:clip;position:relative}
+.pg.wide{overflow:auto hidden}
+.pg-head,.pg-body{display:grid;grid-template-columns:46px repeat(var(--cols),minmax(0,1fr))}
+.pg.wide .pg-head,.pg.wide .pg-body{grid-template-columns:46px repeat(var(--cols),minmax(104px,1fr));min-width:calc(46px + var(--cols) * 104px)}
+.pg-head{position:sticky;top:66px;z-index:4;border-radius:18px 18px 0 0;background:#fff;border-bottom:1px solid var(--bd)}
+.pg-ch{display:flex;align-items:center;gap:8px;padding:10px 8px;border-inline-start:1px solid var(--bd);min-width:0}
+.pg-ch div{min-width:0}.pg-ch b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-ch small{display:block;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:480px){.pg-ch{flex-direction:column;align-items:flex-start;gap:4px;padding:8px 6px}}
+.pg-body{position:relative}
+.pg-times{position:relative}
+.pg-times span{position:absolute;inset-inline:0;transform:translateY(-50%);text-align:center;font-size:10.5px;font-weight:700;color:var(--mute)}
+.pg-times span:first-child{transform:none}
+.pg-col{position:relative;border-inline-start:1px solid var(--bd);background-image:linear-gradient(to bottom,var(--bd) 1px,transparent 1px),linear-gradient(to bottom,#F4F3F0 1px,transparent 1px);background-size:100% calc(var(--slot) * 2),100% var(--slot);cursor:copy}
+.pg-col.off{background-color:#FAFAF8;cursor:not-allowed}
+.pg-offl{position:sticky;top:60px;text-align:center;font-size:12px;font-weight:700;color:var(--mute);padding-top:12px}
+.pg-out{position:absolute;inset-inline:0;background:repeating-linear-gradient(-45deg,rgba(0,0,0,.025) 0 6px,transparent 6px 12px);pointer-events:none}
+.pg-blk{position:absolute;inset-inline:3px;border-radius:8px;background:repeating-linear-gradient(-45deg,#EFEDE9 0 6px,#F7F6F3 6px 12px);border:1px dashed #D6D2CB;color:var(--mute);font-size:11px;font-weight:700;padding:4px 6px;overflow:hidden;pointer-events:none}
+.ev{position:absolute;inset-inline:3px;border-radius:9px;padding:5px 7px 5px 9px;text-align:start;overflow:hidden;background:color-mix(in srgb,var(--bc) 13%,#fff);border:1px solid color-mix(in srgb,var(--bc) 30%,#fff);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.05);z-index:2;display:flex;flex-direction:column;gap:1px;transition:transform .08s}
+.ev::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--bc)}
+.ev:active{transform:scale(.98)}
+.ev b{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+.ev small{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
+.ev.tiny{flex-direction:row;align-items:center;padding-block:2px}.ev.tiny small{display:none}
+.ev.venu{background:#ECFDF3;border-color:#BBF0D0}.ev.venu::before{background:var(--ok)}
+.ev.pend{background:#FFF7ED;border:1.5px dashed #F59E0B}.ev.pend::before{background:#F59E0B}
+.ev.absent{background:#F5F5F4;border-color:#E7E5E4;opacity:.7}.ev.absent b{text-decoration:line-through}.ev.absent::before{background:#A8A29E}
+.evk{position:absolute;top:4px;inset-inline-end:5px;width:16px;height:16px;border-radius:50%;background:var(--ok);color:#fff;font-size:10px;font-style:normal;font-weight:900;display:grid;place-items:center}
+.evk.q{background:#F59E0B}.evk.x{background:#A8A29E}
+.pg-now{position:absolute;inset-inline:46px 0;height:0;border-top:2px solid var(--red);z-index:3;pointer-events:none}
+.pg-now::before{content:"";position:absolute;inset-inline-start:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--red)}
+.pg-now i{position:absolute;inset-inline-start:-46px;top:-9px;width:42px;text-align:center;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:var(--red);border-radius:6px;padding:1px 0}
+.fab{position:fixed;inset-inline-end:18px;bottom:calc(96px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;background:var(--or);color:#fff;font-size:30px;font-weight:400;box-shadow:0 10px 26px rgba(0,0,0,.22);z-index:15;display:grid;place-items:center}
+.fab:active{transform:scale(.94)}
+
+/* fiche */
+.dt{display:grid;gap:0;background:var(--s1);border-radius:14px;padding:4px 14px;margin-bottom:12px}
+.dt div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dt div:last-child{border-bottom:0}
+.dt span{color:var(--mute);font-weight:600}.dt b{text-align:end;display:flex;align-items:center;gap:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 9px;margin-inline-end:4px;vertical-align:1px}
+.dt-contact{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dt-contact a{text-align:center;padding:11px;border-radius:12px;background:var(--s1);font-weight:700;font-size:14px}
+.dt-contact a.wa{background:#E8F9EF;color:#128C4A}
+.dt-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.dt-acts .btn{margin:0}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.payamt{display:flex;align-items:center;gap:8px;background:var(--s1);border-radius:16px;padding:6px 16px}
+.payamt input{flex:1;border:0;background:none;font-family:var(--display);font-weight:900;font-size:44px;padding:4px 0;min-width:0;width:100%}
+.payamt input:focus{outline:none}
+.payamt span{font-weight:800;color:var(--mute)}
+.paychips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.paychips button{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:700;font-size:13px}
+
+/* zid rdv */
+.addf{display:grid;gap:12px}
+.addf input,.addf select{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;min-height:46px}
+.addf input:focus,.addf select:focus{outline:none;border-color:var(--or)}
+.addf .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addf .btn{margin:0}
+.bpick,.spick{display:flex;flex-wrap:wrap;gap:6px}
+.bpick button{display:flex;align-items:center;gap:7px;padding:6px 12px 6px 6px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:14px}
+.bpick button[aria-pressed=true],.spick button[aria-pressed=true]{border-color:var(--or);background:var(--orsoft);color:var(--or2)}
+.spick button{padding:8px 12px;border-radius:12px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:13.5px;text-align:start;line-height:1.2}
+.spick small{display:block;font-weight:600;font-size:11px;color:var(--mute)}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.chk input{width:20px;height:20px;min-height:0;accent-color:var(--or)}
+
+/* caisse */
+.cday{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cday .iconbtn{font-size:22px;font-weight:700}
+.cday .iconbtn:disabled{opacity:.35}
+.cdlab{flex:1;position:relative;text-align:center;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px;font-size:15px}
+.cdlab input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.cash-hero{background:var(--ink);color:#fff;border-radius:22px;padding:18px 18px 16px;margin-bottom:6px}
+.cash-hero small{color:#B9B3A9;font-weight:700;font-size:13px}
+.cash-hero b{display:block;font-family:var(--display);font-weight:900;font-size:52px;line-height:1.05}
+.cash-hero b span{font-size:20px}
+.cbar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin:10px 0 10px}
+.cbar i{display:block;height:100%;background:#34D399;border-radius:99px}
+.cmeta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:#D6D1C8;font-weight:600}
+.ctab{background:#fff;border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+.ctab>div{display:grid;grid-template-columns:30px 1fr auto;grid-template-areas:"a n s" "a m s";column-gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--bd)}
+.ctab>div:last-child{border-bottom:0}
+.ctab .ava{grid-area:a}.ctab>div>.ava,.ttab>div>.ava{color:#fff;font-size:12px;font-weight:800;text-align:center}.ctab b{grid-area:n;font-size:14.5px}.ctab span{grid-area:m;font-size:12px;color:var(--mute)}.ctab strong{grid-area:s;font-family:var(--display);font-size:20px}
+.ctab .tot{background:var(--s1);grid-template-areas:"n n s"}
+.clist{display:grid;gap:6px}
+.crow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px 12px;cursor:pointer}
+.crow.late{border-color:#FECACA;background:#FFFBFA}
+.crow .ch{font-family:var(--display);font-weight:800;font-size:18px;min-width:48px}
+.crow .cn{flex:1;min-width:0}.crow .cn b{display:block;font-size:14.5px}
+.crow .cn small{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camt{font-family:var(--display);font-weight:800;font-size:18px;white-space:nowrap;padding:6px 10px;border-radius:10px;background:#ECFDF3;color:var(--ok)}
+.camt i{font-style:normal;font-size:12px;opacity:.6}
+.camt.muted{background:none;color:var(--mute)}
+.cq{display:flex;gap:6px}
+.cq button{padding:8px 10px;border-radius:10px;background:var(--ok);color:#fff;font-weight:800;font-size:13px;white-space:nowrap}
+.cq button.x{background:var(--s2);color:var(--ink2)}
+
+/* stats */
+.kpi span em{font-style:normal;font-weight:800;font-size:12px;padding:1px 6px;border-radius:6px;margin-inline-start:4px}
+.kpi span em.up{background:rgba(52,211,153,.2);color:#059669}.kpi.main span em.up{color:#A7F3D0}
+.kpi span em.down{background:rgba(239,68,68,.15);color:#DC2626}.kpi.main span em.down{color:#FECACA}
+.kpi span small{opacity:.75}
+.ttab>div{display:grid;grid-template-columns:26px 1fr 54px 70px 40px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ttab>div:last-child{border-bottom:0}
+.ttab .th{grid-template-columns:1fr 54px 70px 40px;font-size:11px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;padding-top:0}
+.ttab .th span:first-child{padding-inline-start:0}
+.ttab span,.ttab strong{text-align:end}.ttab strong{font-weight:800}.ttab .warn{color:var(--red);font-weight:700}
+
+/* plus */
+.menu{display:grid;gap:10px;margin-top:10px}
+.menu>*{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--bd);border-radius:18px;padding:16px;text-align:start;color:inherit;text-decoration:none}
+.menu i{font-style:normal;width:44px;height:44px;border-radius:14px;background:var(--orsoft);color:var(--or2);display:grid;place-items:center;font-size:20px;flex:0 0 44px}
+.menu b{display:block;font-size:16px}.menu small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.pinbox{background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:12px;display:grid;gap:6px}
+.pinbox input{letter-spacing:.3em;font-weight:800}
+.pinbox .btn{justify-self:start;margin:0}
+
+/* bottom nav (telephone) */
+nav.tabs{background:rgba(255,255,255,.96);border:1px solid var(--bd);box-shadow:0 10px 30px rgba(17,17,17,.12)}
+nav.tabs button{color:#8A857C}
+nav.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.badge{box-shadow:0 0 0 2px #fff}
+.side-brand{display:none}
+.is-barber [data-owner]{display:none!important}
+body[data-tab=rdv] .toast{bottom:calc(166px + env(safe-area-inset-bottom))}
+
+/* desktop: sidebar */
+@media(min-width:960px){
+  body{padding-bottom:30px;padding-inline-start:236px}
+  nav.tabs{inset:0 auto 0 0;width:236px;max-width:none;border-radius:0;border:0;border-inline-end:1px solid #1f1d1a;background:#141311;box-shadow:none;padding:18px 12px;transform:none}
+  nav.tabs .wrap{flex-direction:column;align-items:stretch;gap:4px;height:100%;max-width:none;padding:0;display:flex}
+  nav.tabs button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:14.5px;padding:12px 14px;color:#A8A29A;border-radius:12px;position:relative}
+  nav.tabs button svg{width:20px;height:20px}
+  nav.tabs button[aria-selected=true]{background:var(--or);color:#fff}
+  nav.tabs button:hover:not([aria-selected=true]){background:#1f1d1a;color:#fff}
+  nav.tabs .badge{position:static;margin-inline-start:auto;box-shadow:none}
+  .side-brand{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--display);font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px 22px}
+  .side-brand i{width:8px;height:28px;border-radius:5px;background:repeating-linear-gradient(-45deg,var(--or) 0 5px,#fff 5px 10px,#555 10px 15px,#fff 15px 20px)}
+  header .brand{visibility:hidden}
+  .wrap{max-width:1100px;padding:0 28px}
+  .fab{bottom:28px;inset-inline-end:28px}
+  .toast,body[data-tab=rdv] .toast{bottom:30px}
+  .pg-head,.pg-body{grid-template-columns:56px repeat(var(--cols),minmax(150px,1fr))}
+  .pg-now{inset-inline-start:56px}.pg-now i{inset-inline-start:-54px}
+  #t-home{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-items:start}
+  #t-home[hidden]{display:none}
+  #t-home>.hello,#t-home>.kpis4,#t-home>.quick{grid-column:1/-1}
+  #t-home>#pendBox,#t-home>#closeBox,#t-home>#nextBox{grid-column:1}
+  #t-home>#teamToday,#t-home>#remBox{grid-column:2}
+  .modal .sheet{max-width:520px}
+}
 </style>
 </head>
 <body>
@@ -455,11 +675,12 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 <section class="login" id="login">
   <div class="lg-top">
     <div class="lg-pole" aria-hidden="true"></div>
-    <h1>Votre<small>Salon · Admin</small></h1>
+    <h1><span id="lgName">Votre Salon</span><small>Admin</small></h1>
   </div>
   <form id="loginForm" class="lg-body">
     <p>Dkhel l-code dyalek</p>
     <div class="dm-hint">🎬 Démo · Code: <b>1234</b></div>
+    <div class="lg-hint">Mol s-salon wla coiffeur — kol wa7ed b code dyalo</div>
     <div class="dots" id="pinDots" aria-hidden="true"></div>
     <input class="pin-hidden" id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" aria-label="Code">
     <div class="err" id="loginErr" role="alert"></div>
@@ -477,7 +698,8 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 <div id="app" hidden>
   <header><div class="wrap">
     <div class="brand"><i aria-hidden="true"></i><span>Démo<small>Admin</small></span></div>
-    <div style="display:flex;gap:8px">
+    <div class="hdr-r">
+      <span class="rolechip" id="roleChip" hidden></span>
       <a class="iconbtn" href="./" aria-label="Chouf l-site" title="Chouf l-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg></a>
       <button class="iconbtn" id="refresh" aria-label="Actualiser" title="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
       <button class="iconbtn" id="logout" aria-label="Khrej" title="Khrej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
@@ -485,28 +707,79 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
   </div></header>
 
   <main class="wrap">
-    <!-- RDV -->
-    <section id="t-rdv">
+    <!-- LYOUM (dashboard) -->
+    <section id="t-home">
       <div class="hello"><small id="todayLbl"></small><h2 id="helloT"></h2></div>
-      <div class="kpis3" id="daySum"></div>
+      <div class="kpis4" id="daySum"></div>
+      <div class="quick" id="quick">
+        <button type="button" data-q="add"><i>＋</i>Rendez-vous</button>
+        <button type="button" data-q="plan"><i>▦</i>Planning</button>
+        <button type="button" data-q="cash"><i>DH</i>Caisse</button>
+        <button type="button" data-q="block"><i>⦸</i>Sedd wa9t</button>
+      </div>
       <div id="nextBox"></div>
-      <div id="remBox"></div>
       <div class="pend" id="pendBox" hidden>
         <h3>Khasshom validation <i id="pendN"></i></h3>
         <div class="list" id="pendList"></div>
       </div>
-      <div class="strip" id="dayStrip"></div>
+      <div id="closeBox"></div>
+      <div id="remBox"></div>
       <button class="waitbar" id="waitBar" hidden type="button"><span>⏳ <b id="waitN"></b> f liste d'attente</span>Chouf</button>
-      <div class="dayhead2"><h3 id="dayTitle">Lyoum</h3><span id="dayCount"></span></div>
-      <div class="timeline" id="rdvList"></div>
+      <div id="teamToday"></div>
       <div id="waitSec" hidden>
         <div class="section-t">Liste d'attente</div>
         <div class="list" id="waitList"></div>
       </div>
     </section>
 
+    <!-- PLANNING -->
+    <section id="t-rdv" hidden>
+      <div class="ptitle"><h2>Planning</h2>
+        <div class="vseg" role="group" aria-label="Affichage">
+          <button type="button" data-view="plan" aria-pressed="true">▦ Planning</button>
+          <button type="button" data-view="list" aria-pressed="false">☰ Liste</button>
+        </div></div>
+      <div class="strip" id="dayStrip"></div>
+      <div class="bfilter" id="bFilter"></div>
+      <div class="dayhead2"><h3 id="dayTitle">Lyoum</h3><span id="dayCount"></span></div>
+      <div class="plan" id="plan"></div>
+      <div class="timeline" id="rdvList" hidden></div>
+      <button class="fab" type="button" id="fabAdd" aria-label="Zid rendez-vous">＋</button>
+    </section>
+
+    <!-- FLOUS: caisse + stats -->
+    <section id="t-money" hidden>
+      <h2>Flous</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-mseg="cash" aria-selected="true">💵 Caisse</button>
+        <button role="tab" data-mseg="stats" aria-selected="false">📈 Statistiques</button>
+      </div>
+      <div id="mCash">
+        <div class="cday"><button type="button" class="iconbtn" id="cPrev" aria-label="Nhar li fat">‹</button>
+          <label class="cdlab"><b id="cDayL">Lyoum</b><input type="date" id="cDay" aria-label="Khtar nhar"></label>
+          <button type="button" class="iconbtn" id="cNext" aria-label="Nhar li jay">›</button></div>
+        <div id="cashBox"></div>
+      </div>
+      <div id="mStats" hidden>
+        <div class="strip" id="periodStrip"></div>
+        <div id="statsBox"></div>
+      </div>
+    </section>
+
+    <!-- PLUS -->
+    <section id="t-more" hidden>
+      <h2>Plus</h2>
+      <div class="menu" id="moreMenu">
+        <button type="button" data-go="team"><i>✂️</i><span><b>Salon</b><small>Services, l-équipe, codes dyal coiffeurs, paramètres</small></span></button>
+        <button type="button" data-go="block"><i>⦸</i><span><b>Sedd l-wa9t</b><small>Pause, 3otla, numéros bloqués</small></span></button>
+        <button type="button" data-go="photos"><i>🖼️</i><span><b>Photos</b><small>Tsawer dyal l-khdma f l-site</small></span></button>
+        <a href="./"><i>↗</i><span><b>Chouf l-site</b><small>Kifach kayban l les clients</small></span></a>
+      </div>
+    </section>
+
     <!-- BLOCAGES -->
     <section id="t-block" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
       <h2>Sedd l-wa9t</h2>
       <p class="sub">Pause, nhar 3otla, l-3id, coiffeur ghayb… L-site kaysedd had l-wa9t direct.</p>
       <form class="form" id="blockForm">
@@ -527,6 +800,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
       <div class="section-t">Les blocages jayin</div>
       <div class="list" id="blockList"></div>
 
+      <div id="phonesSec">
       <h2 style="margin-top:30px">Numéros bloqués</h2>
       <p class="sub">Had les numéros ma y9derouch yréserviw. Numéro li ma ja 2 merrat kaytbloka b wa7du.</p>
       <form class="form" id="phoneForm">
@@ -538,10 +812,12 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
         <div class="err" id="pErr"></div>
       </form>
       <div class="list" id="phoneList"></div>
+      </div>
     </section>
 
     <!-- SALON: SERVICES + ÉQUIPE -->
     <section id="t-team" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
       <h2>Salon</h2>
       <div class="seg" role="tablist">
         <button role="tab" data-seg="svc" aria-selected="true">✂️ Services</button>
@@ -620,6 +896,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 
     <!-- PHOTOS -->
     <section id="t-photos" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
       <h2>Tsawer dyal l-khdma</h2>
       <p class="sub">Katban f l-accueil dyal l-site. Tsawer w9ofin (portrait) kaybanou a7ssan.</p>
       <label class="upl" for="galFile">
@@ -671,21 +948,15 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
       </div>
     </section>
 
-    <!-- STATS -->
-    <section id="t-stats" hidden>
-      <h2>Statistiques</h2>
-      <div class="strip" id="periodStrip"></div>
-      <div id="statsBox"></div>
-    </section>
   </main>
 
   <nav class="tabs" role="tablist"><div class="wrap">
-    <button role="tab" data-tab="rdv" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Rendez-vous<i class="badge" id="waitBadge" hidden></i></button>
-    <button role="tab" data-tab="block" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>Sedd</button>
-    <button role="tab" data-tab="team" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5c2.3.2 4 1.8 4.5 4.5"/></svg>Salon</button>
-    <button role="tab" data-tab="photos" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>Photos</button>
-    <button role="tab" data-tab="shop" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>Boutique<i class="badge" id="shopBadge" hidden></i></button>
-    <button role="tab" data-tab="stats" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
+    <div class="side-brand" aria-hidden="true"><i></i><span id="sideName">Barber</span></div>
+    <button role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Lyoum<i class="badge" id="waitBadge" hidden></i></button>
+    <button role="tab" data-tab="rdv" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 14h2M13 14h2M9 17h2"/></svg>Planning</button>
+    <button role="tab" data-tab="money" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>Flous</button>
+    <button role="tab" data-tab="shop" aria-selected="false" data-owner><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>Boutique<i class="badge" id="shopBadge" hidden></i></button>
+    <button role="tab" data-tab="more" aria-selected="false" data-owner><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Plus</button>
   </div></nav>
 </div>
 <div class="toast" id="toast" hidden></div>
@@ -731,8 +1002,32 @@ const today = () => iso(new Date());
 const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === addDays(t,1)) return "Ghedda"; if (s === addDays(t,-1)) return "L-bare7"; const d = fromIso(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
 const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
 let PIN = ""; try { PIN = sessionStorage.getItem("dm_pin") || ""; } catch(e){}
+/* chkoun dkhel: "owner" (mol s-salon) wla "barber" (coiffeur, ghir l-khdma dyalo) */
+let ROLE = "", ME = "";
+try { const w = JSON.parse(sessionStorage.getItem("dm_who") || "null"); if (w){ ROLE = w.role; ME = w.barber || ""; } } catch(e){}
+const isOwner = () => ROLE !== "barber";
+function setWho(j){
+  ROLE = j.role === "barber" ? "barber" : "owner"; ME = j.role === "barber" ? (j.barber || "") : "";
+  try { sessionStorage.setItem("dm_who", JSON.stringify({ role: ROLE, barber: ME })); } catch(e){}
+  applyRole();
+}
+function applyRole(){
+  document.body.classList.toggle("is-barber", !isOwner());
+  const rc = $("#roleChip"); rc.hidden = false;
+  rc.textContent = isOwner() ? "👑 Mol s-salon" : "💈 " + ME;
+  document.querySelectorAll("[data-owner]").forEach(el => el.hidden = !isOwner());
+  if ($("#phonesSec")) $("#phonesSec").hidden = !isOwner();
+}
 let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
+try { CFG.salon = JSON.parse(localStorage.getItem("dm_admin_salon") || "null") || {}; } catch(e){}
 const SN = () => (CFG.salon && CFG.salon.nom) || "Votre Salon";
+function paintName(){
+  const n = SN();
+  document.querySelector(".brand span").firstChild.textContent = n.split(/\s+/)[0];
+  const lg = document.getElementById("lgName"); if (lg) lg.textContent = n;
+  const sn = document.getElementById("sideName"); if (sn) sn.textContent = n;
+}
+paintName();
 const MAPS_DEFAULT = "https://maps.google.com/";
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
@@ -767,36 +1062,45 @@ $("#loginForm").addEventListener("submit", async e => {
   $("#loginBtn").disabled = true; $("#loginErr").textContent = "";
   try {
     const j = await call("login");
-    if (j.ok){ try { sessionStorage.setItem("dm_pin", PIN); } catch(e){} start(); }
+    if (j.ok){ try { sessionStorage.setItem("dm_pin", PIN); } catch(e){} setWho(j); start(); }
     else $("#loginErr").textContent = "Backend 9dim: khass déploiement jdid f Apps Script.";
   } catch(err){ if (err.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; }
   $("#loginBtn").disabled = false;
 });
 function logout(msg){
-  PIN = ""; try { sessionStorage.removeItem("dm_pin"); } catch(e){}
+  PIN = ""; ROLE = ""; ME = ""; try { sessionStorage.removeItem("dm_pin"); sessionStorage.removeItem("dm_who"); } catch(e){}
   $("#app").hidden = true; $("#login").hidden = false; $("#pin").value = ""; paintDots(); $("#loginErr").textContent = msg || "";
   if (msg){ $("#pinDots").classList.remove("shake"); void $("#pinDots").offsetWidth; $("#pinDots").classList.add("shake"); }
 }
 $("#logout").addEventListener("click", () => logout());
 
 /* ---------- tabs ---------- */
-let tab = "rdv";
-function setTab(t){
+let tab = "home", backTo = "more";
+const SECTIONS = ["home","rdv","money","shop","more","block","team","photos"];
+const NAV_OF = { block: null, team: "more", photos: "more" };
+function setTab(t, from){
+  if (!isOwner() && ["shop","more","team","photos"].includes(t)) t = "home";
+  if (["block","team","photos"].includes(t)) backTo = from || (isOwner() ? "more" : "home");
   tab = t;
-  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === t));
-  ["rdv","block","team","photos","shop","stats"].forEach(k => $("#t-"+k).hidden = k !== t);
+  const nav = t in NAV_OF ? (NAV_OF[t] || backTo) : t;
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === nav));
+  SECTIONS.forEach(k => $("#t-"+k).hidden = k !== t);
+  document.body.dataset.tab = t;
   load(); window.scrollTo(0,0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+document.querySelectorAll("[data-back]").forEach(b => b.addEventListener("click", () => setTab(backTo)));
+$("#moreMenu").querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => setTab(b.dataset.go, "more")));
 $("#refresh").addEventListener("click", () => load());
-function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loadPhotos, shop: loadShop, stats: loadStats })[tab](); }
+function load(){ ({ home: loadHome, rdv: loadRdv, money: loadMoney, more: () => {}, block: loadBlocks, team: loadTeam, photos: loadPhotos, shop: loadShop })[tab](); }
 
 async function loadConfig(){
   const j = await call("getconfig");
-  if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); loadNotif(); }
+  if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); if (isOwner()) loadNotif(); }
   return CFG;
 }
 function fillBarberSelect(){
+  if (!isOwner()){ $("#bWho").innerHTML = `<option>${esc(ME)}</option>`; return; }
   $("#bWho").innerHTML = `<option value="tous">Salon kamel</option>` + CFG.coiffeurs.filter(c => c.actif).map(c => `<option>${esc(c.nom)}</option>`).join("");
 }
 
@@ -834,7 +1138,7 @@ function rdvCard(r, showDay){
       <div class="contact">
         <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
         <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
-        <button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>
+        ${isOwner() ? `<button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>` : ""}
         ${!pend && !String(r.statut).startsWith("annul") ? `<button class="more iconbtn" style="width:38px;height:38px" data-id="${esc(r.id)}" aria-label="Khiyarat okhrin" title="Reporter / Lgha">⋯</button>` : ""}
       </div>
     </div>
@@ -860,7 +1164,7 @@ function bindCards(container, list, reload){
         af.innerHTML = `<a href="#" data-remsg="1">💬 Sift l-message l ${esc(r.nom)} f WhatsApp</a>`;
         af.querySelector("[data-remsg]").onclick = e => { e.preventDefault(); openMsgModal(r, ok); };
         toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
-        setTimeout(() => { if (tab === "rdv") reload(); }, 15000);
+        setTimeout(() => { if (tab === "rdv" || tab === "home") reload(); }, 15000);
       } else { toast("Tsjjel ✓"); reload(); }
     } catch(e){ b.disabled = false; }
   });
@@ -941,7 +1245,7 @@ async function reschedView(date){
     <div class="dgrid">${days.map(d => { const x = fromIso(d); return `<button type="button" class="dchip" data-d="${d}" aria-pressed="${d === date}"><small>${d === t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("")}</div>
     <div class="tgrid" id="rsTimes"><div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanchoufou les blayes…</div></div>
     <button class="btn full" type="button" id="rsGo" disabled>Reporter</button><div class="err" id="rsErr"></div>`;
-  $("#rsBack").onclick = () => openActions(r, actReload);
+  $("#rsBack").onclick = () => openDetail(r, actReload);
   $("#aBody").querySelectorAll(".dgrid .dchip").forEach(b => b.onclick = () => reschedView(b.dataset.d));
   const on = $("#aBody .dgrid [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
   try {
@@ -1005,21 +1309,21 @@ async function loadPending(){
     LISTS.pending = list;
     $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
     $("#pendList").innerHTML = list.map(r => rdvCard(r, true)).join("");
-    bindCards($("#pendList"), list, () => { loadPending(); loadRdv(true); });
+    bindCards($("#pendList"), list, () => { loadPending(); if (tab === "home") loadHomeDay(); });
     setPendingBadge(list.length);
   } catch(e){}
 }
 function paintBadge(n){
   const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
   $("#waitBadge").hidden = !tot; $("#waitBadge").textContent = tot;
-  document.title = (n ? `(${n}) ` : "") + "Admin · Votre Salon";
+  document.title = (n ? `(${n}) ` : "") + "Admin · " + SN();
 }
 function setPendingBadge(n){
   paintBadge(n);
   if (lastPending >= 0 && n > lastPending){
     toast("🔔 Réservation jdida kaytsenna l-validation");
-    try { if (window.Notification && Notification.permission === "granted") new Notification("Votre Salon", { body:"Réservation jdida kaytsenna l-validation", icon:"../icons/icon-192.png" }); } catch(e){}
-    if (tab === "rdv") loadPending();
+    try { if (window.Notification && Notification.permission === "granted") new Notification(SN(), { body:"Réservation jdida kaytsenna l-validation", icon:"../icons/icon-192.png" }); } catch(e){}
+    if (tab === "home") loadPending();
   }
   lastPending = n;
 }
@@ -1055,7 +1359,7 @@ function renderNext(live){
   box.innerHTML = `<div class="nextc"><div class="nl"><small>${ICO.clock} L-client jay · ${when}</small><b>${esc(nx.heure)}</b></div>
     <div class="nr"><div class="nn">${esc(nx.nom)}</div><div class="ns">${esc(nx.services)} · <span style="color:${barberColor(nx.barber)}">●</span> ${esc(nx.barber)}</div>
     </div><div class="na"><a href="tel:${esc(nx.tel.length === 9 ? "0" + nx.tel : nx.tel)}">📞 3ayet</a><a href="https://wa.me/${waNum(nx.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a><button type="button" id="nxMore">Ma jawebch?</button></div></div>`;
-  $("#nxMore").onclick = () => openActions(nx, () => loadRdv());
+  $("#nxMore").onclick = () => openDetail(nx, () => loadHome());
 }
 function setHello(){
   const d = new Date(), H = d.getHours();
@@ -1072,7 +1376,6 @@ function remMsg(r){
 }
 async function loadReminders(){
   const box = $("#remBox"); if (!box) return;
-  if (day !== today()){ box.innerHTML = ""; return; }
   const d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
   try {
     const j = await call("list", { from: tmr, to: tmr });
@@ -1090,26 +1393,6 @@ async function loadReminders(){
     }));
   } catch(e){ box.innerHTML = ""; }
 }
-async function loadRdv(skipPending){
-  setHello(); renderStrip(); loadWait(); loadReminders(); if (skipPending !== true) loadPending();
-  $("#rdvList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`; $("#daySum").innerHTML = "";
-  try {
-    const j = await call("list", { from: day, to: day });
-    const list = j.list || [], live = list.filter(r => !r.statut.startsWith("annul"));
-    const ca = live.filter(r => !r.statut.startsWith("absent") && !isPend(r.statut)).reduce((a,r) => a + r.prix, 0);
-    $("#daySum").innerHTML = `
-      <div class="kp"><i class="k1">${ICO.cal}</i><b>${live.length}</b><span>Rendez-vous</span></div>
-      <div class="kp"><i class="k2">${ICO.check}</i><b>${live.filter(r => r.statut === "venu").length}</b><span>Jaw</span></div>
-      <div class="kp main"><i class="k3">${ICO.cash}</i><b>${ca}<small> DH</small></b><span>Prévu</span></div>`;
-    $("#dayTitle").textContent = day === today() ? "Lyoum" : label(day);
-    $("#dayCount").textContent = live.length ? `${live.length} rendez-vous` : "";
-    renderNext(day === today() ? live : []);
-    if (!list.length){ $("#rdvList").innerHTML = `<div class="empty big"><span>${ICO.cal}</span><b>Ma kayn 7ta rendez-vous</b>${day === today() ? "lyoum" : "f had nhar"}. Les réservations jdad ghadi ybanou hna.</div>`; return; }
-    $("#rdvList").innerHTML = list.map(r => rdvCard(r, false)).join("");
-    bindCards($("#rdvList"), list, () => loadRdv());
-  } catch(e){ if (e.message !== "auth") $("#rdvList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
-}
-
 /* ---------- attente (f rendez-vous) ---------- */
 $("#waitBar").addEventListener("click", () => { $("#waitSec").hidden = false; $("#waitSec").scrollIntoView({ behavior:"smooth" }); });
 async function loadWait(){
@@ -1288,7 +1571,8 @@ function fillSalon(){
   hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
   setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
   $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
-  if (s.nom) document.querySelector(".brand span").firstChild.textContent = s.nom.split(/\s+/)[0];
+  paintName();
+  try { localStorage.setItem("dm_admin_salon", JSON.stringify({ nom: s.nom || "", couleur: s.couleur || "" })); } catch(e){}
 }
 $("#salonForm").addEventListener("submit", async e => {
   e.preventDefault(); $("#iErr").textContent = "";
@@ -1422,7 +1706,7 @@ function renderTeam(){
       <div class="top">
         <div class="av">${avatar(c)}</div>
         <div class="tx"><div class="n">${esc(c.nom || "Coiffeur jdid")} ${c.actif ? "" : '<span class="pill">Ma b9ach</span>'}</div>
-          <div class="s">${esc(c.de)}–${esc(c.a)} · ${esc(reposTxt(c.repos))}</div></div>
+          <div class="s">${esc(c.de)}–${esc(c.a)} · ${esc(reposTxt(c.repos))}${c.hasPin ? " · 🔑 3ndo code" : ""}</div></div>
         <button class="btn sm ghost" type="button" data-edit="${esc(c.id)}">${openId === c.id ? "Sedd" : "Bddel"}</button>
       </div>
       ${openId === c.id ? editForm(c) : ""}
@@ -1440,6 +1724,11 @@ function editForm(c){
     <div><label class="lbl" for="eName">Smiya</label><input id="eName" value="${esc(c.nom)}" maxlength="40" ${isNew || canRename() ? "" : "readonly"} placeholder="Ex: Hamza">
       ${isNew ? "" : canRename() ? `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Ila beddelti s-smiya, les rendez-vous dyalo kaytbeddlo m3aha.</div>`
         : `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Bach tbeddel s-smiya, khass t-mettre à jour Code.gs f Apps Script (v9).</div>`}</div>
+    <div class="pinbox"><label class="lbl" for="ePin">🔑 Code dyalo l l-admin</label>
+      <input id="ePin" inputmode="numeric" maxlength="8" autocomplete="off" value="${esc(c.pin || "")}" placeholder="${c.hasPin && !c.clearPin ? "•••• kayn — kteb jdid bach tbeddlo" : "4 7ta 8 ar9am (ikhtiyari)"}">
+      <div class="hint">B had l-code, ${esc(c.nom || "l-coiffeur")} ydkhol l l-admin w ychouf <b>ghir</b> les rendez-vous w l-flous dyalo. Ma ychoufch l-boutique wla les paramètres.</div>
+      ${(CFG.v || 0) < 11 ? `<div class="hint" style="color:var(--red)">${OLD_BACKEND}</div>` : ""}
+      ${c.hasPin && !c.clearPin ? `<button type="button" class="btn sm ghost" id="eNoPin">7ayed l-code</button>` : ""}</div>
     <div class="two">
       <div><label class="lbl" for="eDe">Kaybda m3a</label><input type="time" id="eDe" value="${esc(c.de)}" step="1800"></div>
       <div><label class="lbl" for="eA">Kaysali m3a</label><input type="time" id="eA" value="${esc(c.a)}" step="1800"></div>
@@ -1468,6 +1757,8 @@ function bindEdit(c){
   };
   if ($("#eNoPhoto")) $("#eNoPhoto").onclick = () => { c.photo = ""; renderTeam(); };
   $("#eName").oninput = e => { c.nom = e.target.value; };
+  $("#ePin").oninput = e => { e.target.value = e.target.value.replace(/\D/g, ""); c.pin = e.target.value; if (c.pin) delete c.clearPin; };
+  if ($("#eNoPin")) $("#eNoPin").onclick = () => { c.pin = ""; c.clearPin = true; renderTeam(); toast("Ma tnsach Sjjel"); };
   $("#eDe").onchange = e => { c.de = e.target.value; };
   $("#eA").onchange = e => { c.a = e.target.value; };
   document.querySelectorAll(".days7 button").forEach(b => b.onclick = () => {
@@ -1481,6 +1772,7 @@ function bindEdit(c){
     $("#eErr").textContent = "";
     if (!String(c.nom || "").trim()){ $("#eErr").textContent = "Kteb smiya dyal l-coiffeur."; return; }
     if (!c.de || !c.a || c.a <= c.de){ $("#eErr").textContent = "Sa3a dyal l-bdya khass tkoun 9bel sa3a dyal l-akhir."; return; }
+    if (c.pin && !/^\d{4,8}$/.test(c.pin)){ $("#eErr").textContent = "L-code khasso ykoun bin 4 w 8 ar9am."; return; }
     if (c.repos && c.repos.length === 7){ $("#eErr").textContent = "Ma ymkench ykoun kol nhar ra7a. Ila ma b9ach, khtar \"Ma b9ach\"."; return; }
     $("#eSave").disabled = true;
     try {
@@ -1489,7 +1781,7 @@ function bindEdit(c){
       if (j.ok && prev && prev !== c.nom.trim()){ toast(`${prev} → ${c.nom.trim()} ✓ · ${j.renamed || 0} rendez-vous tbeddlo`); }
       else if (j.ok) toast("Tsjjel ✓ · l-site tbeddel");
       if (j.ok){ CFG.coiffeurs = j.coiffeurs; team = JSON.parse(JSON.stringify(j.coiffeurs)); openId = null; fillBarberSelect(); renderTeam(); }
-      else $("#eErr").textContent = j.error === "dup" ? "Had s-smiya deja kayna." : j.error === "hours" ? "Tchecki les heures." : "Ma tsjjelch.";
+      else $("#eErr").textContent = j.error === "dup" ? "Had s-smiya deja kayna." : j.error === "pindup" ? "Had l-code deja m3ti l chi wa7ed akhor (wla howa code dyal mol s-salon). Khtar wa7ed akhor." : j.error === "hours" ? "Tchecki les heures." : "Ma tsjjelch.";
     } catch(err){ if (err.message !== "auth") $("#eErr").textContent = "Ma kaynach connexion."; }
     if ($("#eSave")) $("#eSave").disabled = false;
   };
@@ -1560,31 +1852,6 @@ function barsHtml(title, obj){
   const max = e[0][1];
   return `<div class="bars"><h3>${title}</h3>${e.map(([k,v]) => `<div class="bar"><span class="l">${esc(k)}</span><span class="t"><i style="width:${Math.round(v/max*100)}%"></i></span><span class="n">${v}</span></div>`).join("")}</div>`;
 }
-async function loadStats(){
-  renderPeriods();
-  $("#statsBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
-  const [from, to] = range(period);
-  try {
-    const j = await call("stats", { from, to }), s = j.stats;
-    const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
-    const maxV = Math.max(1, ...days.map(d => s.days[d] || 0));
-    const absRate = s.confirmed ? Math.round(s.absent / s.confirmed * 100) : 0;
-    $("#statsBox").innerHTML = `
-      <div class="kpis">
-        <div class="kpi main"><b>${s.revenue} DH</b><span>Dkhal (bla les absents w les annulations)</span></div>
-        <div class="kpi"><b>${s.confirmed}</b><span>Réservations</span></div>
-        <div class="kpi"><b>${s.clients}</b><span>Clients mkhtalfin</span></div>
-        <div class="kpi"><b>${s.cancelled}</b><span>Tlghaw</span></div>
-        <div class="kpi"><b>${absRate}%</b><span>Ma jawch (${s.absent})</span></div>
-      </div>
-      ${days.length <= 31 ? `<div class="bars"><h3>Dkhal kol nhar (DH)</h3>
-        <div class="chart">${days.map(d => `<div style="height:${Math.round((s.days[d]||0)/maxV*100)}%" data-v="${label(d)}: ${s.days[d]||0} DH"></div>`).join("")}</div>
-        <div class="chartx">${days.map((d,i) => `<span>${i % Math.ceil(days.length/7) === 0 ? fromIso(d).getDate() : ""}</span>`).join("")}</div></div>` : ""}
-      ${barsHtml("Les services", s.services)}
-      ${barsHtml("Les coiffeurs", s.barbers)}`;
-  } catch(e){ if (e.message !== "auth") $("#statsBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
-}
-
 /* ---------- BOUTIQUE ---------- */
 let SHOPC = null, PRODS = [], ORDERS = [], openProd = null, sseg = "ord", ordF = "open";
 const MODE_L = { whatsapp: "WhatsApp", salon: "F s-salon", livraison: "Livraison" };
@@ -1779,16 +2046,440 @@ $("#shopForm").addEventListener("submit", async e => {
   } catch(err){ if (err.message !== "auth") $("#shErr").textContent = "Ma kaynach connexion."; }
 });
 
+/* =====================================================================
+   PRO: Lyoum (dashboard) · Planning · Fiche client · Zid RDV · Caisse
+   ===================================================================== */
+const money = n => (Number(n) || 0).toLocaleString("fr-FR").replace(/ | /g, " ");
+const telHref = t => { const x = String(t || ""); return x.length === 9 ? "0" + x : x; };
+const isLive = r => !String(r.statut).startsWith("annul");
+const isVenu = r => r.statut === "venu";
+const isAbs = r => String(r.statut).startsWith("absent");
+const isConf = r => r.statut === "confirmé";
+const ended = r => r.date < today() || (r.date === today() && hm2m(r.heure) + r.dur <= nowM());
+const m2hm = m => pad(Math.floor(m / 60)) + ":" + pad(m % 60);
+const svcName = s => (s.nom && (s.nom.fr || s.nom.da || s.nom.ar)) || "Service";
+const OLD_BACKEND = "Khass t-mettre à jour Code.gs (v11) f Apps Script bach tkhddem hadi.";
+async function ensureConfig(){ if (!CFG.coiffeurs.length) { try { await loadConfig(); } catch(e){} } }
+function activeTeam(){
+  const t = (CFG.coiffeurs || []).filter(c => c.actif);
+  if (!isOwner()) return t.filter(c => c.nom === ME).concat(t.some(c => c.nom === ME) ? [] : [{ nom: ME, de: "11:00", a: "21:00", repos: [] }]);
+  return t;
+}
+function ava(name, size){
+  const c = (CFG.coiffeurs || []).find(x => x.nom === name);
+  const st = `background:${barberColor(name)}${size ? `;width:${size}px;height:${size}px;flex-basis:${size}px` : ""}`;
+  return c && c.photo ? `<span class="ava" style="${st}"><img src="${esc(c.photo)}" alt="" referrerpolicy="no-referrer"></span>` : `<span class="ava" style="${st}">${esc((name || "?")[0].toUpperCase())}</span>`;
+}
+
+/* ---------- LYOUM ---------- */
+function loadHome(){ setHello(); loadPending(); loadReminders(); loadWait(); loadHomeDay(); }
+async function loadHomeDay(){
+  const t = today();
+  $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    await ensureConfig();
+    const j = await call("list", { from: t, to: t }), list = j.list || [], live = list.filter(isLive);
+    const venu = live.filter(isVenu), enc = venu.reduce((a, r) => a + r.prix, 0);
+    const prevu = live.filter(r => !isAbs(r) && !isPend(r.statut)).reduce((a, r) => a + r.prix, 0);
+    $("#daySum").innerHTML = `
+      <div class="kp"><i class="k1">${ICO.cal}</i><b>${live.filter(r => !isAbs(r)).length}</b><span>Rendez-vous</span></div>
+      <div class="kp"><i class="k2">${ICO.check}</i><b>${venu.length}</b><span>Jaw</span></div>
+      <div class="kp main"><i class="k3">${ICO.cash}</i><b>${money(enc)}<small> DH</small></b><span>Tkhelless</span></div>
+      <div class="kp"><i class="k4">${ICO.clock}</i><b>${money(prevu)}<small> DH</small></b><span>Prévu lyoum</span></div>`;
+    renderNext(live);
+    const toClose = live.filter(r => isConf(r) && ended(r));
+    $("#closeBox").innerHTML = toClose.length ? `<button type="button" class="closebar" id="goClose"><span>💵 <b>${toClose.length}</b> ${toClose.length > 1 ? "clients fatou" : "client fat"} w mazal ma tsddouch f l-caisse</span><i>Sedd ›</i></button>` : "";
+    if (toClose.length) $("#goClose").onclick = () => { mseg = "cash"; cday = t; setTab("money"); };
+    const team = activeTeam();
+    if (isOwner() && team.length > 1){
+      const n = nowM();
+      $("#teamToday").innerHTML = `<div class="section-t">L-équipe lyoum</div><div class="tt">${team.map(c => {
+        const mine = live.filter(r => r.barber === c.nom && !isAbs(r));
+        const nx = mine.filter(r => !isVenu(r) && hm2m(r.heure) + r.dur > n).sort((a, b) => a.heure.localeCompare(b.heure))[0];
+        const busy = mine.some(r => hm2m(r.heure) <= n && hm2m(r.heure) + r.dur > n);
+        const off = (c.repos || []).includes(DAYKEYS[new Date().getDay()]);
+        return `<div class="ttc">${ava(c.nom, 38)}<div class="ttx"><b>${esc(c.nom)}</b>
+          <small>${off ? "Nhar ra7a" : busy ? "🟢 Khddam daba" : nx ? "Jay: " + esc(nx.heure) + " · " + esc(nx.nom) : "Khawi"}</small></div>
+          <div class="ttn"><b>${mine.length}</b><small>${money(mine.filter(isVenu).reduce((a, r) => a + r.prix, 0))} DH</small></div></div>`;
+      }).join("")}</div>`;
+    } else $("#teamToday").innerHTML = "";
+  } catch(e){ if (e.message !== "auth") $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+}
+document.querySelectorAll("#quick [data-q]").forEach(b => b.addEventListener("click", () => {
+  const q = b.dataset.q;
+  if (q === "add") openAdd({ date: today() });
+  else if (q === "plan"){ day = today(); setTab("rdv"); }
+  else if (q === "cash"){ mseg = "cash"; cday = today(); setTab("money"); }
+  else setTab("block", "home");
+}));
+
+/* ---------- PLANNING ---------- */
+let VIEW = "plan", BF = "", DAYLIST = [];
+try { VIEW = localStorage.getItem("dm_view") === "list" ? "list" : "plan"; } catch(e){}
+const PPM = 1.6;                        // pixels f d-dqi9a (30 min = 48px)
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
+  VIEW = b.dataset.view; try { localStorage.setItem("dm_view", VIEW); } catch(e){}
+  paintView(); renderDay();
+}));
+function paintView(){
+  document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x.dataset.view === VIEW));
+  $("#plan").hidden = VIEW !== "plan"; $("#rdvList").hidden = VIEW !== "list";
+}
+function renderFilter(){
+  const team = activeTeam();
+  if (!isOwner() || team.length < 2){ $("#bFilter").innerHTML = ""; return; }
+  $("#bFilter").innerHTML = [["", "Kolchi"]].concat(team.map(c => [c.nom, c.nom])).map(([k, l]) =>
+    `<button type="button" data-bf="${esc(k)}" aria-pressed="${BF === k}">${k ? `<i style="background:${barberColor(k)}"></i>` : ""}${esc(l)}</button>`).join("");
+  $("#bFilter").querySelectorAll("[data-bf]").forEach(b => b.onclick = () => { BF = b.dataset.bf; renderFilter(); renderDay(); });
+}
+let DAYBLOCKS = [];
+async function loadRdv(){
+  renderStrip(); paintView();
+  $("#dayTitle").textContent = day === today() ? "Lyoum" : label(day); $("#dayCount").textContent = "";
+  const busy = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  $("#plan").innerHTML = busy; $("#rdvList").innerHTML = busy;
+  try {
+    await ensureConfig(); renderFilter();
+    const [j, bl] = await Promise.all([call("list", { from: day, to: day }), day >= today() ? call("blocks").catch(() => ({ list: [] })) : Promise.resolve({ list: [] })]);
+    DAYLIST = j.list || []; DAYBLOCKS = (bl.list || []).filter(b => b.date === day);
+    renderDay();
+  } catch(e){ if (e.message !== "auth"){ $("#plan").innerHTML = $("#rdvList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; } }
+}
+function renderDay(){
+  const list = BF ? DAYLIST.filter(r => r.barber === BF) : DAYLIST, live = list.filter(isLive);
+  $("#dayCount").textContent = live.length ? `${live.length} rendez-vous · ${money(live.filter(r => !isAbs(r)).reduce((a, r) => a + r.prix, 0))} DH` : "";
+  if (VIEW === "list"){
+    if (!list.length){ $("#rdvList").innerHTML = `<div class="empty big"><span>${ICO.cal}</span><b>Ma kayn 7ta rendez-vous</b>${day === today() ? "lyoum" : "f had nhar"}. Brek 3la ＋ bach tzid wa7ed.</div>`; return; }
+    $("#rdvList").innerHTML = list.map(r => rdvCard(r, false)).join("");
+    bindCards($("#rdvList"), list, () => loadRdv());
+    $("#rdvList").querySelectorAll(".rdv").forEach(a => a.addEventListener("click", e => {
+      if (e.target.closest("button,a")) return;
+      const r = list.find(x => x.id === a.dataset.id); if (r) openDetail(r, () => loadRdv());
+    }));
+    return;
+  }
+  renderPlan(list);
+}
+function renderPlan(list){
+  let cols = activeTeam().map(c => c.nom);
+  if (BF) cols = [BF];
+  list.forEach(r => { if (!cols.includes(r.barber) && (!BF || r.barber === BF)) cols.push(r.barber); });
+  if (!cols.length){ $("#plan").innerHTML = `<div class="empty">Zid les coiffeurs f Plus → Salon → L-équipe.</div>`; return; }
+  const dk = DAYKEYS[fromIso(day).getDay()], hz = CFG.salon && CFG.salon.horaires, sd = hz && hz.hasOwnProperty(dk) ? hz[dk] : undefined;
+  const team = CFG.coiffeurs || [];
+  let lo = 24 * 60, hi = 0;
+  if (sd){ lo = hm2m(sd[0]); hi = hm2m(sd[1]); }
+  else cols.forEach(n => { const c = team.find(x => x.nom === n) || { de: "11:00", a: "21:00" }; lo = Math.min(lo, hm2m(c.de || "11:00")); hi = Math.max(hi, hm2m(c.a || "21:00")); });
+  list.forEach(r => { const m = hm2m(r.heure); lo = Math.min(lo, m); hi = Math.max(hi, m + r.dur); });
+  if (hi <= lo){ lo = 11 * 60; hi = 21 * 60; }
+  lo = Math.floor(lo / 60) * 60; hi = Math.ceil(hi / 60) * 60;
+  const H = (hi - lo) * PPM, y = m => (m - lo) * PPM;
+  const closed = sd === null && !list.length;
+  const hours = []; for (let m = lo; m <= hi; m += 60) hours.push(`<span style="top:${y(m)}px">${m2hm(m)}</span>`);
+  const head = cols.map(n => { const mine = list.filter(r => r.barber === n && isLive(r) && !isAbs(r));
+    return `<div class="pg-ch">${ava(n, 30)}<div><b>${esc(n)}</b><small>${mine.length} rdv · ${money(mine.reduce((a, r) => a + r.prix, 0))} DH</small></div></div>`; }).join("");
+  const body = cols.map(n => {
+    const c = team.find(x => x.nom === n) || {}, off = (c.repos || []).includes(dk);
+    const outs = [];
+    if (!off && c.de && c.a){ if (hm2m(c.de) > lo) outs.push([lo, hm2m(c.de)]); if (hm2m(c.a) < hi) outs.push([hm2m(c.a), hi]); }
+    const blks = DAYBLOCKS.filter(b => b.coiffeur === "tous" || b.coiffeur === n).map(b => {
+      const s = b.de ? hm2m(b.de) : lo, e = b.a ? hm2m(b.a) : hi;
+      return `<div class="pg-blk" style="top:${y(Math.max(s, lo))}px;height:${Math.max(18, (Math.min(e, hi) - Math.max(s, lo)) * PPM)}px"><span>⦸ ${esc(b.raison || "Msdod")}</span></div>`; }).join("");
+    const evs = list.filter(r => r.barber === n && isLive(r)).map(r => {
+      const m = hm2m(r.heure), h = Math.max(22, r.dur * PPM - 3), st = isPend(r.statut) ? "pend" : r.statut;
+      return `<button type="button" class="ev ${esc(st)}${h < 40 ? " tiny" : ""}" data-id="${esc(r.id)}" style="top:${y(m) + 1}px;height:${h}px;--bc:${barberColor(n)}">
+        <b>${esc(r.heure)} · ${esc(r.nom)}</b><small>${esc(r.services)} · ${r.prix} DH</small>${isVenu(r) ? '<i class="evk">✓</i>' : isPend(r.statut) ? '<i class="evk q">?</i>' : isAbs(r) ? '<i class="evk x">✗</i>' : ""}</button>`; }).join("");
+    return `<div class="pg-col${off ? " off" : ""}" data-b="${esc(n)}">${off ? `<div class="pg-offl">Nhar ra7a</div>` : ""}${outs.map(([a, b]) => `<div class="pg-out" style="top:${y(a)}px;height:${(b - a) * PPM}px"></div>`).join("")}${blks}${evs}</div>`;
+  }).join("");
+  const n = nowM(), now = day === today() && n >= lo && n <= hi ? `<div class="pg-now" style="top:${y(n)}px"><i>${m2hm(n)}</i></div>` : "";
+  $("#plan").innerHTML = (closed ? `<div class="empty" style="margin-bottom:10px">S-salon msdod had nhar (Paramètres). Tqder tzid rendez-vous b ＋.</div>` : "") +
+    `<div class="pg${cols.length > 4 ? " wide" : ""}" style="--cols:${cols.length};--slot:${30 * PPM}px"><div class="pg-head"><div class="pg-gut"></div>${head}</div>
+    <div class="pg-body" style="height:${H}px"><div class="pg-times">${hours.join("")}</div>${body}${now}</div></div>`;
+  $("#plan").querySelectorAll(".ev").forEach(b => b.onclick = e => { e.stopPropagation(); const r = list.find(x => x.id === b.dataset.id); if (r) openDetail(r, () => loadRdv()); });
+  $("#plan").querySelectorAll(".pg-col").forEach(col => col.onclick = e => {
+    if (e.target.closest(".ev")) return;
+    const rect = col.getBoundingClientRect(), m = lo + Math.floor((e.clientY - rect.top) / PPM / 30) * 30;
+    openAdd({ date: day, barber: col.dataset.b, start: Math.max(lo, Math.min(hi - 30, m)) });
+  });
+  if (day === today()){ const nl = $("#plan .pg-now"); if (nl && !renderPlan._scrolled){ renderPlan._scrolled = true; setTimeout(() => window.scrollTo({ top: Math.max(0, nl.getBoundingClientRect().top + window.scrollY - 260), behavior: "smooth" }), 80); } }
+}
+$("#fabAdd").addEventListener("click", () => openAdd({ date: day < today() ? today() : day }));
+
+/* ---------- FICHE dyal rendez-vous ---------- */
+function openDetail(r, reload){
+  actR = r; actReload = reload;
+  const pend = isPend(r.statut), canc = !isLive(r);
+  $("#aIcon").innerHTML = esc((r.nom || "?")[0].toUpperCase()); $("#aIcon").className = "mic"; $("#aIcon").style.background = barberColor(r.barber); $("#aIcon").style.color = "#fff";
+  $("#aTitle").textContent = r.nom;
+  $("#aSub").textContent = `${label(r.date)} · ${r.heure} · ${r.dur} min`;
+  let acts = "";
+  if (pend) acts = `<button class="btn" type="button" data-d="ok">✓ Valider</button><button class="btn ghost" type="button" data-d="no">✗ Refuser</button>`;
+  else if (isConf(r)) acts = `<button class="btn ok" type="button" data-d="pay">✓ Ja · Khelless</button><button class="btn ghost" type="button" data-d="abs">✗ Ma jach</button>`;
+  else if (isVenu(r)) acts = `<button class="btn ghost" type="button" data-d="pay">✎ Bddel l-prix</button><button class="btn ghost" type="button" data-d="undo">↺ Mazal ma ja</button>`;
+  else if (isAbs(r)) acts = `<button class="btn ghost" type="button" data-d="undo">↺ Ja f l-akhir</button>`;
+  $("#aBody").innerHTML = `
+    <div class="dt">
+      <div><span>Service</span><b>${esc(r.services || "—")}</b></div>
+      <div><span>Coiffeur</span><b><i class="dot" style="background:${barberColor(r.barber)}"></i>${esc(r.barber)}</b></div>
+      <div><span>Prix</span><b>${money(r.prix)} DH</b></div>
+      <div><span>Statut</span><b><span class="pill ${pend ? "attente" : esc(r.statut)}">${esc(r.statut)}</span></b></div>
+      ${r.tel ? `<div><span>Téléphone</span><b>${esc(telHref(r.tel))}</b></div>` : ""}
+    </div>
+    ${r.tel ? `<div class="dt-contact"><a href="tel:${esc(telHref(r.tel))}">📞 3ayet</a><a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a></div>` : ""}
+    ${acts ? `<div class="dt-acts">${acts}</div>` : ""}
+    ${canc ? `<div class="freebox">Had r-rendez-vous tlgha.</div>` : `<div class="opts">
+      <button class="opt" type="button" data-d="resched"><i>⏱</i><span><b>Reporter</b><small>Bddel n-nhar wla s-sa3a</small></span></button>
+      <button class="opt danger" type="button" data-d="cancel"><i>🗑</i><span><b>Lgha</b><small>L-blassa katwelli khawya</small></span></button>
+      ${isOwner() && r.tel ? `<button class="opt danger" type="button" data-d="block"><i>🚫</i><span><b>Bloqui had n-numéro</b><small>Ma y9derch yréservi men l-site</small></span></button>` : ""}
+    </div>`}`;
+  $("#aBody").querySelectorAll("[data-d]").forEach(b => b.onclick = () => detailAct(b.dataset.d, b));
+  openAct();
+}
+async function detailAct(a, btn){
+  const r = actR;
+  if (a === "resched") return reschedView(r.date);
+  if (a === "cancel") return freeSlot("annulé");
+  if (a === "abs") return freeSlot("absent");
+  if (a === "pay") return payView();
+  btn.disabled = true;
+  try {
+    if (a === "block"){
+      if (!btn.dataset.arm){ btn.dataset.arm = 1; btn.querySelector("b").textContent = "Brek merra okhra bach tbloqui"; btn.disabled = false; return; }
+      const j = await call("blockphone", { tel: r.tel, raison: "men l-admin" });
+      if (j.ok){ closeAct(); toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); actReload && actReload(); refreshPendingCount(); }
+      return;
+    }
+    const s = a === "ok" ? "confirmé" : a === "no" ? "annulé" : "confirmé";
+    const j = await call("status", { id: r.id, statut: s });
+    if (!j.ok){ toast("Ma tsjjelch"); btn.disabled = false; return; }
+    closeAct(); actReload && actReload();
+    if (a === "ok" || a === "no"){ refreshPendingCount(); if (r.tel) openMsgModal(r, a === "ok"); toast(a === "ok" ? "Tvalidat ✓" : "Trefdat"); }
+    else toast("Tsjjel ✓");
+  } catch(e){ btn.disabled = false; }
+}
+function payView(){
+  const r = actR;
+  $("#aIcon").textContent = "DH"; $("#aIcon").style.background = "var(--ok)";
+  $("#aTitle").textContent = "Khelless · " + r.nom;
+  $("#aSub").textContent = `${r.services} · ${r.barber}`;
+  $("#aBody").innerHTML = `<button class="back" type="button" id="pyBack">‹ Rje3</button>
+    <label class="lbl" for="pyAmt">Ch7al khelless (DH)</label>
+    <div class="payamt"><input id="pyAmt" type="number" inputmode="numeric" min="0" value="${r.prix}"><span>DH</span></div>
+    <div class="paychips">${[-10, +10, +20, +50].map(d => `<button type="button" data-dd="${d}">${d > 0 ? "+" : ""}${d}</button>`).join("")}<button type="button" data-dd="reset">${r.prix} DH</button></div>
+    <p class="hint" style="margin:6px 0 14px">Ila zad chi service wla 3ta pourboire, beddel l-montant. Kayt7sab f l-caisse w f les stats.</p>
+    <button class="btn full ok" type="button" id="pyGo">✓ Tkhelless</button><div class="err" id="pyErr"></div>`;
+  const amt = $("#pyAmt"), upd = () => $("#pyGo").textContent = `✓ Tkhelless ${money(amt.value || 0)} DH`;
+  upd(); amt.oninput = upd;
+  $("#aBody").querySelectorAll("[data-dd]").forEach(b => b.onclick = () => { amt.value = b.dataset.dd === "reset" ? r.prix : Math.max(0, (Number(amt.value) || 0) + Number(b.dataset.dd)); upd(); });
+  $("#pyBack").onclick = () => openDetail(r, actReload);
+  $("#pyGo").onclick = async () => {
+    const v = Math.round(Number(amt.value)); if (!(v >= 0)){ $("#pyErr").textContent = "Kteb l-montant."; return; }
+    $("#pyGo").disabled = true; $("#pyErr").textContent = "";
+    try {
+      if (v !== r.prix){
+        const p = await call("price", { id: r.id, prix: v });
+        if (!p.ok){ $("#pyErr").textContent = p.error === "op" ? OLD_BACKEND : "Ma tsjjelch l-prix."; $("#pyGo").disabled = false; return; }
+      }
+      if (!isVenu(r)){ const j = await call("status", { id: r.id, statut: "venu" }); if (!j.ok){ $("#pyErr").textContent = "Ma tsjjelch."; $("#pyGo").disabled = false; return; } }
+      closeAct(); toast(`Tkhelless ${money(v)} DH ✓`); actReload && actReload();
+    } catch(e){ if (e.message !== "auth"){ $("#pyErr").textContent = "Ma kaynach connexion."; $("#pyGo").disabled = false; } }
+  };
+  setTimeout(() => amt.select(), 60);
+}
+
+/* ---------- ZID RENDEZ-VOUS (men l-admin) ---------- */
+let addSel = [];
+function openAdd(pre){
+  pre = pre || {};
+  const team = activeTeam(), svc = (CFG.services || []).filter(s => s.actif !== false);
+  addSel = [];
+  const barber = pre.barber && team.some(c => c.nom === pre.barber) ? pre.barber : (team[0] || {}).nom || ME;
+  const start = pre.start != null ? pre.start : (() => { const m = Math.ceil((nowM() + 5) / 30) * 30; return Math.min(Math.max(m, 9 * 60), 22 * 60); })();
+  const times = []; for (let m = 7 * 60; m <= 23 * 60 + 30; m += 15) times.push(m);
+  $("#aIcon").textContent = "＋"; $("#aIcon").className = "mic"; $("#aIcon").style.background = ""; $("#aIcon").style.color = "";
+  $("#aTitle").textContent = "Rendez-vous jdid";
+  $("#aSub").textContent = "Client f s-salon, b telephone wla WhatsApp";
+  $("#aBody").innerHTML = `<form id="addForm" class="addf">
+    <div class="two">
+      <div><label class="lbl" for="adDate">Nhar</label><input type="date" id="adDate" value="${esc(pre.date || today())}" required></div>
+      <div><label class="lbl" for="adTime">Sa3a</label><select id="adTime">${times.map(m => `<option value="${m}" ${m === start ? "selected" : ""}>${m2hm(m)}</option>`).join("")}</select></div>
+    </div>
+    ${isOwner() ? `<div><span class="lbl">Coiffeur</span><div class="bpick" id="adBarber">${team.map(c => `<button type="button" data-b="${esc(c.nom)}" aria-pressed="${c.nom === barber}">${ava(c.nom, 24)}${esc(c.nom)}</button>`).join("")}</div></div>` : ""}
+    <div><span class="lbl">Services</span><div class="spick" id="adSvc">${svc.map(s => `<button type="button" data-s="${esc(s.id)}" aria-pressed="false">${esc(svcName(s))}<small>${s.prix} DH · ${s.duree} min</small></button>`).join("")}</div></div>
+    <div class="two">
+      <div><label class="lbl" for="adDur">Mudda</label><select id="adDur">${[15,20,30,45,60,75,90,120,150,180].map(d => `<option value="${d}" ${d === 30 ? "selected" : ""}>${d} min</option>`).join("")}</select></div>
+      <div><label class="lbl" for="adPrix">Prix (DH)</label><input id="adPrix" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    </div>
+    <div class="two">
+      <div><label class="lbl" for="adNom">Smiyt l-client</label><input id="adNom" maxlength="80" placeholder="Ex: Yassine" autocomplete="off"></div>
+      <div><label class="lbl" for="adTel">Téléphone (ikhtiyari)</label><input id="adTel" type="tel" inputmode="tel" maxlength="17" placeholder="06…" autocomplete="off"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="adNow"> Client jalss daba f s-salon (ytsjjel "venu")</label>
+    <button class="btn full" type="submit" id="adGo">Zid r-rendez-vous</button>
+    <div class="err" id="adErr"></div>
+  </form>`;
+  let bSel = barber;
+  if (isOwner()) $("#adBarber").querySelectorAll("[data-b]").forEach(b => b.onclick = () => { bSel = b.dataset.b; $("#adBarber").querySelectorAll("[data-b]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  const sync = () => {
+    const ss = svc.filter(s => addSel.includes(s.id));
+    if (ss.length){
+      const d = ss.reduce((a, s) => a + (Number(s.duree) || 0), 0), opts = [...$("#adDur").options].map(o => +o.value);
+      if (!opts.includes(d)) $("#adDur").insertAdjacentHTML("beforeend", `<option value="${d}">${d} min</option>`);
+      $("#adDur").value = d; $("#adPrix").value = ss.reduce((a, s) => a + (Number(s.prix) || 0), 0);
+    }
+  };
+  $("#adSvc").querySelectorAll("[data-s]").forEach(b => b.onclick = () => {
+    const id = b.dataset.s; addSel = addSel.includes(id) ? addSel.filter(x => x !== id) : [...addSel, id];
+    b.setAttribute("aria-pressed", addSel.includes(id)); sync();
+  });
+  $("#adNow").onchange = e => { if (e.target.checked){ $("#adDate").value = today(); const m = Math.floor(nowM() / 15) * 15; $("#adTime").value = Math.max(7 * 60, Math.min(23 * 60 + 30, m)); } };
+  const submit = async force => {
+    $("#adErr").textContent = "";
+    const ss = svc.filter(s => addSel.includes(s.id));
+    const body = { date: $("#adDate").value, start: +$("#adTime").value, dur: +$("#adDur").value, barber: bSel,
+      services: ss.length ? ss.map(svcName).join(" + ") : "Service", prix: Number($("#adPrix").value) || 0,
+      nom: $("#adNom").value.trim(), tel: $("#adTel").value.replace(/[^\d+]/g, ""), statut: $("#adNow").checked ? "venu" : "confirmé", force: !!force };
+    if (!body.date){ $("#adErr").textContent = "Khtar n-nhar."; return; }
+    if (!body.nom){ $("#adErr").textContent = "Kteb smiyt l-client."; $("#adNom").focus(); return; }
+    $("#adGo").disabled = true;
+    try {
+      const j = await call("add", body);
+      if (j.ok){ closeAct(); toast("Rendez-vous tzad ✓"); if (tab === "rdv"){ day = body.date; loadRdv(); } else load(); return; }
+      if (j.error === "taken"){
+        $("#adErr").innerHTML = `Had l-wa9t m3emmer 3and ${esc(bSel)} (rendez-vous wla blocage). <button type="button" class="btn sm ghost" id="adForce">Zid b-sse7</button>`;
+        $("#adForce").onclick = () => submit(true);
+      } else $("#adErr").textContent = j.error === "op" ? OLD_BACKEND : "Ma tsjjelch. Tchecki les infos.";
+    } catch(e){ if (e.message !== "auth") $("#adErr").textContent = "Ma kaynach connexion."; }
+    if ($("#adGo")) $("#adGo").disabled = false;
+  };
+  $("#addForm").onsubmit = e => { e.preventDefault(); submit(false); };
+  openAct();
+  setTimeout(() => { if (!svc.length) $("#adNom").focus(); }, 80);
+}
+
+/* ---------- FLOUS: caisse + stats ---------- */
+let mseg = "cash", cday = today();
+document.querySelectorAll("[data-mseg]").forEach(b => b.addEventListener("click", () => {
+  mseg = b.dataset.mseg; loadMoney();
+}));
+function loadMoney(){
+  document.querySelectorAll("[data-mseg]").forEach(x => x.setAttribute("aria-selected", x.dataset.mseg === mseg));
+  $("#mCash").hidden = mseg !== "cash"; $("#mStats").hidden = mseg !== "stats";
+  if (mseg === "cash") loadCash(); else loadStats();
+}
+$("#cPrev").addEventListener("click", () => { cday = addDays(cday, -1); loadCash(); });
+$("#cNext").addEventListener("click", () => { if (cday < today()){ cday = addDays(cday, 1); loadCash(); } });
+$("#cDay").addEventListener("change", e => { if (e.target.value){ cday = e.target.value > today() ? today() : e.target.value; loadCash(); } });
+async function loadCash(){
+  $("#cDayL").textContent = cday === today() ? "Lyoum" : label(cday); $("#cDay").value = cday; $("#cDay").max = today();
+  $("#cNext").disabled = cday >= today();
+  $("#cashBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
+  try {
+    await ensureConfig();
+    const j = await call("list", { from: cday, to: cday }), live = (j.list || []).filter(isLive);
+    const venu = live.filter(isVenu), enc = venu.reduce((a, r) => a + r.prix, 0);
+    const conf = live.filter(isConf), late = conf.filter(ended), next = conf.filter(r => !ended(r));
+    const prevu = enc + conf.reduce((a, r) => a + r.prix, 0), abs = live.filter(isAbs);
+    const pct = prevu ? Math.round(enc / prevu * 100) : 0;
+    const team = [...new Set(live.map(r => r.barber))];
+    let h = `<div class="cash-hero"><small>Tkhelless ${cday === today() ? "lyoum" : label(cday)}</small><b>${money(enc)}<span> DH</span></b>
+      <div class="cbar"><i style="width:${pct}%"></i></div>
+      <div class="cmeta"><span>${venu.length} client${venu.length > 1 ? "s" : ""}</span><span>Prévu: ${money(prevu)} DH</span>${abs.length ? `<span>${abs.length} ma jawch</span>` : ""}</div></div>`;
+    if (isOwner() && team.length > 1){
+      h += `<div class="section-t">Kol coiffeur</div><div class="ctab">${team.map(n => { const v = venu.filter(r => r.barber === n), rest = conf.filter(r => r.barber === n);
+        return `<div>${ava(n, 30)}<b>${esc(n)}</b><span>${v.length} client${v.length > 1 ? "s" : ""}${rest.length ? ` · ${rest.length} mazal` : ""}</span><strong>${money(v.reduce((a, r) => a + r.prix, 0))} DH</strong></div>`; }).join("")}
+        <div class="tot"><b>Total</b><span></span><strong>${money(enc)} DH</strong></div></div>`;
+    }
+    if (late.length) h += `<div class="section-t warn">Fatou w mazal ma tsddouch (${late.length})</div><div class="clist">${late.map(r => cashRow(r, "late")).join("")}</div>`;
+    if (venu.length) h += `<div class="section-t">Les paiements (${venu.length})</div><div class="clist">${venu.sort((a, b) => a.heure.localeCompare(b.heure)).map(r => cashRow(r, "paid")).join("")}</div>`;
+    if (next.length) h += `<div class="section-t">Mazal jayin (${next.length}) · ${money(next.reduce((a, r) => a + r.prix, 0))} DH</div><div class="clist">${next.map(r => cashRow(r, "next")).join("")}</div>`;
+    if (!live.length) h += `<div class="empty big"><span>${ICO.cash}</span><b>Ma kayn 7ta 7aja f had nhar</b>Mlli tsjjel client "Ja", kayban hna.</div>`;
+    $("#cashBox").innerHTML = h;
+    const all = live;
+    $("#cashBox").querySelectorAll("[data-cid]").forEach(el => el.onclick = e => {
+      const r = all.find(x => x.id === el.dataset.cid); if (!r) return;
+      if (e.target.closest("[data-q]")) return;
+      openDetail(r, () => loadCash());
+    });
+    $("#cashBox").querySelectorAll("[data-q]").forEach(b => b.onclick = async e => {
+      e.stopPropagation();
+      const r = all.find(x => x.id === b.dataset.id); if (!r) return;
+      if (b.dataset.q === "pay"){ actR = r; actReload = () => loadCash(); payView(); openAct(); return; }
+      b.disabled = true;
+      try { const j = await call("status", { id: r.id, statut: b.dataset.q === "ok" ? "venu" : "absent" }); if (j.ok){ toast(b.dataset.q === "ok" ? `+${r.prix} DH ✓` : "Tsjjel absent"); loadCash(); } else b.disabled = false; }
+      catch(err){ b.disabled = false; }
+    });
+  } catch(e){ if (e.message !== "auth") $("#cashBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+function cashRow(r, kind){
+  return `<div class="crow ${kind}" data-cid="${esc(r.id)}" role="button" tabindex="0">
+    <span class="ch">${esc(r.heure)}</span>
+    <span class="cn"><b>${esc(r.nom)}</b><small><i class="dot" style="background:${barberColor(r.barber)}"></i>${esc(r.barber)} · ${esc(r.services)}</small></span>
+    ${kind === "late" ? `<span class="cq"><button type="button" data-q="ok" data-id="${esc(r.id)}" aria-label="Ja">✓ ${r.prix}</button><button type="button" data-q="no" data-id="${esc(r.id)}" class="x" aria-label="Ma jach">✗</button></span>`
+      : kind === "paid" ? `<button type="button" class="camt" data-q="pay" data-id="${esc(r.id)}">${money(r.prix)} DH <i>✎</i></button>`
+      : `<span class="camt muted">${money(r.prix)} DH</span>`}</div>`;
+}
+
+/* ---------- stats (pro) ---------- */
+function prevRange(from, to){
+  const n = Math.round((fromIso(to) - fromIso(from)) / 864e5) + 1;
+  return [addDays(from, -n), addDays(from, -1)];
+}
+function delta(cur, prev){
+  if (prev == null) return "";
+  if (!prev) return cur ? `<em class="up">jdid</em>` : "";
+  const p = Math.round((cur - prev) / prev * 100);
+  return `<em class="${p >= 0 ? "up" : "down"}">${p >= 0 ? "▲" : "▼"} ${Math.abs(p)}%</em>`;
+}
+async function loadStats(){
+  renderPeriods();
+  $("#statsBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
+  const [from, to] = range(period), [pf, pt] = prevRange(from, to);
+  try {
+    await ensureConfig();
+    const j = await call("stats", { from, to, prevFrom: pf, prevTo: pt }), s = j.stats;
+    const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+    const maxV = Math.max(1, ...days.map(d => s.days[d] || 0));
+    const done = Object.values(s.barbers || {}).reduce((a, n) => a + n, 0);
+    const ticket = done ? Math.round(s.revenue / done) : 0;
+    const absRate = s.confirmed ? Math.round(s.absent / s.confirmed * 100) : 0;
+    const team = s.team || null;
+    const hrs = s.hours ? Object.entries(s.hours).map(([h, n]) => [+h, n]).sort((a, b) => a[0] - b[0]) : [];
+    const maxH = Math.max(1, ...hrs.map(x => x[1]));
+    $("#statsBox").innerHTML = `
+      <div class="kpis">
+        <div class="kpi main"><b>${money(s.revenue)} DH</b><span>Dkhal ${delta(s.revenue, s.prev)}${s.prev != null ? ` <small>· 9bel: ${money(s.prev)} DH</small>` : ""}</span></div>
+        <div class="kpi"><b>${done}</b><span>Clients khddmo</span></div>
+        <div class="kpi"><b>${money(ticket)} DH</b><span>Moyenne l kol client</span></div>
+        <div class="kpi"><b>${s.clients}</b><span>Clients mkhtalfin${s.newClients != null ? ` · ${s.newClients} jdad` : ""}</span></div>
+        <div class="kpi"><b>${absRate}%</b><span>Ma jawch (${s.absent}) · ${s.cancelled} tlghaw</span></div>
+        ${s.shop != null && isOwner() ? `<div class="kpi"><b>${money(s.shop)} DH</b><span>Boutique (tsellmo)</span></div>` : ""}
+      </div>
+      ${team && Object.keys(team).length ? `<div class="bars"><h3>${isOwner() ? "L-équipe" : "L-khdma dyalek"}</h3><div class="ttab">
+        <div class="th"><span>Coiffeur</span><span>Clients</span><span>Dkhal</span><span>Abs.</span></div>
+        ${Object.entries(team).sort((a, b) => b[1].ca - a[1].ca).map(([n, k]) => `<div>${ava(n, 26)}<b>${esc(n)}</b><span>${k.n}</span><strong>${money(k.ca)}</strong><span class="${k.absent ? "warn" : ""}">${k.absent}</span></div>`).join("")}
+      </div></div>` : barsHtml("Les coiffeurs", s.barbers || {})}
+      ${days.length <= 31 ? `<div class="bars"><h3>Dkhal kol nhar (DH)</h3>
+        <div class="chart">${days.map(d => `<div style="height:${Math.round((s.days[d]||0)/maxV*100)}%" data-v="${label(d)}: ${s.days[d]||0} DH"></div>`).join("")}</div>
+        <div class="chartx">${days.map((d,i) => `<span>${i % Math.ceil(days.length/7) === 0 ? fromIso(d).getDate() : ""}</span>`).join("")}</div></div>` : ""}
+      ${hrs.length ? `<div class="bars"><h3>Swaye3 li fihom l-khdma</h3>
+        <div class="chart">${hrs.map(([h, n]) => `<div style="height:${Math.round(n / maxH * 100)}%" data-v="${pad(h)}h: ${n} clients"></div>`).join("")}</div>
+        <div class="chartx">${hrs.map(([h]) => `<span>${h}h</span>`).join("")}</div></div>` : ""}
+      ${barsHtml("Les services", s.services || {})}`;
+  } catch(e){ if (e.message !== "auth") $("#statsBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
 /* ---------- start ---------- */
-function start(){
+async function start(){
   $("#login").hidden = true; $("#app").hidden = false;
+  if (!ROLE){ try { const j = await call("login"); if (!j.ok) return; setWho(j); } catch(e){ if (e.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; return; } }
+  else applyRole();
   loadConfig().catch(() => {});
-  if (location.hash === "#boutique") setTab("shop");
-  else if (location.hash === "#pending" && tab !== "rdv") setTab("rdv"); else load();
-  refreshShopBadge();
-  if (location.hash === "#pending") setTimeout(() => $("#pendBox").scrollIntoView({ behavior:"smooth" }), 1500);
-  clearInterval(window._poll); window._poll = setInterval(() => { refreshPendingCount(); refreshShopBadge(); }, 60000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden){ refreshPendingCount(); if (tab === "rdv") loadPending(); } });
+  if (location.hash === "#boutique" && isOwner()) setTab("shop"); else setTab("home");
+  if (isOwner()) refreshShopBadge();
+  if (location.hash === "#pending") setTimeout(() => { if (!$("#pendBox").hidden) $("#pendBox").scrollIntoView({ behavior:"smooth" }); }, 1500);
+  clearInterval(window._poll); window._poll = setInterval(() => { refreshPendingCount(); if (isOwner()) refreshShopBadge(); if (tab === "rdv" && day === today() && VIEW === "plan") renderDay(); }, 60000);
+  if (!start._vis){ start._vis = true; document.addEventListener("visibilitychange", () => { if (!document.hidden && PIN){ refreshPendingCount(); if (tab === "home") loadHome(); } }); }
   try { if (window.Notification && Notification.permission === "default") document.addEventListener("click", () => Notification.requestPermission(), { once:true }); } catch(e){}
 }
 if (PIN) start();
