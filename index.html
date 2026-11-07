@@ -23,7 +23,8 @@ const CONFIG = {
   ville:    "Salé",
   adresse:  "Tabriquet, Salé",
   mapsUrl:  "https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9",
-  instagram: "",                   // ex: "oussama.barber" (bla @). Khawi = ma kayban.
+  instagram: "",                   // ex: "oussama.barber" (bla @). Khawi = ma kayban. (katbeddel men l-admin → Salon → Infos)
+  facebook: "",                    // lien dyal la page Facebook (katbeddel men l-admin → Salon → Infos)
   whatsapp: "212655778899",        // 212 + numéro bla 0
   telAffiche: "06 55 77 88 99",
 
@@ -380,6 +381,21 @@ h2{font-family:var(--display);font-weight:800;font-size:42px;line-height:1;lette
 .ticket .ref b{font-family:var(--display);font-weight:800;font-size:21px;color:var(--ink);letter-spacing:.08em}
 .barcode{height:34px;margin:0 22px 18px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 8px,var(--ink) 8px 11px,transparent 11px 12px);opacity:.85;border-radius:2px}
 .acts{display:grid;gap:10px;width:100%;max-width:360px;margin:0 auto}
+.tk-map{display:flex;align-items:center;gap:12px;margin:0 12px 12px;padding:12px;border-radius:12px;background:var(--s1);text-decoration:none;color:var(--ink);text-align:start}
+.tk-map i{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:var(--orsoft);color:var(--or);display:grid;place-items:center}
+.tk-map i svg{width:19px;height:19px}
+.tk-map span{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.3}
+.tk-map small{display:block;font-weight:600;font-size:11.5px;color:var(--mute)}
+.tk-map b{display:inline-flex;align-items:center;gap:6px;background:var(--or);color:#fff;border-radius:999px;padding:8px 12px;font-size:13px;white-space:nowrap}
+.tk-map b svg{width:14px;height:14px}
+.social{display:flex;flex-direction:column;align-items:center;gap:10px;margin:2px auto 22px;max-width:360px}
+.social>span{font-size:13px;font-weight:700;color:var(--mute)}
+.social>div{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%}
+.social a{flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:9px;min-height:50px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14.5px;color:#fff}
+.social a svg{width:20px;height:20px}
+.social a.ig{background:linear-gradient(45deg,#F58529,#DD2A7B 50%,#8134AF)}
+.social a.fb{background:#1877F2}
+.home .social{margin-top:26px}
 .small{font-size:13px;color:var(--mute);margin-top:16px}
 .small a{color:var(--or2)}
 
@@ -474,6 +490,7 @@ html[lang=ar] .block h3{font-size:21px}
     </div>
     <div class="contact" id="contact" hidden></div>
 
+    <div id="homeSocial"></div>
     <a href="#" class="textlink" id="manageLink" data-t="manageLink"></a>
     <p class="foot" id="footTxt"></p>
   </section>
@@ -539,6 +556,7 @@ html[lang=ar] .block h3{font-size:21px}
     <h2 id="h6t"></h2>
     <p class="sub" id="doneSub" style="max-width:360px;margin:8px auto 0"></p>
     <div class="ticket" id="ticket"></div>
+    <div id="tkSocial"></div>
     <div class="acts">
       <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
@@ -626,6 +644,7 @@ const I18N = {
     welcomeT:"Mrehba bik 👋", welcomeS:"Réservi l-blassa dyalek f 30 seconde, bla ma t3ayet wla ttsenna f s-salon.",
     openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal",
     qMap:"Kifach nwsel", qCall:"3ayet", svcT:"Les services w l-prix", seeAll:"Réservi",
+    followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
     waMsg:"Salam 👋 3endi réservation f {salon}", calAlarm:"Rendez-vous f {salon}"
   },
   fr: {
@@ -677,6 +696,7 @@ const I18N = {
     welcomeT:"Bienvenue 👋", welcomeS:"Réservez votre place en 30 secondes, sans appeler ni attendre au salon.",
     openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon",
     qMap:"Itinéraire", qCall:"Appeler", svcT:"Services & prix", seeAll:"Réserver",
+    followT:"Suivez-nous", mapRow:"Comment venir au salon",
     waMsg:"Bonjour 👋 j'ai une réservation chez {salon}", calAlarm:"Rendez-vous chez {salon}"
   },
   ar: {
@@ -728,6 +748,7 @@ const I18N = {
     welcomeT:"مرحبا بك 👋", welcomeS:"احجز مكانك في 30 ثانية، بدون اتصال ولا انتظار في الصالون.",
     openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل",
     qMap:"الطريق", qCall:"اتصل", svcT:"الخدمات والأسعار", seeAll:"احجز",
+    followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
     waMsg:"السلام عليكم 👋 لدي حجز في {salon}", calAlarm:"موعد في {salon}"
   }
 };
@@ -831,6 +852,11 @@ const duration = () => chosen().reduce((a,s) => a + s.duree, 0) || CONFIG.crenea
 const fallbackTeam = () => CONFIG.coiffeurs.map(n => ({ nom: n, photo: "", de: null, a: null, repos: (CONFIG.reposCoiffeurs || {})[n] || [] }));
 let TEAM = (store.get("ob_cfg", null) || {}).coiffeurs || fallbackTeam();
 let GALLERY = (store.get("ob_cfg", null) || {}).galerie || CONFIG.galerie || [];
+let SALON = (store.get("ob_cfg", null) || {}).salon || {};
+const mapsLink = () => SALON.maps || CONFIG.mapsUrl;
+const igLink = () => { const v = SALON.instagram || CONFIG.instagram || ""; return !v ? "" : v.startsWith("http") ? v : "https://instagram.com/" + v.replace(/^@/, ""); };
+const igName = () => { const v = SALON.instagram || CONFIG.instagram || ""; return v.startsWith("http") ? "Instagram" : "@" + v.replace(/^@/, ""); };
+const fbLink = () => SALON.facebook || CONFIG.facebook || "";
 let SERVICES = ((store.get("ob_cfg", null) || {}).services || CONFIG.services.map((s, i) => ({ id: "s" + (i + 1), ...s }))).map(s => ({ photo: "", ...s }));
 const member = name => TEAM.find(x => x.nom === name);
 const names = () => TEAM.map(x => x.nom);
@@ -852,10 +878,12 @@ async function loadConfig(){
     if (!j.ok || !Array.isArray(j.coiffeurs) || !j.coiffeurs.length) return;
     TEAM = j.coiffeurs; GALLERY = j.galerie || [];
     if (Array.isArray(j.services) && j.services.length) SERVICES = j.services;
+    if (j.salon) SALON = j.salon;
     st.services = st.services.filter(id => SERVICES.some(s => s.id === id));
-    store.set("ob_cfg", { coiffeurs: TEAM, galerie: GALLERY, services: SERVICES });
+    store.set("ob_cfg", { coiffeurs: TEAM, galerie: GALLERY, services: SERVICES, salon: SALON });
+    renderLinks();
     if (st.step === 1) renderServices();
-    renderSvcStrip(); update();
+    renderSvcStrip(); renderLinks(); update();
     if (st.barber !== ANY && !member(st.barber)) st.barber = ANY;
     renderGallery(); renderTeamStrip();
     if (st.step === 2) renderTeam();
@@ -894,10 +922,10 @@ function renderStatic(){
   $("#where").textContent = "📍 " + CONFIG.adresse;
   { const hh = hoursFor(new Date()), m = nowMin(), open = hh && m >= toMin(hh[0]) && m < toMin(hh[1]);
     $("#openChip").classList.toggle("closed", !open); $("#openChip b").textContent = open ? t("openNow") + " · " + hh[1] : t("closedNow"); }
-  $("#addrTxt").textContent = CONFIG.adresse; $("#addrLink").href = CONFIG.mapsUrl || "#";
+  $("#addrTxt").textContent = CONFIG.adresse;
   $("#quick").innerHTML =
     `<a class="wa" href="https://wa.me/${esc(CONFIG.whatsapp)}" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg></i>WhatsApp</a>
-     <a href="${esc(CONFIG.mapsUrl)}" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg></i>${t("qMap")}</a>
+     <a class="maplink" href="#" target="_blank" rel="noopener"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg></i>${t("qMap")}</a>
      <a href="tel:+${esc(CONFIG.whatsapp)}"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg></i>${t("qCall")}</a>`;
   $("#footTxt").textContent = "© " + new Date().getFullYear() + " " + CONFIG.salon + " · " + CONFIG.ville;
   renderSvcStrip();
@@ -1009,6 +1037,23 @@ document.addEventListener("click", e => {
   const b = e.target.closest("#svcStrip button[data-sid]"); if (!b) return;
   resetFlow(); st.services = [b.dataset.sid]; go(1);
 });
+
+const IG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>';
+const FB_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z"/></svg>';
+const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+const NAV_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
+function socialHtml(){
+  const ig = igLink(), fb = fbLink(); if (!ig && !fb) return "";
+  return `<div class="social"><span>${t("followT")}</span><div>` +
+    (ig ? `<a class="ig" href="${esc(ig)}" target="_blank" rel="noopener" aria-label="Instagram">${IG_SVG}<b>${esc(igName())}</b></a>` : "") +
+    (fb ? `<a class="fb" href="${esc(fb)}" target="_blank" rel="noopener" aria-label="Facebook">${FB_SVG}<b>Facebook</b></a>` : "") + `</div></div>`;
+}
+function renderLinks(){
+  document.querySelectorAll(".maplink").forEach(a => a.href = mapsLink());
+  if ($("#addrLink")) $("#addrLink").href = mapsLink();
+  if ($("#homeSocial")) $("#homeSocial").innerHTML = socialHtml();
+  if ($("#tkSocial")) $("#tkSocial").innerHTML = socialHtml();
+}
 
 /* ---------- 2. coiffeur ---------- */
 const avatar = c => c.photo ? `<img src="${esc(c.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : esc((c.nom || "?")[0].toUpperCase());
@@ -1270,7 +1315,10 @@ function showTicket(stay){
       <dt>${t("tTotal")}</dt><dd>${price(finalTotal())}</dd>
     </dl>
     <div class="ref"><span>${t("tRef")}</span><b dir="ltr">#${esc(r.id)}</b></div>
-    <div class="barcode" aria-hidden="true"></div>`;
+    <div class="barcode" aria-hidden="true"></div>
+    <a class="tk-map maplink" href="${esc(mapsLink())}" target="_blank" rel="noopener">
+      <i>${PIN_SVG}</i><span><small>${t("mapRow")}</small>${esc(CONFIG.adresse)}</span><b>${NAV_SVG}${t("qMap")}</b></a>`;
+  $("#tkSocial").innerHTML = socialHtml();
   const msg = `${t("waMsg", { salon: CONFIG.salon })}${pend ? " (" + t("stPending") + ")" : ""}
 📅 ${longDate(st.date)} · ${hhmm(st.start)}
 💈 ${r.barber}

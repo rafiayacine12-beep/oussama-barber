@@ -146,8 +146,8 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 .file{position:absolute;width:1px;height:1px;opacity:0}
 
 /* segmented */
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px;margin:4px 0 16px}
-.seg button{padding:11px;border-radius:10px;font-weight:700;font-size:14px;color:var(--mute)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px;margin:4px 0 16px}
+.seg button{padding:11px 4px;border-radius:10px;font-weight:700;font-size:13px;color:var(--mute)}
 .seg button[aria-selected=true]{background:var(--ink);color:#fff}
 /* services admin */
 .svcthumb{width:64px;height:64px;border-radius:14px;flex:0 0 64px;background:var(--orsoft);overflow:hidden;display:grid;place-items:center;color:var(--or2);font-family:var(--display);font-weight:900;font-size:24px}
@@ -298,13 +298,25 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
     <section id="t-team" hidden>
       <h2>Salon</h2>
       <div class="seg" role="tablist">
-        <button role="tab" data-seg="svc" aria-selected="true">✂️ Services w prix</button>
+        <button role="tab" data-seg="svc" aria-selected="true">✂️ Services</button>
         <button role="tab" data-seg="team" aria-selected="false">👤 L-équipe</button>
+        <button role="tab" data-seg="info" aria-selected="false">📍 Infos</button>
       </div>
       <div id="segSvc">
         <p class="sub">L-prix, l-wa9t, smiya w tswira dyal kol service. Kaybanou f étape 1 dyal réservation.</p>
         <div class="list" id="svcList"></div>
         <button class="btn ghost full" type="button" id="addSvc">＋ Zid service</button>
+      </div>
+      <div id="segInfo" hidden>
+        <p class="sub">Had les liens kaybanou f ticket dyal l-client, f l-accueil, w f message dyal l-confirmation.</p>
+        <form class="form" id="salonForm">
+          <div><label for="iMaps">Lien Google Maps dyal s-salon</label><input id="iMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…">
+            <div class="s" style="font-size:12px;color:var(--mute);margin-top:5px">F Google Maps: 7el s-salon → Partager → Copier le lien.</div></div>
+          <div><label for="iIg">Instagram</label><input id="iIg" placeholder="@oussama.barber"></div>
+          <div><label for="iFb">Facebook (lien dyal la page)</label><input id="iFb" type="url" inputmode="url" placeholder="https://facebook.com/…"></div>
+          <button class="btn full" type="submit" id="iSave" style="margin-top:0">Sjjel</button>
+          <div class="err" id="iErr"></div>
+        </form>
       </div>
       <div id="segTeam" hidden>
         <p class="sub">Les coiffeurs li kaybanou f l-site, l-wa9t dyal l-khdma w nhar l-ra7a dyal kol wa7ed.</p>
@@ -362,7 +374,8 @@ const today = () => iso(new Date());
 const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === addDays(t,1)) return "Ghedda"; if (s === addDays(t,-1)) return "L-bare7"; const d = fromIso(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
 const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
 let PIN = ""; try { PIN = sessionStorage.getItem("ob_pin") || ""; } catch(e){}
-let CFG = { coiffeurs: [], galerie: [], services: [] };
+let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
+const MAPS_DEFAULT = "https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9";
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
 async function call(op, extra){
@@ -404,7 +417,7 @@ function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loa
 
 async function loadConfig(){
   const j = await call("getconfig");
-  if (j.ok){ CFG = { coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [] }; fillBarberSelect(); }
+  if (j.ok){ CFG = { coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); }
   return CFG;
 }
 function fillBarberSelect(){
@@ -420,11 +433,11 @@ function fmtDate(s, lg){
   return label(s).toLowerCase() === "lyoum" ? "lyoum" : label(s);
 }
 function clientMsg(r, ok){
-  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg);
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
   if (ok) return {
-    da: `Salam ${r.nom} 👋 réservation dyalek f Oussama Barber tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nNtsennawk!`,
-    fr: `Bonjour ${r.nom} 👋 votre réservation chez Oussama Barber est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nÀ bientôt !`,
-    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في Oussama Barber ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nفي انتظارك!` }[lg];
+    da: `Salam ${r.nom} 👋 réservation dyalek f Oussama Barber tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Kifach twsel: ${maps}\nNtsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 votre réservation chez Oussama Barber est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Itinéraire : ${maps}\nÀ bientôt !`,
+    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في Oussama Barber ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 الموقع: ${maps}\nفي انتظارك!` }[lg];
   return {
     da: `Salam ${r.nom}, smeh lina 🙏 ma qdernach nconfirmiw réservation dyal ${d} m3a ${r.heure}. Tqder tkhtar wa9t akhor hna: ${SITE}`,
     fr: `Bonjour ${r.nom}, désolé 🙏 nous ne pouvons pas confirmer votre réservation du ${d} à ${r.heure}. Choisissez un autre créneau ici : ${SITE}`,
@@ -455,19 +468,24 @@ function bindCards(container, list, reload){
   container.querySelectorAll(".st").forEach(b => b.onclick = async () => {
     const r = list.find(x => x.id === b.dataset.id); if (!r) return;
     const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
+    const decide = isPend(r.statut) && (s === "confirmé" || b.dataset.refuse);
+    // n7elou tab daba (f nefs l-click) bach l-navigateur ma ybloquihch, w n3amrouh b WhatsApp mn b3d
+    let win = null; if (decide){ try { win = window.open("", "_blank"); if (win) win.document.write('<p style="font:16px sans-serif;padding:24px">WhatsApp…</p>'); } catch(e){ win = null; } }
     b.disabled = true;
     try {
       const j = await call("status", { id: r.id, statut: s });
-      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
-      if (isPend(r.statut) && (s === "confirmé" || b.dataset.refuse)){
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; if (win) win.close(); return; }
+      if (decide){
         const card = b.closest(".rdv"), ok = s === "confirmé";
+        const wa = `https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}`;
+        if (win) win.location.href = wa; else location.href = wa;
         card.querySelector(".row").innerHTML = `<span class="pill ${ok ? "venu" : "annulé"}">${ok ? "✓ Tvalidat" : "Trefdat"}</span>`;
         const af = card.querySelector(".after"); af.hidden = false;
-        af.innerHTML = `<a href="https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}" target="_blank" rel="noopener">💬 Sift l-${ok ? "confirmation" : "message"} l ${esc(r.nom)} f WhatsApp</a>`;
+        af.innerHTML = `<a href="${wa}" target="_blank" rel="noopener">💬 3awed 7el WhatsApp l ${esc(r.nom)}</a>`;
         toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
         setTimeout(() => { if (tab === "rdv") reload(); }, 15000);
       } else { toast("Tsjjel ✓"); reload(); }
-    } catch(e){ b.disabled = false; }
+    } catch(e){ b.disabled = false; if (win) win.close(); }
   });
   container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
     if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
@@ -481,6 +499,7 @@ function bindCards(container, list, reload){
 let lastPending = -1;
 async function loadPending(){
   try {
+    if (!CFG.salon || CFG.salon.maps === undefined) loadConfig().catch(() => {});
     const j = await call("pending"), list = j.list || [];
     LISTS.pending = list;
     $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
@@ -635,7 +654,24 @@ async function loadTeam(){
 }
 document.querySelectorAll("[data-seg]").forEach(b => b.onclick = () => {
   document.querySelectorAll("[data-seg]").forEach(x => x.setAttribute("aria-selected", x === b));
-  $("#segSvc").hidden = b.dataset.seg !== "svc"; $("#segTeam").hidden = b.dataset.seg !== "team";
+  $("#segSvc").hidden = b.dataset.seg !== "svc"; $("#segTeam").hidden = b.dataset.seg !== "team"; $("#segInfo").hidden = b.dataset.seg !== "info";
+});
+
+/* ---------- infos dyal salon ---------- */
+function fillSalon(){
+  const s = CFG.salon || {};
+  if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
+  $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
+}
+$("#salonForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#iErr").textContent = "";
+  const maps = $("#iMaps").value.trim(), fb = $("#iFb").value.trim();
+  if ((maps && !maps.startsWith("https://")) || (fb && !fb.startsWith("https://"))){ $("#iErr").textContent = "L-liens khasshom ybdaw b https://"; return; }
+  $("#iSave").disabled = true;
+  try { const j = await call("savesalon", { maps, instagram: $("#iIg").value.trim(), facebook: fb });
+    if (j.ok){ CFG.salon = j.salon; fillSalon(); toast("Tsjjel ✓ · l-site tbeddel"); } else $("#iErr").textContent = "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#iErr").textContent = "Ma kaynach connexion."; }
+  $("#iSave").disabled = false;
 });
 
 /* ---------- services ---------- */

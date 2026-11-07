@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v5
+ * BACKEND — Oussama Barber (Google Apps Script) · v6
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -120,6 +120,7 @@ function config_() {
   if (!c) c = { coiffeurs: DEFAULT_TEAM.map((n, i) => ({ id: 'c' + (i + 1), nom: n, actif: true, photo: '', de: DEFAULT_HOURS[0], a: DEFAULT_HOURS[1], repos: [] })), galerie: [] };
   c.coiffeurs = c.coiffeurs || []; c.galerie = c.galerie || [];
   if (!Array.isArray(c.services) || !c.services.length) c.services = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+  c.salon = c.salon || { maps: '', instagram: '', facebook: '' };
   return c;
 }
 function saveConfig_(c) { PropertiesService.getScriptProperties().setProperty('config', JSON.stringify(c)); }
@@ -127,6 +128,7 @@ function publicConfig_() {
   const c = config_();
   return { ok: true, coiffeurs: c.coiffeurs.filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, photo: x.photo || '', de: x.de, a: x.a, repos: x.repos || [] })),
     galerie: c.galerie.map(g => g.url),
+    salon: c.salon,
     services: c.services.filter(s => s.actif).map(s => ({ id: s.id, nom: s.nom, desc: s.desc, prix: s.prix, duree: s.duree, top: !!s.top, photo: s.photo || '' })) };
 }
 function worksAt_(name, date, start, dur) {
@@ -378,7 +380,15 @@ function admin_(b) {
         clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
         services: svc, barbers: brb, days: days } };
     }
-    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services }; }
+    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services, salon: c.salon }; }
+    case 'savesalon': {
+      const url = v => { v = String(v || '').trim().slice(0, 300); return /^https:\/\//.test(v) ? v : ''; };
+      const ig = String(b.instagram || '').trim().replace(/^@/, '').slice(0, 300);
+      const c = config_();
+      c.salon = { maps: url(b.maps), instagram: /^https:\/\//.test(ig) ? ig : ig.replace(/[^A-Za-z0-9._]/g, ''), facebook: url(b.facebook) };
+      saveConfig_(c);
+      return { ok: true, salon: c.salon };
+    }
     case 'saveservices': {
       if (!Array.isArray(b.services)) return { ok: false, error: 'services' };
       const str = (v, n) => String(v || '').trim().slice(0, n);
