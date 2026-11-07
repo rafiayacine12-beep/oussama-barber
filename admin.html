@@ -191,6 +191,23 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 .contact .blk.armed{background:var(--red);color:#fff}
 .dayof{font-size:12px;color:var(--or2);font-weight:700}
 
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(23,20,15,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .25s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.mhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mhead>div{flex:1;min-width:0}
+.mhead h3{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.mhead p{font-size:13px;color:var(--mute)}
+.mic{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px;background:var(--oksoft);color:var(--ok)}
+.mic.no{background:var(--redsoft);color:var(--red)}
+.sheet textarea{width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14.5px;line-height:1.5;resize:vertical;margin-bottom:12px}
+.sheet textarea:focus{outline:none;border-color:var(--or);background:#fff}
+.btn.wa{background:var(--wa);color:#05290F}
+.btn.wa:hover{background:#1FBF5B}
+
 /* stats */
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -356,6 +373,20 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 </div>
 <div class="toast" id="toast" hidden></div>
 
+<!-- popup dyal message WhatsApp -->
+<div class="modal" id="msgModal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="mIcon">✓</span><div><h3 id="mTitle"></h3><p id="mSub"></p></div>
+      <button class="iconbtn" type="button" id="mClose" aria-label="Sedd">✕</button></div>
+    <label class="lbl" for="mText">Message (tqder tbeddlo)</label>
+    <textarea id="mText" rows="7"></textarea>
+    <a class="btn full wa" id="mSend" href="#" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
+      Sift f WhatsApp</a>
+    <button class="btn ghost full" type="button" id="mLater" style="margin-top:8px">Mn b3d</button>
+  </div>
+</div>
+
 <script>
 (() => {
 "use strict";
@@ -469,23 +500,22 @@ function bindCards(container, list, reload){
     const r = list.find(x => x.id === b.dataset.id); if (!r) return;
     const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
     const decide = isPend(r.statut) && (s === "confirmé" || b.dataset.refuse);
-    // n7elou tab daba (f nefs l-click) bach l-navigateur ma ybloquihch, w n3amrouh b WhatsApp mn b3d
-    let win = null; if (decide){ try { win = window.open("", "_blank"); if (win) win.document.write('<p style="font:16px sans-serif;padding:24px">WhatsApp…</p>'); } catch(e){ win = null; } }
     b.disabled = true;
     try {
       const j = await call("status", { id: r.id, statut: s });
-      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; if (win) win.close(); return; }
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
       if (decide){
         const card = b.closest(".rdv"), ok = s === "confirmé";
         const wa = `https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}`;
-        if (win) win.location.href = wa; else location.href = wa;
+        openMsgModal(r, ok);
         card.querySelector(".row").innerHTML = `<span class="pill ${ok ? "venu" : "annulé"}">${ok ? "✓ Tvalidat" : "Trefdat"}</span>`;
         const af = card.querySelector(".after"); af.hidden = false;
-        af.innerHTML = `<a href="${wa}" target="_blank" rel="noopener">💬 3awed 7el WhatsApp l ${esc(r.nom)}</a>`;
+        af.innerHTML = `<a href="#" data-remsg="1">💬 Sift l-message l ${esc(r.nom)} f WhatsApp</a>`;
+        af.querySelector("[data-remsg]").onclick = e => { e.preventDefault(); openMsgModal(r, ok); };
         toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
         setTimeout(() => { if (tab === "rdv") reload(); }, 15000);
       } else { toast("Tsjjel ✓"); reload(); }
-    } catch(e){ b.disabled = false; if (win) win.close(); }
+    } catch(e){ b.disabled = false; }
   });
   container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
     if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
@@ -494,6 +524,27 @@ function bindCards(container, list, reload){
     catch(e){ b.disabled = false; }
   });
 }
+
+/* ---------- popup message ---------- */
+let modalR = null;
+function waHref(){ return `https://wa.me/${waNum(modalR.tel)}?text=${encodeURIComponent($("#mText").value)}`; }
+function openMsgModal(r, ok){
+  modalR = r;
+  $("#mIcon").textContent = ok ? "✓" : "✕"; $("#mIcon").classList.toggle("no", !ok);
+  $("#mTitle").textContent = ok ? "Réservation tvalidat" : "Réservation trefdat";
+  $("#mSub").textContent = `${r.nom} · ${label(r.date)} · ${r.heure} — sift lih l-message`;
+  $("#mText").value = clientMsg(r, ok);
+  $("#mSend").href = waHref();
+  $("#msgModal").hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(() => $("#mSend").focus(), 50);
+}
+function closeMsgModal(){ $("#msgModal").hidden = true; document.body.style.overflow = ""; }
+$("#mText").addEventListener("input", () => { $("#mSend").href = waHref(); });
+$("#mSend").addEventListener("click", () => { $("#mSend").href = waHref(); setTimeout(closeMsgModal, 300); toast("WhatsApp t7el ✓"); });
+$("#mClose").addEventListener("click", closeMsgModal);
+$("#mLater").addEventListener("click", closeMsgModal);
+$("#msgModal").addEventListener("click", e => { if (e.target.id === "msgModal") closeMsgModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#msgModal").hidden) closeMsgModal(); });
 
 /* ---------- en attente ---------- */
 let lastPending = -1;
