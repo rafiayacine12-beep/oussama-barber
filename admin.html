@@ -1013,6 +1013,12 @@ function applyRole(){
 }
 let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
 try { CFG.salon = JSON.parse(localStorage.getItem("ob_admin_salon") || "null") || {}; } catch(e){}
+/* cache: kanbiyno l-données li fatou dghya, w kanjibou l-jdad men lor */
+const cKey = k => "ob_c_" + k + "_" + ROLE + "_" + ME;
+function cGet(k){ try { return JSON.parse(localStorage.getItem(cKey(k)) || "null"); } catch(e){ return null; } }
+function cSet(k, v){ try { localStorage.setItem(cKey(k), JSON.stringify(v)); } catch(e){} }
+function cClear(){ try { Object.keys(localStorage).filter(k => k.indexOf("ob_c_") === 0).forEach(k => localStorage.removeItem(k)); } catch(e){} }
+{ const c = cGet("cfg"); if (c && c.coiffeurs) CFG = c; }
 const SN = () => (CFG.salon && CFG.salon.nom) || "Barber Junior";
 function paintName(){
   const n = SN();
@@ -1061,7 +1067,7 @@ $("#loginForm").addEventListener("submit", async e => {
   $("#loginBtn").disabled = false;
 });
 function logout(msg){
-  PIN = ""; ROLE = ""; ME = ""; try { sessionStorage.removeItem("ob_pin"); sessionStorage.removeItem("ob_who"); } catch(e){}
+  cClear(); PIN = ""; ROLE = ""; ME = ""; try { sessionStorage.removeItem("ob_pin"); sessionStorage.removeItem("ob_who"); } catch(e){}
   $("#app").hidden = true; $("#login").hidden = false; $("#pin").value = ""; paintDots(); $("#loginErr").textContent = msg || "";
   if (msg){ $("#pinDots").classList.remove("shake"); void $("#pinDots").offsetWidth; $("#pinDots").classList.add("shake"); }
 }
@@ -1087,10 +1093,16 @@ $("#moreMenu").querySelectorAll("[data-go]").forEach(b => b.addEventListener("cl
 $("#refresh").addEventListener("click", () => load());
 function load(){ ({ home: loadHome, rdv: loadRdv, money: loadMoney, more: () => {}, block: loadBlocks, team: loadTeam, photos: loadPhotos, shop: loadShop })[tab](); }
 
-async function loadConfig(){
-  const j = await call("getconfig");
-  if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); if (isOwner()) loadNotif(); }
-  return CFG;
+let _cfgP = null;
+function loadConfig(){
+  if (_cfgP) return _cfgP;              // ila kayna wa7da f t-tri9, ma nsifto jouj
+  const p = _cfgP = (async () => {
+    const j = await call("getconfig");
+    if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; cSet("cfg", CFG); fillBarberSelect(); fillSalon(); }
+    return CFG;
+  })();
+  p.finally(() => { if (_cfgP === p) _cfgP = null; }).catch(() => {});
+  return p;
 }
 function fillBarberSelect(){
   if (!isOwner()){ $("#bWho").innerHTML = `<option>${esc(ME)}</option>`; return; }
@@ -1295,16 +1307,15 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#msgMo
 
 /* ---------- en attente ---------- */
 let lastPending = -1;
-async function loadPending(){
-  try {
-    if (!CFG.salon || CFG.salon.maps === undefined) loadConfig().catch(() => {});
-    const j = await call("pending"), list = j.list || [];
+function paintPending(list, cached){
     LISTS.pending = list;
     $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
     $("#pendList").innerHTML = list.map(r => rdvCard(r, true)).join("");
     bindCards($("#pendList"), list, () => { loadPending(); if (tab === "home") loadHomeDay(); });
-    setPendingBadge(list.length);
-  } catch(e){}
+    if (cached) paintBadge(list.length); else setPendingBadge(list.length);
+}
+async function loadPending(){
+  try { const j = await call("pending"), list = j.list || []; cSet("pend", list); paintPending(list); } catch(e){}
 }
 function paintBadge(n){
   const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
@@ -1367,12 +1378,13 @@ function remMsg(r){
     fr: `Bonjour ${r.nom} 👋 petit rappel de votre rendez-vous chez ${SN()} demain :\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nSi vous ne pouvez pas venir, prévenez-nous 🙏 À demain !`,
     ar: `مرحبا ${r.nom} 👋 كنفكروك بالموعد ديالك في ${SN()} غدا:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nإلا ما تقدرش تجي، علمنا 🙏 في انتظارك!` }[lg];
 }
-async function loadReminders(){
+async function loadReminders(p){
+  try { const h = await (p || homeList()); paintReminders(h.all.filter(r => r.date === h.tmr)); } catch(e){}
+}
+function paintReminders(raw){
   const box = $("#remBox"); if (!box) return;
-  const d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
-  try {
-    const j = await call("list", { from: tmr, to: tmr });
-    const list = (j.list || []).filter(r => !String(r.statut).startsWith("annul") && !String(r.statut).startsWith("absent")).sort((a,b) => a.heure.localeCompare(b.heure));
+  {
+    const list = raw.filter(r => !String(r.statut).startsWith("annul") && !String(r.statut).startsWith("absent")).sort((a,b) => a.heure.localeCompare(b.heure));
     if (!list.length){ box.innerHTML = ""; return; }
     const sent = id => { try { return localStorage.getItem("rem_" + id) === "1"; } catch(e){ return false; } };
     const left = list.filter(r => !sent(r.id)).length;
@@ -1384,13 +1396,15 @@ async function loadReminders(){
       const row = a.closest(".ri"); try { localStorage.setItem("rem_" + row.dataset.id, "1"); } catch(e){}
       setTimeout(() => { row.classList.add("sent"); a.textContent = "✓ Tsifet"; const n = box.querySelectorAll(".ri:not(.sent)").length; box.querySelector("summary small").textContent = n ? n + " mazal" : "Kolchi tsifet ✓"; }, 400);
     }));
-  } catch(e){ box.innerHTML = ""; }
+  }
 }
 /* ---------- attente (f rendez-vous) ---------- */
 $("#waitBar").addEventListener("click", () => { $("#waitSec").hidden = false; $("#waitSec").scrollIntoView({ behavior:"smooth" }); });
 async function loadWait(){
-  try {
-    const j = await call("waitlist"), list = j.list || [];
+  try { const j = await call("waitlist"), list = j.list || []; cSet("wait", list); paintWait(list); } catch(e){}
+}
+function paintWait(list){
+  {
     const pending = list.filter(w => w.statut.includes("attente"));
     $("#waitBadge").dataset.wait = pending.length; paintBadge(Math.max(0, lastPending));
     $("#waitBar").hidden = !pending.length; $("#waitN").textContent = pending.length;
@@ -1403,7 +1417,7 @@ async function loadWait(){
     $("#waitList").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
       b.disabled = true; try { const j = await call("waitdone", { id: b.dataset.id }); if (j.ok) loadWait(); } catch(e){ b.disabled = false; }
     });
-  } catch(e){}
+  }
 }
 
 /* ---------- blocages ---------- */
@@ -1485,6 +1499,7 @@ let team = [], openId = null;
 async function loadTeam(){
   $("#teamList").innerHTML = $("#svcList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
   try {
+    if (isOwner()) loadNotif();
     await loadConfig();
     team = JSON.parse(JSON.stringify(CFG.coiffeurs)); renderTeam();
     svcs = JSON.parse(JSON.stringify(CFG.services)); renderSvcs();
@@ -2065,13 +2080,32 @@ function ava(name, size){
 }
 
 /* ---------- LYOUM ---------- */
-function loadHome(){ setHello(); loadPending(); loadReminders(); loadWait(); loadHomeDay(); }
-async function loadHomeDay(){
-  const t = today();
-  $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
+/* talab wa7ed l lyoum + ghedda (bla jouj) */
+function homeList(){
+  const t = today(), d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
+  return call("list", { from: t, to: tmr }).then(j => { const h = { t, tmr, all: j.list || [] }; cSet("home", h); return h; });
+}
+function loadHome(){
+  setHello();
+  const p = homeList(); p.catch(() => {});        // l-awla: rendez-vous dyal lyoum
+  // kanbiyno dghya akhir données li kaynin, 7ta yjiw l-jdad
+  const h = cGet("home");
+  if (h && h.t === today() && CFG.coiffeurs.length){ paintHomeDay(h.all.filter(r => r.date === h.t)); paintReminders(h.all.filter(r => r.date === h.tmr)); }
+  const pe = cGet("pend"); if (pe) paintPending(pe, true);
+  const w = cGet("wait"); if (w) paintWait(w);
+  loadHomeDay(p, !!(h && h.t === today())); loadReminders(p); loadPending(); loadWait();
+}
+async function loadHomeDay(p, quiet){
+  if (!quiet) $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
   try {
-    await ensureConfig();
-    const j = await call("list", { from: t, to: t }), list = j.list || [], live = list.filter(isLive);
+    const [h] = await Promise.all([p || homeList(), ensureConfig()]);
+    paintHomeDay(h.all.filter(r => r.date === h.t));
+  } catch(e){ if (e.message !== "auth" && !quiet) $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+}
+function paintHomeDay(list){
+  const t = today();
+  {
+    const live = list.filter(isLive);
     const venu = live.filter(isVenu), enc = venu.reduce((a, r) => a + r.prix, 0);
     const prevu = live.filter(r => !isAbs(r) && !isPend(r.statut)).reduce((a, r) => a + r.prix, 0);
     $("#daySum").innerHTML = `
@@ -2096,7 +2130,7 @@ async function loadHomeDay(){
           <div class="ttn"><b>${mine.length}</b><small>${money(mine.filter(isVenu).reduce((a, r) => a + r.prix, 0))} DH</small></div></div>`;
       }).join("")}</div>`;
     } else $("#teamToday").innerHTML = "";
-  } catch(e){ if (e.message !== "auth") $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+  }
 }
 document.querySelectorAll("#quick [data-q]").forEach(b => b.addEventListener("click", () => {
   const q = b.dataset.q;
@@ -2467,9 +2501,9 @@ async function start(){
   $("#login").hidden = true; $("#app").hidden = false;
   if (!ROLE){ try { const j = await call("login"); if (!j.ok) return; setWho(j); } catch(e){ if (e.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; return; } }
   else applyRole();
-  loadConfig().catch(() => {});
   if (location.hash === "#boutique" && isOwner()) setTab("shop"); else setTab("home");
-  if (isOwner()) refreshShopBadge();
+  loadConfig().catch(() => {});
+  if (isOwner()) setTimeout(refreshShopBadge, 4000);
   if (location.hash === "#pending") setTimeout(() => { if (!$("#pendBox").hidden) $("#pendBox").scrollIntoView({ behavior:"smooth" }); }, 1500);
   clearInterval(window._poll); window._poll = setInterval(() => { refreshPendingCount(); if (isOwner()) refreshShopBadge(); if (tab === "rdv" && day === today() && VIEW === "plan") renderDay(); }, 60000);
   if (!start._vis){ start._vis = true; document.addEventListener("visibilitychange", () => { if (!document.hidden && PIN){ refreshPendingCount(); if (tab === "home") loadHome(); } }); }

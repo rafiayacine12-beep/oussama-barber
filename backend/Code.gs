@@ -298,9 +298,12 @@ function loyalty_(phone) {
 }
 
 /* ---------------- POST ---------------- */
+const READ_OPS = ['login', 'list', 'pending', 'blocked', 'blocks', 'waitlist', 'stats', 'getnotif', 'getconfig', 'getshop', 'orders'];
 function doPost(e) {
   let b;
   try { b = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, error: 'json' }); }
+  // L-9raya (admin) ma kat7tajch lock: kaytjbdo b jouj f nefs l-wa9t → l-admin kayt7el dghya
+  if (b.action === 'admin' && READ_OPS.indexOf(b.op) >= 0) return json_(admin_(b));
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
