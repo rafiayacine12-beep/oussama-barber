@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#0e0e0e">
+<title>Réservation Barber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+/* =====================================================================
+   CONFIG — BEDDEL GHIR HNA. Ma t9ich l-code li ta7t.
+   ===================================================================== */
+const CONFIG = {
+  salon:    "Oussama Barber",
+  ville:    "Salé",
+  adresse:  "Tabriquet, Salé",
+  whatsapp: "212655778899",        // numéro WhatsApp: 212 + numéro bla 0 (ex: 212612345678)
+  telAffiche: "06 55 77 88 99",
+
+  // URL dyal Google Apps Script (kat-sali b /exec). Khlliha khawya = mode démo.
+  apiUrl: "https://script.google.com/macros/s/AKfycbzBna68m3uYB009UEVxlTisv_vr2G3eAaMUGQg0eeThgE43x_TUKor1Frhb1s8a-8NmIQ/exec",
+
+  creneau: 30,                     // ch7al d dqiqa bin crénau w lakhor
+  delaiMin: 30,                    // l-client ma yqderch yréservi 9bel mn had l-w9t (dqayq)
+
+  services: [
+    { nom: "Coupe",          prix: 40, duree: 30, icon: "✂️" },
+    { nom: "Dégradé",        prix: 50, duree: 30, icon: "💈" },
+    { nom: "Barbe",          prix: 25, duree: 20, icon: "🧔" },
+    { nom: "Coupe + Barbe",  prix: 60, duree: 45, icon: "⭐" },
+    { nom: "Soin visage",    prix: 60, duree: 30, icon: "🧖" },
+    { nom: "Coupe enfant",   prix: 30, duree: 30, icon: "👦" }
+  ],
+
+  coiffeurs: ["Oussama", "Yassine", "Aymane"],
+
+  // Horaires: [ouverture, fermeture]. null = msdod.
+  horaires: {
+    lundi:    ["11:00", "21:00"],
+    mardi:    ["11:00", "21:00"],
+    mercredi: ["11:00", "21:00"],
+    jeudi:    ["11:00", "21:00"],
+    vendredi: ["11:00", "21:00"],
+    samedi:   ["11:00", "21:00"],
+    dimanche: ["11:00", "21:00"]   // null = nhar l-3otla
+  }
+};
+/* ===================================================================== */
+</script>
+<style>
+:root{--bg:#0e0e0e;--card:#181818;--card2:#202020;--line:#2c2c2c;--text:#f4f1ea;--muted:#9b978e;--gold:#d6a84f;--gold2:#f1c873;--wa:#25d366;--red:#ff6b6b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:110px}
+
+/* header */
+.top{padding:22px 20px 10px;text-align:center;background:radial-gradient(ellipse at top,rgba(214,168,79,.2),transparent 70%)}
+.brand{font-family:"Bebas Neue";font-size:40px;letter-spacing:2px;line-height:1}
+.brand span{color:var(--gold)}
+.loc{color:var(--muted);font-size:13px;margin-top:4px}
+.open{display:inline-block;margin-top:10px;font-size:12px;padding:4px 10px;border-radius:99px;background:#1d1d1d;border:1px solid var(--line)}
+.open i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--red);vertical-align:1px}
+.open.on i{background:var(--wa)}
+
+/* progress */
+.prog{display:flex;gap:6px;padding:14px 20px 4px}
+.prog div{flex:1;text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.prog div::before{content:"";display:block;height:5px;border-radius:5px;background:var(--line);margin-bottom:6px;transition:.25s}
+.prog div.on{color:var(--text)}
+.prog div.on::before{background:var(--gold)}
+
+.screen{padding:16px 20px;display:none;animation:in .25s ease}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font-family:"Bebas Neue";font-size:36px;letter-spacing:1.5px;line-height:1.05}
+.hint{color:var(--muted);font-size:14px;margin:4px 0 16px}
+.back{font-size:14px;color:var(--muted);padding:6px 0;margin-bottom:6px}
+
+/* options */
+.list{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;min-height:72px;transition:.12s}
+.opt:active{transform:scale(.98)}
+.opt.sel{border-color:var(--gold);background:#231d12}
+.opt .ic{font-size:26px;width:44px;height:44px;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex:0 0 44px}
+.opt .tx{flex:1}
+.opt .n{font-weight:700;font-size:16px}
+.opt .d{color:var(--muted);font-size:13px}
+.opt .p{font-weight:800;color:var(--gold);white-space:nowrap}
+.check{width:24px;height:24px;border-radius:7px;border:2px solid #555;flex:0 0 24px;display:grid;place-items:center;font-size:14px;color:#111}
+.opt.sel .check{background:var(--gold);border-color:var(--gold)}
+.check.round{border-radius:50%}
+
+/* days */
+.days{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.day{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 0;text-align:center;min-height:78px}
+.day .w{font-size:12px;color:var(--muted);text-transform:capitalize}
+.day .n{font-size:24px;font-weight:800;line-height:1.2}
+.day .m{font-size:11px;color:var(--muted);text-transform:capitalize}
+.day.sel{border-color:var(--gold);background:#231d12}
+.day:disabled{opacity:.28;cursor:not-allowed}
+.day:disabled .m::after{content:" · msdod"}
+
+/* times */
+.period{font-size:13px;color:var(--muted);font-weight:600;margin:14px 0 8px}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.time{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:13px 0;font-weight:700;font-size:15px}
+.time.sel{background:var(--gold);border-color:var(--gold);color:#111}
+.time:disabled{opacity:.25;text-decoration:line-through;cursor:not-allowed}
+.empty{color:var(--muted);text-align:center;padding:30px 10px;background:var(--card);border-radius:14px}
+.loading{color:var(--muted);text-align:center;padding:30px}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid #444;border-top-color:var(--gold);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-4px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* form */
+.field{margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+input{width:100%;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px;font:inherit;font-size:16px;color:var(--text)}
+input:focus{outline:none;border-color:var(--gold)}
+.recap{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.row:last-child{border:0}
+.row span{color:var(--muted)}
+.row b{text-align:right}
+.row.tot{font-size:18px}
+.row.tot b{color:var(--gold)}
+.err{color:var(--red);font-size:14px;min-height:20px;margin-top:6px;text-align:center}
+
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(14,14,14,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom))}
+.bar .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.sum{flex:1;font-size:13px;color:var(--muted)}
+.sum b{display:block;color:var(--text);font-size:17px}
+.btn{background:var(--gold);color:#111;font-weight:800;border-radius:14px;padding:16px 22px;font-size:16px;min-width:150px;transition:.12s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.full{width:100%}
+.btn.wa{background:var(--wa);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+
+/* done */
+.done{text-align:center}
+.tick{width:84px;height:84px;margin:10px auto 14px;border-radius:50%;background:rgba(37,211,102,.12);display:grid;place-items:center;font-size:42px;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.4)}to{transform:scale(1)}}
+.done .ref{color:var(--muted);font-size:13px;margin:4px 0 18px}
+.done .recap{text-align:left}
+.stack{display:grid;gap:10px}
+.small{color:var(--muted);font-size:12px;text-align:center;margin-top:10px;word-break:break-all}
+.demo{margin:10px 20px 0;padding:10px 12px;border-radius:10px;background:#2a2212;border:1px solid #4d3d1c;color:#e8c67d;font-size:12px;text-align:center}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:24px 20px 0}
+footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand" id="brand"></div>
+    <div class="loc" id="loc"></div>
+    <div class="open" id="open"><i></i><span></span></div>
+  </div>
+  <div class="demo" id="demo" hidden>Mode démo: les réservations katsjjel ghir f had t-téléphone. Zid <b>apiUrl</b> f CONFIG bach tkhdem 7a9i9a.</div>
+
+  <div class="prog" id="prog">
+    <div data-s="1">Service</div><div data-s="2">Coiffeur</div><div data-s="3">Nhar</div><div data-s="4">Sa3a</div>
+  </div>
+
+  <!-- 1 SERVICE -->
+  <section class="screen on" id="s1">
+    <h2>Khtar service dyalek</h2>
+    <p class="hint">Tqder tkhtar ktar mn wa7ed 👇</p>
+    <div class="list" id="services"></div>
+  </section>
+
+  <!-- 2 COIFFEUR -->
+  <section class="screen" id="s2">
+    <button class="back" data-go="1">← Rje3</button>
+    <h2>Chkoun l-coiffeur?</h2>
+    <p class="hint">Ila ma3ndekch chi wa7ed, khtar "Ay wa7ed" w ghadi tl9a blassa asra3.</p>
+    <div class="list" id="barbers"></div>
+  </section>
+
+  <!-- 3 JOUR -->
+  <section class="screen" id="s3">
+    <button class="back" data-go="2">← Rje3</button>
+    <h2>Ach mn nhar?</h2>
+    <p class="hint">14 yawm jayin.</p>
+    <div class="days" id="days"></div>
+  </section>
+
+  <!-- 4 HEURE -->
+  <section class="screen" id="s4">
+    <button class="back" data-go="3">← Rje3</button>
+    <h2>Ach mn sa3a?</h2>
+    <p class="hint" id="dayLabel"></p>
+    <div id="times"></div>
+  </section>
+
+  <!-- 5 INFOS -->
+  <section class="screen" id="s5">
+    <button class="back" data-go="4">← Rje3</button>
+    <h2>Akhir 7aja 🙌</h2>
+    <p class="hint">Smiytek w numéro dyalek bach n3erfouk.</p>
+    <div class="recap" id="recap"></div>
+    <div class="field"><label for="name">Smiya</label><input id="name" autocomplete="name" placeholder="Ex: Yassine"></div>
+    <div class="field"><label for="phone">Numéro dyal téléphone</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="06 XX XX XX XX"></div>
+    <div class="err" id="err"></div>
+  </section>
+
+  <!-- 6 DONE -->
+  <section class="screen done" id="s6">
+    <div class="tick">✅</div>
+    <h2>Réservation dyalek tsjlat</h2>
+    <p class="ref" id="ref"></p>
+    <div class="recap" id="recapDone"></div>
+    <div class="stack">
+      <a class="btn wa full" id="waBtn" href="#" target="_blank" rel="noopener">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
+        Sift l-récap l salon f WhatsApp
+      </a>
+      <button class="btn ghost full" id="again">Réservation jdida</button>
+    </div>
+    <p class="small">Bghiti tbeddel wla tlghi? 3ayet l <b id="telDone"></b></p>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<div class="bar" id="bar">
+  <div class="in">
+    <div class="sum" id="sum"></div>
+    <button class="btn" id="next" disabled>Kemmel</button>
+  </div>
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const DAYKEYS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const DAYSHORT = ["Had","Tnin","Tlat","Larb3","Khmis","Jem3a","Sebt"];
+const MONTHS = ["jan","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
+const ANY = "__any__";
+const pad = n => String(n).padStart(2,"0");
+const toMin = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
+const hhmm = m => pad(Math.floor(m/60))+":"+pad(m%60);
+const iso = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fromIso = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const niceDate = s => { const d = fromIso(s); return DAYSHORT[d.getDay()]+" "+d.getDate()+" "+MONTHS[d.getMonth()]; };
+
+const st = { step:1, services:[], barber:null, date:null, start:null, bookings:[], result:null };
+const DEMO = !CONFIG.apiUrl;
+
+/* ---------- storage (API wla démo) ---------- */
+const demoKey = "barber_demo_bookings";
+const demoAll = () => { try { return JSON.parse(localStorage.getItem(demoKey)) || []; } catch(e) { return []; } };
+const demoSave = l => { try { localStorage.setItem(demoKey, JSON.stringify(l)); } catch(e) {} };
+const overlaps = (list, b, s, d) => list.some(x => x.barber === b && s < x.start + x.dur && x.start < s + d);
+
+async function fetchBookings(date){
+  if (DEMO) return demoAll().filter(b => b.date === date);
+  const r = await fetch(CONFIG.apiUrl + "?date=" + date, { cache:"no-store" });
+  const j = await r.json();
+  if (!j.ok) throw new Error("api");
+  return j.bookings;
+}
+async function saveBooking(p){
+  if (DEMO) {
+    const all = demoAll(), day = all.filter(b => b.date === p.date);
+    const barber = p.candidates.find(c => !overlaps(day, c, p.start, p.dur));
+    if (!barber) return { ok:false, error:"taken" };
+    all.push({ date:p.date, start:p.start, dur:p.dur, barber });
+    demoSave(all);
+    return { ok:true, barber, id: Math.random().toString(36).slice(2,8).toUpperCase() };
+  }
+  const r = await fetch(CONFIG.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(p) });
+  return r.json();
+}
+
+/* ---------- calculs ---------- */
+const chosen = () => CONFIG.services.filter((_,i) => st.services.includes(i));
+const total = () => chosen().reduce((a,s) => a + s.prix, 0);
+const duration = () => chosen().reduce((a,s) => a + s.duree, 0);
+const candidates = () => st.barber === ANY ? CONFIG.coiffeurs.slice() : [st.barber];
+const hoursFor = d => CONFIG.horaires[DAYKEYS[d.getDay()]];
+
+/* ---------- header ---------- */
+const parts = CONFIG.salon.trim().split(/\s+/);
+$("#brand").innerHTML = esc(parts[0]) + (parts.length > 1 ? " <span>" + esc(parts.slice(1).join(" ")) + "</span>" : "");
+$("#loc").textContent = "📍 " + CONFIG.adresse;
+document.title = CONFIG.salon + " · Réservation";
+(function(){
+  const now = new Date(), h = hoursFor(now), m = now.getHours()*60 + now.getMinutes();
+  const on = h && m >= toMin(h[0]) && m < toMin(h[1]);
+  $("#open").classList.toggle("on", !!on);
+  $("#open span").textContent = on ? "M7loul daba · 7ta " + h[1] : "Msdod daba · réservi 3adi 24h/24";
+})();
+$("#demo").hidden = !DEMO;
+$("#foot").innerHTML = "📞 " + esc(CONFIG.telAffiche) + " · " + esc(CONFIG.ville) + "<br>© " + new Date().getFullYear() + " " + esc(CONFIG.salon);
+$("#telDone").textContent = CONFIG.telAffiche;
+
+/* ---------- render ---------- */
+function renderServices(){
+  $("#services").innerHTML = CONFIG.services.map((s,i) => `
+    <button class="opt ${st.services.includes(i)?"sel":""}" data-i="${i}">
+      <div class="ic">${s.icon||"✂️"}</div>
+      <div class="tx"><div class="n">${esc(s.nom)}</div><div class="d">${s.duree} min</div></div>
+      <div class="p">${s.prix} DH</div>
+      <div class="check">${st.services.includes(i)?"✓":""}</div>
+    </button>`).join("");
+}
+$("#services").onclick = e => {
+  const b = e.target.closest(".opt"); if (!b) return;
+  const i = +b.dataset.i;
+  st.services = st.services.includes(i) ? st.services.filter(x => x !== i) : [...st.services, i];
+  st.start = null; renderServices(); bar();
+};
+
+function renderBarbers(){
+  const list = [{ id:ANY, n:"Ay wa7ed", d:"Li khawi l-awwel", ic:"🎲" }]
+    .concat(CONFIG.coiffeurs.map(c => ({ id:c, n:c, d:"Coiffeur", ic:"💈" })));
+  $("#barbers").innerHTML = list.map(o => `
+    <button class="opt ${st.barber===o.id?"sel":""}" data-id="${esc(o.id)}">
+      <div class="ic">${o.ic}</div>
+      <div class="tx"><div class="n">${esc(o.n)}</div><div class="d">${o.d}</div></div>
+      <div class="check round">${st.barber===o.id?"✓":""}</div>
+    </button>`).join("");
+}
+$("#barbers").onclick = e => {
+  const b = e.target.closest(".opt"); if (!b) return;
+  st.barber = b.dataset.id; st.start = null; renderBarbers(); bar();
+  setTimeout(() => go(3), 180);
+};
+
+function renderDays(){
+  const t = new Date(); t.setHours(0,0,0,0);
+  let html = "";
+  for (let i = 0; i < 14; i++){
+    const d = new Date(t); d.setDate(t.getDate()+i);
+    const h = hoursFor(d);
+    // lyoum msdod ila fat l-akhir crénau
+    const late = i === 0 && h && (new Date().getHours()*60 + new Date().getMinutes() + CONFIG.delaiMin) > toMin(h[1]) - duration();
+    const w = i === 0 ? "Lyoum" : i === 1 ? "Ghedda" : DAYSHORT[d.getDay()];
+    html += `<button class="day ${st.date===iso(d)?"sel":""}" data-d="${iso(d)}" ${(!h||late)?"disabled":""}>
+      <div class="w">${w}</div><div class="n">${d.getDate()}</div><div class="m">${MONTHS[d.getMonth()]}</div></button>`;
+  }
+  $("#days").innerHTML = html;
+}
+$("#days").onclick = e => {
+  const b = e.target.closest(".day"); if (!b || b.disabled) return;
+  st.date = b.dataset.d; st.start = null; renderDays(); bar();
+  setTimeout(() => go(4), 180);
+};
+
+let loadSeq = 0;
+async function loadTimes(){
+  const seq = ++loadSeq;
+  $("#dayLabel").textContent = niceDate(st.date) + " · " + duration() + " min";
+  $("#times").innerHTML = '<div class="loading"><span class="spin"></span>Kanchoufou l-blayes l-khawyin…</div>';
+  try {
+    const list = await fetchBookings(st.date);
+    if (seq !== loadSeq) return;
+    st.bookings = list; renderTimes();
+  } catch(e) {
+    if (seq !== loadSeq) return;
+    $("#times").innerHTML = '<div class="empty">Kayn mochkil f l-connexion 😕<br><br><button class="btn" id="retry">3awed</button></div>';
+    $("#retry").onclick = loadTimes;
+  }
+}
+function slotFree(start){
+  const dur = duration();
+  return candidates().some(c => !overlaps(st.bookings, c, start, dur));
+}
+function renderTimes(){
+  const d = fromIso(st.date), h = hoursFor(d), dur = duration();
+  const now = new Date(), isToday = iso(now) === st.date;
+  const minStart = now.getHours()*60 + now.getMinutes() + CONFIG.delaiMin;
+  const groups = { "☀️ Sba7": [], "🌤️ L3chiya": [], "🌙 Lil": [] };
+  let free = 0;
+  for (let m = toMin(h[0]); m + dur <= toMin(h[1]); m += CONFIG.creneau){
+    const ok = !(isToday && m < minStart) && slotFree(m);
+    if (ok) free++;
+    const g = m < 720 ? "☀️ Sba7" : m < 1080 ? "🌤️ L3chiya" : "🌙 Lil";
+    groups[g].push(`<button class="time ${st.start===m?"sel":""}" data-m="${m}" ${ok?"":"disabled"}>${hhmm(m)}</button>`);
+  }
+  if (!free){ $("#times").innerHTML = '<div class="empty">Ma bqat 7ta blassa f had nhar 😕<br>Jreb nhar akhor.</div>'; return; }
+  $("#times").innerHTML = Object.entries(groups).filter(([,v]) => v.length)
+    .map(([k,v]) => `<div class="period">${k}</div><div class="times">${v.join("")}</div>`).join("");
+}
+$("#times").onclick = e => {
+  const b = e.target.closest(".time"); if (!b || b.disabled) return;
+  st.start = +b.dataset.m; renderTimes(); bar();
+};
+
+function recapHtml(barberName){
+  return `
+    <div class="row"><span>Service</span><b>${chosen().map(s => esc(s.nom)).join(" + ")}</b></div>
+    <div class="row"><span>Coiffeur</span><b>${esc(barberName)}</b></div>
+    <div class="row"><span>Nhar</span><b>${niceDate(st.date)}</b></div>
+    <div class="row"><span>Sa3a</span><b>${hhmm(st.start)} (${duration()} min)</b></div>
+    <div class="row tot"><span>Total</span><b>${total()} DH</b></div>`;
+}
+
+/* ---------- navigation ---------- */
+function go(n){
+  st.step = n;
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === "s"+n));
+  document.querySelectorAll("#prog div").forEach(p => p.classList.toggle("on", +p.dataset.s <= Math.min(n,4)));
+  $("#prog").style.display = n === 6 ? "none" : "";
+  if (n === 1) renderServices();
+  if (n === 2) renderBarbers();
+  if (n === 3) renderDays();
+  if (n === 4) loadTimes();
+  if (n === 5) { $("#recap").innerHTML = recapHtml(st.barber === ANY ? "Ay wa7ed" : st.barber); $("#err").textContent = ""; }
+  bar();
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(+b.dataset.go));
+
+const phoneOk = () => /^(?:\+?212|0)[5-7]\d{8}$/.test($("#phone").value.replace(/[\s.\-]/g,""));
+function bar(){
+  const n = st.step, btn = $("#next");
+  $("#bar").style.display = n === 6 ? "none" : "";
+  const c = chosen();
+  $("#sum").innerHTML = c.length ? `${c.length} service${c.length>1?"s":""} · ${duration()} min<b>${total()} DH</b>` : "Ma khtariti 7ta service";
+  const ready = { 1: c.length > 0, 2: !!st.barber, 3: !!st.date, 4: st.start !== null,
+                  5: $("#name").value.trim().length > 1 && phoneOk() }[n];
+  btn.disabled = !ready;
+  btn.textContent = n === 5 ? "Confirmer la réservation" : "Kemmel →";
+}
+$("#name").oninput = bar;
+$("#phone").oninput = () => { bar(); $("#err").textContent = ""; };
+$("#phone").onblur = () => { if ($("#phone").value && !phoneOk()) $("#err").textContent = "Numéro machi sa7i7 (ex: 0612345678)"; };
+
+$("#next").onclick = async () => {
+  if (st.step < 5) return go(st.step + 1);
+  const btn = $("#next");
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Kansjjlo…';
+  const payload = {
+    date: st.date, start: st.start, dur: duration(), candidates: candidates(),
+    services: chosen().map(s => s.nom).join(" + "), price: total(),
+    name: $("#name").value.trim(), phone: $("#phone").value.trim()
+  };
+  try {
+    const r = await saveBooking(payload);
+    if (r.ok) { st.result = r; showDone(); return; }
+    if (r.error === "taken") {
+      $("#err").textContent = "Smeh lina, had sa3a t7jzat daba 🙏 Khtar sa3a okhra.";
+      setTimeout(() => go(4), 1600);
+    } else $("#err").textContent = "Chi 7aja ma mchatch. 3awed jreb.";
+  } catch(e) {
+    $("#err").textContent = "Mochkil f l-connexion. 3awed jreb.";
+  }
+  bar();
+};
+
+function showDone(){
+  const r = st.result;
+  $("#recapDone").innerHTML = recapHtml(r.barber) +
+    `<div class="row"><span>Smiya</span><b>${esc(payloadName())}</b></div>`;
+  $("#ref").textContent = "Référence: #" + r.id;
+  const msg =
+`Salam 👋 3endi réservation f ${CONFIG.salon}:
+✂️ ${chosen().map(s => s.nom).join(" + ")}
+💈 Coiffeur: ${r.barber}
+📅 ${niceDate(st.date)} · ${hhmm(st.start)}
+💰 ${total()} DH
+🙍 ${payloadName()} · ${$("#phone").value.trim()}
+🔖 Réf #${r.id}`;
+  $("#waBtn").href = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(msg);
+  go(6);
+}
+const payloadName = () => $("#name").value.trim();
+
+$("#again").onclick = () => {
+  Object.assign(st, { services:[], barber:null, date:null, start:null, bookings:[], result:null });
+  $("#name").value = ""; $("#phone").value = "";
+  go(1);
+};
+
+go(1);
+})();
+</script>
+</body>
+</html>
