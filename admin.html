@@ -696,7 +696,7 @@ function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loa
 
 async function loadConfig(){
   const j = await call("getconfig");
-  if (j.ok){ CFG = { coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); loadNotif(); }
+  if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); loadNotif(); }
   return CFG;
 }
 function fillBarberSelect(){
@@ -1305,14 +1305,16 @@ function renderTeam(){
   $("#teamList").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { openId = openId === b.dataset.edit ? null : b.dataset.edit; renderTeam(); });
   if (openId) bindEdit(team.find(c => c.id === openId));
 }
+const canRename = () => (CFG.v || 0) >= 9;
 function editForm(c){
   const isNew = !CFG.coiffeurs.some(x => x.id === c.id);
   return `<div class="edit">
     <div class="photo-pick"><div class="av" id="eAv">${avatar(c)}</div>
       <label class="btn sm ghost" for="eFile">📷 ${c.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="eFile" accept="image/*">
       ${c.photo ? `<button class="btn sm ghost" type="button" id="eNoPhoto">7ayed</button>` : ""}</div>
-    <div><label class="lbl" for="eName">Smiya</label><input id="eName" value="${esc(c.nom)}" maxlength="40" ${isNew ? "" : "readonly"} placeholder="Ex: Hamza">
-      ${isNew ? "" : `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Smiya ma katbeddelch 7it marbota b les rendez-vous.</div>`}</div>
+    <div><label class="lbl" for="eName">Smiya</label><input id="eName" value="${esc(c.nom)}" maxlength="40" ${isNew || canRename() ? "" : "readonly"} placeholder="Ex: Hamza">
+      ${isNew ? "" : canRename() ? `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Ila beddelti s-smiya, les rendez-vous dyalo kaytbeddlo m3aha.</div>`
+        : `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Bach tbeddel s-smiya, khass t-mettre à jour Code.gs f Apps Script (v9).</div>`}</div>
     <div class="two">
       <div><label class="lbl" for="eDe">Kaybda m3a</label><input type="time" id="eDe" value="${esc(c.de)}" step="1800"></div>
       <div><label class="lbl" for="eA">Kaysali m3a</label><input type="time" id="eA" value="${esc(c.a)}" step="1800"></div>
@@ -1357,8 +1359,11 @@ function bindEdit(c){
     if (c.repos && c.repos.length === 7){ $("#eErr").textContent = "Ma ymkench ykoun kol nhar ra7a. Ila ma b9ach, khtar \"Ma b9ach\"."; return; }
     $("#eSave").disabled = true;
     try {
+      const prev = (CFG.coiffeurs.find(x => x.id === c.id) || {}).nom;
       const j = await call("saveteam", { coiffeurs: team });
-      if (j.ok){ CFG.coiffeurs = j.coiffeurs; team = JSON.parse(JSON.stringify(j.coiffeurs)); openId = null; fillBarberSelect(); renderTeam(); toast("Tsjjel ✓ · l-site tbeddel"); }
+      if (j.ok && prev && prev !== c.nom.trim()){ toast(`${prev} → ${c.nom.trim()} ✓ · ${j.renamed || 0} rendez-vous tbeddlo`); }
+      else if (j.ok) toast("Tsjjel ✓ · l-site tbeddel");
+      if (j.ok){ CFG.coiffeurs = j.coiffeurs; team = JSON.parse(JSON.stringify(j.coiffeurs)); openId = null; fillBarberSelect(); renderTeam(); }
       else $("#eErr").textContent = j.error === "dup" ? "Had s-smiya deja kayna." : j.error === "hours" ? "Tchecki les heures." : "Ma tsjjelch.";
     } catch(err){ if (err.message !== "auth") $("#eErr").textContent = "Ma kaynach connexion."; }
     if ($("#eSave")) $("#eSave").disabled = false;

@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v8
+ * BACKEND — Oussama Barber (Google Apps Script) · v9
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -422,7 +422,7 @@ function admin_(b) {
       PropertiesService.getScriptProperties().setProperty('notif', JSON.stringify(n));
       return { ok: true, phone: ph, hasKey: true };
     }
-    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services, salon: c.salon }; }
+    case 'getconfig': { const c = config_(); return { ok: true, v: 9, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services, salon: c.salon }; }
     case 'savesalon': {
       const url = v => { v = String(v || '').trim().slice(0, 300); return /^https:\/\//.test(v) ? v : ''; };
       const ig = String(b.instagram || '').trim().replace(/^@/, '').slice(0, 300);
@@ -471,8 +471,24 @@ function admin_(b) {
       if (team.some(x => toMin_(x.a) <= toMin_(x.de))) return { ok: false, error: 'hours' };
       const names = team.map(x => x.nom.toLowerCase());
       if (new Set(names).size !== names.length) return { ok: false, error: 'dup' };
-      const c = config_(); c.coiffeurs = team; saveConfig_(c);
-      return { ok: true, coiffeurs: team };
+      const c = config_(), old = {};
+      c.coiffeurs.forEach(x => old[x.id] = x.nom);
+      // smiya tbeddlat → beddelha ta f les rendez-vous, blocages w liste d'attente
+      const ren = {};
+      team.forEach(x => { if (old[x.id] && old[x.id] !== x.nom) ren[old[x.id]] = x.nom; });
+      let renamed = 0;
+      if (Object.keys(ren).length) {
+        ['Reservations', 'Blocages', 'Attente'].forEach(name => {
+          const sh = sh_(name), col = SHEETS[name].indexOf('coiffeur') + 1, n = sh.getLastRow() - 1;
+          if (n < 1) return;
+          const rg = sh.getRange(2, col, n, 1), vals = rg.getValues();
+          let ch = false;
+          vals.forEach(v => { const k = String(v[0]).trim(); if (ren.hasOwnProperty(k)) { v[0] = ren[k]; ch = true; renamed++; } });
+          if (ch) rg.setValues(vals);
+        });
+      }
+      c.coiffeurs = team; saveConfig_(c);
+      return { ok: true, coiffeurs: team, renamed: renamed };
     }
     case 'upload': {
       const r = upload_(b);
