@@ -376,20 +376,24 @@ html[lang=ar] .how h3{font-family:"Noto Kufi Arabic",sans-serif;letter-spacing:0
 .bar .sum b{display:block;font-family:var(--display);font-weight:800;font-size:27px;color:var(--ink);line-height:1.05}
 .bar .cta{min-width:150px}
 /* ===== Annuler (brek mtwel) ===== */
-#s5{padding-bottom:190px}
-.hold-row{max-width:516px;margin:10px auto 0;display:flex;align-items:center;justify-content:center;gap:10px}
+#s5{padding-bottom:180px}
+.bar-acts{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.hold-row{display:flex;justify-content:center}
+.hold-row .hold{width:100%}
 .hold-row[hidden]{display:none}
-.hold{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;height:36px;min-width:176px;padding:0 14px;border-radius:10px;border:1px solid #E7B3AF;background:var(--redsoft);color:var(--red);font-weight:700;font-size:13px;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;transition:transform .15s cubic-bezier(.23,1,.32,1),background-color .15s,border-color .15s,color .15s;outline:none}
-.hold:focus-visible{box-shadow:0 0 0 2px #fff,0 0 0 4px #E7B3AF}
-.hold[data-input=pointer]:active{transform:scale(.98)}
+.hold{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;height:34px;min-width:118px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--mute);font-weight:600;font-size:13.5px;letter-spacing:.01em;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;transition:transform .15s cubic-bezier(.23,1,.32,1),border-color .15s,color .15s,background-color .15s;outline:none}
+.hold:hover{border-color:#D9D4CC;color:var(--ink2)}
+.hold:focus-visible{box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(200,50,42,.35)}
+.hold[data-input=pointer]:active{transform:scale(.97)}
+.hold.on{border-color:var(--red)}
 .hold .lb,.hold .ov{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .hold .lb{position:relative}
-.hold .ov{position:absolute;inset:0;padding:0 14px;background:var(--red);color:#fff;clip-path:inset(0 100% 0 0);transition:clip-path .18s cubic-bezier(.23,1,.32,1)}
-.hold svg{width:14px;height:14px;flex:0 0 14px}
+.hold .ov{position:absolute;inset:0;padding:0 16px;background:var(--red);color:#fff;clip-path:inset(0 100% 0 0);transition:clip-path .18s cubic-bezier(.23,1,.32,1)}
+.hold svg{width:12px;height:12px;flex:0 0 12px}
 .hold.on .ov{clip-path:inset(0 0 0 0);transition:clip-path var(--hold-ms,1600ms) linear}
 .hold.kb .ov{transition-duration:0ms!important}
 .hold.nudge{animation:holdNudge .32s cubic-bezier(.23,1,.32,1)}
-@keyframes holdNudge{20%{transform:translateX(-4px)}45%{transform:translateX(4px)}70%{transform:translateX(-2px)}}
+@keyframes holdNudge{20%{transform:translateX(-3px)}45%{transform:translateX(3px)}70%{transform:translateX(-1.5px)}}
 .hold.done{background:var(--red);border-color:var(--red);color:#fff}
 .hold.done .ov{display:none}
 @media (prefers-reduced-motion:reduce){.hold .ov,.hold.on .ov{transition-duration:0ms}}
@@ -788,10 +792,10 @@ html[lang=ar] .block h3{font-size:21px}
   <div class="bar" id="bar" hidden>
     <div class="in">
       <div class="sum" id="sum" aria-live="polite"></div>
-      <button class="cta" id="next" type="button" disabled></button>
-    </div>
-    <div class="hold-row" id="holdRow" hidden>
-      <button type="button" class="hold" id="holdCancel"><span class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span data-t="holdL"></span></span><span class="ov" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span data-t="holdL"></span></span></button>
+      <div class="bar-acts">
+        <button class="cta" id="next" type="button" disabled></button>
+        <div class="hold-row" id="holdRow" hidden><button type="button" class="hold" id="holdCancel"><span class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span data-t="holdL"></span></span><span class="ov" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span data-t="holdL"></span></span></button></div>
+      </div>
     </div>
   </div>
 </div>
@@ -828,7 +832,7 @@ const I18N = {
     errTaken:"Chi wa7ed khda had sa3a 9bel chwiya. Khtar sa3a okhra.",
     errFail:"Ma tsjjlatch. Tchecki les infos w 3awed.", errNet:"Ma kaynach connexion. 3awed mn b3d chwiya.",
     pickFirst:"Khtar service bach tbda", nServices:n => n + " service" + (n>1?"s":""),
-     holdL:"Ched mtwel bach tlghi", holdDone:"Tlghat", holdHint:"Ched 3la l-bouton 7ta ytmla", next:"Kemmel", confirm:"Confirmer la réservation", saving:"Kansjjlo",
+     holdL:"Annuler", holdDone:"Annulée", holdHint:"Ched 3la l-bouton 7ta ytmla", next:"Kemmel", confirm:"Confirmer la réservation", saving:"Kansjjlo",
     doneH:"Réservation dyalek tsjlat ✅",
     tName:"Smiya", tBarber:"Coiffeur", tService:"Service", tDur:"Mudda", tTotal:"Total", tRef:"Réf",
     waBtn:"Sift l-ticket l salon f WhatsApp", calBtn:"Zid-ha f l-calendrier", again:"Réservation jdida",
@@ -885,7 +889,7 @@ const I18N = {
     errTaken:"Quelqu'un vient de réserver ce créneau. Choisissez une autre heure.",
     errFail:"La réservation n'a pas été enregistrée. Vérifiez vos infos et réessayez.", errNet:"Pas de connexion. Réessayez dans un instant.",
     pickFirst:"Choisissez un service pour commencer", nServices:n => n + " service" + (n>1?"s":""),
-     holdL:"Maintenir pour annuler", holdDone:"Annulée", holdHint:"Maintiens le bouton jusqu\u2019au bout", next:"Continuer", confirm:"Confirmer la réservation", saving:"Réservation…",
+     holdL:"Annuler", holdDone:"Annulée", holdHint:"Maintiens le bouton jusqu\u2019au bout", next:"Continuer", confirm:"Confirmer la réservation", saving:"Réservation…",
     doneH:"Votre réservation est enregistrée ✅",
     tName:"Nom", tBarber:"Coiffeur", tService:"Service", tDur:"Durée", tTotal:"Total", tRef:"Réf",
     waBtn:"Envoyer le ticket au salon sur WhatsApp", calBtn:"Ajouter au calendrier", again:"Nouvelle réservation",
@@ -942,7 +946,7 @@ const I18N = {
     errTaken:"حجز شخص آخر هذا الموعد قبل قليل. اختر موعدًا آخر.",
     errFail:"لم يتم الحجز. تحقّق من المعلومات وأعد المحاولة.", errNet:"لا يوجد اتصال. أعد المحاولة بعد قليل.",
     pickFirst:"اختر خدمة للبدء", nServices:n => n === 1 ? "خدمة واحدة" : n === 2 ? "خدمتان" : n + " خدمات",
-     holdL:"ضغط مطوّل للإلغاء", holdDone:"تلغات", holdHint:"خلي صبعك على الزر حتى يعمر", next:"التالي", confirm:"تأكيد الحجز", saving:"جارٍ الحجز",
+     holdL:"إلغاء", holdDone:"تلغات", holdHint:"خلي صبعك على الزر حتى يعمر", next:"التالي", confirm:"تأكيد الحجز", saving:"جارٍ الحجز",
     doneH:"تم تسجيل حجزك ✅",
     tName:"الاسم", tBarber:"الحلاق", tService:"الخدمة", tDur:"المدة", tTotal:"المجموع", tRef:"رقم الحجز",
     waBtn:"أرسل التذكرة إلى المحل عبر واتساب", calBtn:"أضِفه إلى التقويم", again:"حجز جديد",
