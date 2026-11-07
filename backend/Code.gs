@@ -1,10 +1,11 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v3
+ * BACKEND — Oussama Barber (Google Apps Script) · v4
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
  *
- * Statut d'une réservation (colonne "statut"): confirmé · venu · absent · annulé
+ * Statut d'une réservation (colonne "statut"): en attente · confirmé · venu · absent · annulé
+ *   - "en attente" => l-client sifet, Oussama khasso yvalidi men l-admin (l-crénau msdod).
  *   - "annulé" => l-crénau kayrje3 khawi.
  *
  * Blocages (pause, congé, 3id…): date | de | a | coiffeur | raison
@@ -17,6 +18,16 @@ const ADMIN_PIN = '2468';                 // code dyal page admin (beddlo!)
 const NOTIFY_EMAIL = '';                  // khawi = email dyal compte Google li dar déploiement
 const TELEGRAM_TOKEN = '';                // optionnel: token dyal bot Telegram (@BotFather)
 const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal Oussama
+// Notification f WhatsApp (gratuit, CallMeBot): numéro (212…) + apikey li katwsel men CallMeBot
+const WHATSAPP_PHONE = '';                // ex: '212655778899'
+const WHATSAPP_APIKEY = '';               // ex: '1234567'
+// Notification push b l-application ntfy (gratuit): smiya dyal topic (sirriya!)
+const NTFY_TOPIC = '';                    // ex: 'oussama-barber-x7k2p9'
+
+// Validation & anti-fake
+const REQUIRE_VALIDATION = true;          // true = kol réservation katbda "en attente" 7ta tvalidiha
+const MAX_ACTIVE_PER_PHONE = 1;           // ch7al mn réservation jaya y9der ykoun 3and nefs n-numéro
+const ABSENT_LIMIT = 2;                   // men b3d ch7al mn "absent" kaytbloka n-numéro automatiquement (0 = la)
 const SALON = 'Oussama Barber';
 // Équipe par défaut (mra lowla). Mn b3d kolchi katbeddlo men page admin → onglet "Équipe".
 const DEFAULT_TEAM = ['Oussama', 'Yassine', 'Aymane'];
@@ -27,7 +38,8 @@ const SITE_URL = 'https://oussama-barber.vercel.app';
 const SHEETS = {
   Reservations: ['date','heure','debut_min','duree_min','coiffeur','services','prix_dh','nom','telephone','statut','cree_le','id','remise_dh','langue'],
   Blocages:     ['date','de','a','coiffeur','raison','id','cree_le'],
-  Attente:      ['date','nom','telephone','services','coiffeur','statut','cree_le','id']
+  Attente:      ['date','nom','telephone','services','coiffeur','statut','cree_le','id'],
+  Bloques:      ['telephone','raison','cree_le']
 };
 
 /* ---------------- helpers ---------------- */
@@ -59,6 +71,8 @@ function today_() { return Utilities.formatDate(new Date(), Session.getScriptTim
 function id_() { return Utilities.getUuid().slice(0, 8).toUpperCase(); }
 function isDate_(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s)); }
 function cancelled_(st) { return String(st).toLowerCase().indexOf('annul') === 0; }
+function pending_(st) { return String(st).toLowerCase().indexOf('attente') >= 0; }
+function absent_(st) { return String(st).toLowerCase().indexOf('absent') === 0; }
 
 function rows_(name) {
   const sh = sh_(name), vals = sh.getDataRange().getValues(), head = SHEETS[name];
@@ -72,7 +86,8 @@ function reservations_() {
   return rows_('Reservations').map(r => ({
     row: r._row, date: day_(r.date), heure: hm_(r.heure) || hh_(Number(r.debut_min)), start: Number(r.debut_min), dur: Number(r.duree_min),
     barber: String(r.coiffeur), services: String(r.services), prix: Number(r.prix_dh) || 0, nom: String(r.nom),
-    tel: String(r.telephone).replace(/^'/, ''), statut: String(r.statut || 'confirmé'), id: String(r.id), remise: Number(r.remise_dh) || 0
+    tel: String(r.telephone).replace(/^'/, ''), statut: String(r.statut || 'confirmé'), id: String(r.id), remise: Number(r.remise_dh) || 0,
+    langue: String(r.langue || '')
   }));
 }
 function blocks_() {
@@ -129,19 +144,35 @@ function upload_(b) {
 }
 
 /* ---------------- notifications ---------------- */
-function notify_(subject, lines) {
+function notify_(subject, lines, link) {
   const body = lines.join('\n');
+  const url = link || (SITE_URL + '/admin.html');
+  try {
+    if (WHATSAPP_PHONE && WHATSAPP_APIKEY) {
+      UrlFetchApp.fetch('https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(WHATSAPP_PHONE) +
+        '&apikey=' + encodeURIComponent(WHATSAPP_APIKEY) + '&text=' + encodeURIComponent('💈 ' + subject + '\n\n' + body + '\n\n👉 ' + url), { muteHttpExceptions: true });
+    }
+  } catch (e) { console.error(e); }
+  try {
+    if (NTFY_TOPIC) {
+      UrlFetchApp.fetch('https://ntfy.sh/' + encodeURIComponent(NTFY_TOPIC), {
+        method: 'post', muteHttpExceptions: true, payload: body,
+        headers: { 'Title': '💈 ' + subject, 'Priority': 'high', 'Tags': 'barber', 'Click': url, 'Actions': 'view, Valider, ' + url }
+      });
+    }
+  } catch (e) { console.error(e); }
   try {
     if (TELEGRAM_TOKEN && TELEGRAM_CHAT_ID) {
       UrlFetchApp.fetch('https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage', {
         method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-        payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: '💈 ' + subject + '\n\n' + body })
+        payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: '💈 ' + subject + '\n\n' + body,
+          reply_markup: { inline_keyboard: [[{ text: '👉 Valider / Refuser', url: url }]] } })
       });
     }
   } catch (e) { console.error(e); }
   try {
     const to = NOTIFY_EMAIL || Session.getEffectiveUser().getEmail();
-    if (to) MailApp.sendEmail(to, '💈 ' + subject + ' — ' + SALON, body + '\n\n' + SITE_URL + '/admin.html');
+    if (to) MailApp.sendEmail(to, '💈 ' + subject + ' — ' + SALON, body + '\n\n👉 ' + url);
   } catch (e) { console.error(e); }
 }
 
@@ -150,6 +181,11 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.action === 'loyalty') return json_(loyalty_(p.phone));
   if (p.action === 'config') return json_(publicConfig_());
+  if (p.action === 'status') {
+    const id = String(p.id || '').toUpperCase(), ph = phone_(p.phone);
+    const r = reservations_().find(x => x.id.toUpperCase() === id && phone_(x.tel) === ph);
+    return json_(r ? { ok: true, statut: r.statut, date: r.date, heure: hh_(r.start), barber: r.barber } : { ok: false, error: 'notfound' });
+  }
   if (!isDate_(p.date)) return json_({ ok: false, error: 'date' });
   return json_({ ok: true, bookings: busyFor_(p.date) });
 }
@@ -158,7 +194,7 @@ function loyalty_(phone) {
   const ph = phone_(phone);
   if (ph.length < 9) return { ok: false, error: 'phone' };
   const t = today_();
-  const visits = reservations_().filter(r => phone_(r.tel) === ph && r.date <= t && !cancelled_(r.statut) && r.statut.toLowerCase().indexOf('absent') !== 0).length;
+  const visits = reservations_().filter(r => phone_(r.tel) === ph && r.date <= t && !cancelled_(r.statut) && !absent_(r.statut) && !pending_(r.statut)).length;
   return { ok: true, visits: visits };
 }
 
@@ -179,20 +215,40 @@ function doPost(e) {
   } finally { lock.releaseLock(); }
 }
 
+function blockedPhones_() {
+  return rows_('Bloques').map(r => ({ row: r._row, tel: phone_(r.telephone), raison: String(r.raison || ''), date: r.cree_le })).filter(x => x.tel.length >= 9);
+}
+function isBlocked_(ph) {
+  if (blockedPhones_().some(x => x.tel === ph)) return true;
+  if (ABSENT_LIMIT > 0) {
+    const n = reservations_().filter(r => phone_(r.tel) === ph && absent_(r.statut)).length;
+    if (n >= ABSENT_LIMIT) return true;
+  }
+  return false;
+}
 function book_(b) {
   const valid = isDate_(b.date) && b.start >= 0 && b.dur > 0 && b.dur <= 480 &&
     String(b.name || '').trim() && phone_(b.phone).length >= 9 && Array.isArray(b.candidates) && b.candidates.length;
   if (!valid) return { ok: false, error: 'invalid' };
+  if (b.hp) return { ok: false, error: 'invalid' };                         // piège l les robots
+  const ph = phone_(b.phone);
+  if (isBlocked_(ph)) return { ok: false, error: 'blocked' };
+  if (MAX_ACTIVE_PER_PHONE > 0) {
+    const t = today_();
+    const active = reservations_().filter(r => phone_(r.tel) === ph && r.date >= t && !cancelled_(r.statut) && !absent_(r.statut)).length;
+    if (active >= MAX_ACTIVE_PER_PHONE) return { ok: false, error: 'limit' };
+  }
   const busy = busyFor_(b.date);
   const barber = b.candidates.find(c => worksAt_(String(c), b.date, b.start, b.dur) && !overlaps_(busy, String(c), b.start, b.dur));
   if (!barber) return { ok: false, error: 'taken' };
   const id = id_(), hh = hh_(b.start);
   sh_('Reservations').appendRow([txt_(b.date), txt_(hh), b.start, b.dur, String(barber), String(b.services || '').slice(0, 300),
-    Number(b.price) || 0, String(b.name).slice(0, 80), txt_(String(b.phone).slice(0, 30)), 'confirmé', new Date(), id,
+    Number(b.price) || 0, String(b.name).slice(0, 80), txt_(String(b.phone).slice(0, 30)), REQUIRE_VALIDATION ? 'en attente' : 'confirmé', new Date(), id,
     Number(b.discount) || 0, String(b.lang || '').slice(0, 4)]);
-  notify_('Réservation jdida', ['📅 ' + b.date + ' · ' + hh, '💈 ' + barber, '✂️ ' + b.services + ' (' + (Number(b.price) || 0) + ' DH)',
-    '🙍 ' + b.name + ' · ' + b.phone, '🔖 #' + id]);
-  return { ok: true, barber: String(barber), id: id };
+  notify_(REQUIRE_VALIDATION ? 'Réservation jdida — khassha validation' : 'Réservation jdida',
+    ['📅 ' + b.date + ' · ' + hh, '💈 ' + barber, '✂️ ' + b.services + ' (' + (Number(b.price) || 0) + ' DH)',
+    '🙍 ' + b.name + ' · ' + b.phone, '🔖 #' + id], SITE_URL + '/admin.html#pending');
+  return { ok: true, barber: String(barber), id: id, statut: REQUIRE_VALIDATION ? 'en attente' : 'confirmé' };
 }
 
 function cancel_(b) {
@@ -232,11 +288,31 @@ function admin_(b) {
       const from = isDate_(b.from) ? b.from : today_(), to = isDate_(b.to) ? b.to : from;
       const list = reservations_().filter(r => r.date >= from && r.date <= to)
         .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start)))
-        .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut }));
+        .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue }));
       return { ok: true, list: list };
     }
+    case 'pending': {
+      const t = today_();
+      return { ok: true, list: reservations_().filter(r => r.date >= t && pending_(r.statut))
+        .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start)))
+        .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue })) };
+    }
+    case 'blocked': return { ok: true, list: blockedPhones_().map(x => ({ tel: x.tel, raison: x.raison })) };
+    case 'blockphone': {
+      const ph = phone_(b.tel); if (ph.length < 9) return { ok: false, error: 'phone' };
+      if (!blockedPhones_().some(x => x.tel === ph)) sh_('Bloques').appendRow([txt_(ph), String(b.raison || '').slice(0, 120), new Date()]);
+      // les réservations jayin dyal had n-numéro katlghaw
+      const t = today_(); let n = 0;
+      reservations_().forEach(r => { if (phone_(r.tel) === ph && r.date >= t && !cancelled_(r.statut)) { sh_('Reservations').getRange(r.row, 10).setValue('annulé'); n++; } });
+      return { ok: true, cancelled: n };
+    }
+    case 'unblockphone': {
+      const ph = phone_(b.tel), rows = blockedPhones_().filter(x => x.tel === ph).map(x => x.row).sort((a, c) => c - a);
+      rows.forEach(r => sh_('Bloques').deleteRow(r));
+      return { ok: true, removed: rows.length };
+    }
     case 'status': {
-      const ok = ['confirmé', 'venu', 'absent', 'annulé'];
+      const ok = ['en attente', 'confirmé', 'venu', 'absent', 'annulé'];
       if (ok.indexOf(b.statut) < 0) return { ok: false, error: 'statut' };
       const r = reservations_().find(x => x.id === String(b.id));
       if (!r) return { ok: false, error: 'notfound' };
@@ -278,7 +354,7 @@ function admin_(b) {
       const from = isDate_(b.from) ? b.from : today_(), to = isDate_(b.to) ? b.to : today_();
       const all = reservations_().filter(r => r.date >= from && r.date <= to);
       const live = all.filter(r => !cancelled_(r.statut));
-      const done = live.filter(r => r.statut.toLowerCase().indexOf('absent') !== 0);
+      const done = live.filter(r => !absent_(r.statut) && !pending_(r.statut));
       const svc = {}, brb = {}, days = {};
       done.forEach(r => {
         r.services.split(' + ').forEach(s => svc[s] = (svc[s] || 0) + 1);
@@ -286,8 +362,8 @@ function admin_(b) {
         days[r.date] = (days[r.date] || 0) + r.prix;
       });
       return { ok: true, stats: {
-        total: all.length, confirmed: live.length, cancelled: all.length - live.length,
-        absent: live.length - done.length, revenue: done.reduce((a, r) => a + r.prix, 0),
+        total: all.length, confirmed: live.filter(r => !pending_(r.statut)).length, cancelled: all.length - live.length,
+        absent: live.filter(r => absent_(r.statut)).length, pending: live.filter(r => pending_(r.statut)).length, revenue: done.reduce((a, r) => a + r.prix, 0),
         clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
         services: svc, barbers: brb, days: days } };
     }

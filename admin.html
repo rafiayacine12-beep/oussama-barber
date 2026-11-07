@@ -160,6 +160,21 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 .progress{height:6px;border-radius:6px;background:var(--s2);overflow:hidden;margin:6px 0 12px}
 .progress i{display:block;height:100%;background:var(--or);width:0;transition:width .3s}
 
+/* pending */
+.pend{background:#fff;border:1.5px solid var(--orline);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(226,86,10,.10)}
+.pend h3{font-family:var(--display);font-weight:800;font-size:24px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pend h3 i{font-style:normal;font-family:var(--body);font-size:13px;background:var(--or);color:#fff;border-radius:99px;padding:2px 9px}
+.pend .list{gap:8px}
+.rdv.en.attente,.rdv[data-pending="1"]{border-inline-start-color:var(--or);background:#FFFBF8}
+.pill.attente{background:var(--or);color:#fff}
+.st.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.no{background:#fff;border-color:#F0C3BF;color:var(--red)}
+.after{grid-column:1/-1;margin-top:8px}
+.after a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:999px;background:#E8F9EE;border:1px solid #BFE9CF;color:#0B5A2C;font-weight:700;font-size:14px}
+.contact .blk{background:var(--redsoft);border-color:#F0C3BF;font-size:15px}
+.contact .blk.armed{background:var(--red);color:#fff}
+.dayof{font-size:12px;color:var(--or2);font-weight:700}
+
 /* stats */
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -214,6 +229,10 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
     <!-- RDV -->
     <section id="t-rdv">
       <h2>Rendez-vous</h2>
+      <div class="pend" id="pendBox" hidden>
+        <h3>Khasshom validation <i id="pendN"></i></h3>
+        <div class="list" id="pendList"></div>
+      </div>
       <div class="strip" id="dayStrip"></div>
       <button class="waitbar" id="waitBar" hidden type="button"><span>⏳ <b id="waitN"></b> f liste d'attente</span>Chouf</button>
       <div class="summary" id="daySum"></div>
@@ -245,6 +264,18 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
       </form>
       <div class="section-t">Les blocages jayin</div>
       <div class="list" id="blockList"></div>
+
+      <h2 style="margin-top:30px">Numéros bloqués</h2>
+      <p class="sub">Had les numéros ma y9derouch yréserviw. Numéro li ma ja 2 merrat kaytbloka b wa7du.</p>
+      <form class="form" id="phoneForm">
+        <div class="two">
+          <div><label for="pTel">Numéro</label><input id="pTel" type="tel" inputmode="tel" placeholder="06 12 34 56 78" maxlength="17"></div>
+          <div><label for="pWhy">Sabab</label><input id="pWhy" maxlength="80" placeholder="Ex: fake"></div>
+        </div>
+        <button class="btn full" type="submit" id="pBtn" style="margin-top:0">🚫 Bloqui had n-numéro</button>
+        <div class="err" id="pErr"></div>
+      </form>
+      <div class="list" id="phoneList"></div>
     </section>
 
     <!-- ÉQUIPE -->
@@ -353,6 +384,100 @@ function fillBarberSelect(){
   $("#bWho").innerHTML = `<option value="tous">Salon kamel</option>` + CFG.coiffeurs.filter(c => c.actif).map(c => `<option>${esc(c.nom)}</option>`).join("");
 }
 
+/* ---------- messages l l-client ---------- */
+const SITE = location.origin + location.pathname.replace(/admin\.html$/, "");
+function fmtDate(s, lg){
+  const d = fromIso(s);
+  if (lg === "fr") return d.toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
+  if (lg === "ar") return d.toLocaleDateString("ar-MA", { weekday:"long", day:"numeric", month:"long" });
+  return label(s).toLowerCase() === "lyoum" ? "lyoum" : label(s);
+}
+function clientMsg(r, ok){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg);
+  if (ok) return {
+    da: `Salam ${r.nom} 👋 réservation dyalek f Oussama Barber tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nNtsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 votre réservation chez Oussama Barber est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nÀ bientôt !`,
+    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في Oussama Barber ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\nفي انتظارك!` }[lg];
+  return {
+    da: `Salam ${r.nom}, smeh lina 🙏 ma qdernach nconfirmiw réservation dyal ${d} m3a ${r.heure}. Tqder tkhtar wa9t akhor hna: ${SITE}`,
+    fr: `Bonjour ${r.nom}, désolé 🙏 nous ne pouvons pas confirmer votre réservation du ${d} à ${r.heure}. Choisissez un autre créneau ici : ${SITE}`,
+    ar: `مرحبا ${r.nom}، نعتذر 🙏 لم نتمكن من تأكيد حجزك ليوم ${d} على ${r.heure}. يمكنك اختيار موعد آخر هنا: ${SITE}` }[lg];
+}
+const isPend = s => String(s).includes("attente");
+function rdvCard(r, showDay){
+  const pend = isPend(r.statut);
+  return `<article class="rdv ${esc(r.statut)}" data-pending="${pend ? 1 : 0}" data-id="${esc(r.id)}">
+    <div class="h">${esc(r.heure)}<small>${r.dur} min</small></div>
+    <div class="who">${esc(r.nom)} <span class="pill ${pend ? "attente" : esc(r.statut)}">${esc(r.statut)}</span></div>
+    <div class="what">${showDay ? `<span class="dayof">${esc(label(r.date))}</span> · ` : ""}${esc(r.services)} · ${r.prix} DH · ${esc(r.barber)}</div>
+    <div class="row">
+      ${pend
+        ? `<button class="st ok" data-id="${esc(r.id)}" data-s="confirmé">✓ Valider</button><button class="st no" data-id="${esc(r.id)}" data-s="annulé" data-refuse="1">✗ Refuser</button>`
+        : ["venu","absent","annulé"].map(s => `<button class="st ${s} ${r.statut===s?"on":""}" data-id="${esc(r.id)}" data-s="${s}">${{venu:"✓ Ja",absent:"✗ Ma jach",annulé:"Lgha"}[s]}</button>`).join("")}
+      <div class="contact">
+        <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
+        <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
+        <button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>
+      </div>
+    </div>
+    <div class="after" hidden></div>
+  </article>`;
+}
+let LISTS = {};
+function bindCards(container, list, reload){
+  container.querySelectorAll(".st").forEach(b => b.onclick = async () => {
+    const r = list.find(x => x.id === b.dataset.id); if (!r) return;
+    const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
+    b.disabled = true;
+    try {
+      const j = await call("status", { id: r.id, statut: s });
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
+      if (isPend(r.statut) && (s === "confirmé" || b.dataset.refuse)){
+        const card = b.closest(".rdv"), ok = s === "confirmé";
+        card.querySelector(".row").innerHTML = `<span class="pill ${ok ? "venu" : "annulé"}">${ok ? "✓ Tvalidat" : "Trefdat"}</span>`;
+        const af = card.querySelector(".after"); af.hidden = false;
+        af.innerHTML = `<a href="https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}" target="_blank" rel="noopener">💬 Sift l-${ok ? "confirmation" : "message"} l ${esc(r.nom)} f WhatsApp</a>`;
+        toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
+        setTimeout(() => { if (tab === "rdv") reload(); }, 15000);
+      } else { toast("Tsjjel ✓"); reload(); }
+    } catch(e){ b.disabled = false; }
+  });
+  container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
+    if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
+    b.disabled = true;
+    try { const j = await call("blockphone", { tel: b.dataset.tel, raison: "men l-admin" }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); reload(); refreshPendingCount(); } }
+    catch(e){ b.disabled = false; }
+  });
+}
+
+/* ---------- en attente ---------- */
+let lastPending = -1;
+async function loadPending(){
+  try {
+    const j = await call("pending"), list = j.list || [];
+    LISTS.pending = list;
+    $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
+    $("#pendList").innerHTML = list.map(r => rdvCard(r, true)).join("");
+    bindCards($("#pendList"), list, () => { loadPending(); loadRdv(true); });
+    setPendingBadge(list.length);
+  } catch(e){}
+}
+function paintBadge(n){
+  const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
+  $("#waitBadge").hidden = !tot; $("#waitBadge").textContent = tot;
+  document.title = (n ? `(${n}) ` : "") + "Admin · Oussama Barber";
+}
+function setPendingBadge(n){
+  paintBadge(n);
+  if (lastPending >= 0 && n > lastPending){
+    toast("🔔 Réservation jdida kaytsenna l-validation");
+    try { if (window.Notification && Notification.permission === "granted") new Notification("Oussama Barber", { body:"Réservation jdida kaytsenna l-validation", icon:"icons/icon-192.png" }); } catch(e){}
+    if (tab === "rdv") loadPending();
+  }
+  lastPending = n;
+}
+async function refreshPendingCount(){ try { const j = await call("pending"); setPendingBadge((j.list || []).length); } catch(e){} }
+
 /* ---------- rendez-vous ---------- */
 let day = today();
 function renderStrip(){
@@ -362,8 +487,8 @@ function renderStrip(){
   $("#dayStrip").querySelectorAll("button").forEach(b => b.onclick = () => { day = b.dataset.d; loadRdv(); });
   $("#pickDay").onchange = e => { if (e.target.value){ day = e.target.value; loadRdv(); } };
 }
-async function loadRdv(){
-  renderStrip(); loadWait();
+async function loadRdv(skipPending){
+  renderStrip(); loadWait(); if (skipPending !== true) loadPending();
   $("#rdvList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`; $("#daySum").innerHTML = "";
   try {
     const j = await call("list", { from: day, to: day });
@@ -372,25 +497,8 @@ async function loadRdv(){
       <div><b>${live.filter(r => r.statut === "venu").length}</b><span>Jaw</span></div>
       <div><b>${live.filter(r => !r.statut.startsWith("absent")).reduce((a,r) => a + r.prix, 0)}</b><span>DH prévu</span></div>`;
     if (!list.length){ $("#rdvList").innerHTML = `<div class="empty">Ma kayn 7ta rendez-vous ${day === today() ? "lyoum" : "f had nhar"}.</div>`; return; }
-    $("#rdvList").innerHTML = list.map(r => `
-      <article class="rdv ${esc(r.statut)}">
-        <div class="h">${esc(r.heure)}<small>${r.dur} min</small></div>
-        <div class="who">${esc(r.nom)} <span class="pill ${esc(r.statut)}">${esc(r.statut)}</span></div>
-        <div class="what">${esc(r.services)} · ${r.prix} DH · ${esc(r.barber)}</div>
-        <div class="row">
-          ${["venu","absent","annulé"].map(s => `<button class="st ${s} ${r.statut===s?"on":""}" data-id="${esc(r.id)}" data-s="${s}">${{venu:"✓ Ja",absent:"✗ Ma jach",annulé:"Lgha"}[s]}</button>`).join("")}
-          <div class="contact">
-            <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
-            <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
-          </div>
-        </div>
-      </article>`).join("");
-    $("#rdvList").querySelectorAll(".st").forEach(b => b.onclick = async () => {
-      const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
-      b.disabled = true;
-      try { const j = await call("status", { id: b.dataset.id, statut: s }); if (j.ok){ toast("Tsjjel ✓"); loadRdv(); } else { toast("Ma tsjjelch"); b.disabled = false; } }
-      catch(e){ b.disabled = false; }
-    });
+    $("#rdvList").innerHTML = list.map(r => rdvCard(r, false)).join("");
+    bindCards($("#rdvList"), list, () => loadRdv());
   } catch(e){ if (e.message !== "auth") $("#rdvList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
 }
 
@@ -400,7 +508,7 @@ async function loadWait(){
   try {
     const j = await call("waitlist"), list = j.list || [];
     const pending = list.filter(w => w.statut.includes("attente"));
-    $("#waitBadge").hidden = !pending.length; $("#waitBadge").textContent = pending.length;
+    $("#waitBadge").dataset.wait = pending.length; paintBadge(Math.max(0, lastPending));
     $("#waitBar").hidden = !pending.length; $("#waitN").textContent = pending.length;
     $("#waitSec").hidden = !list.length || $("#waitSec").hidden;
     $("#waitList").innerHTML = list.map(w => `<div class="item"><div class="tx">
@@ -434,6 +542,7 @@ $("#blockForm").addEventListener("submit", async e => {
   $("#bBtn").disabled = false;
 });
 async function loadBlocks(){
+  loadPhones();
   $("#blockList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
   try {
     if (!CFG.coiffeurs.length) await loadConfig();
@@ -450,6 +559,27 @@ async function loadBlocks(){
     });
   } catch(e){ if (e.message !== "auth") $("#blockList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
 }
+
+/* ---------- numéros bloqués ---------- */
+async function loadPhones(){
+  try {
+    const j = await call("blocked"), list = j.list || [];
+    $("#phoneList").innerHTML = list.length ? list.map(p => `<div class="item"><div class="tx"><b>${esc(p.tel)}</b><div class="s">${esc(p.raison || "—")}</div></div>
+      <button class="del" data-tel="${esc(p.tel)}">Debloqui</button></div>`).join("") : `<div class="empty">Ma kayn 7ta numéro bloqué.</div>`;
+    $("#phoneList").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const j = await call("unblockphone", { tel: b.dataset.tel }); if (j.ok){ toast("Tdebloqua ✓"); loadPhones(); } } catch(e){ b.disabled = false; }
+    });
+  } catch(e){}
+}
+$("#phoneForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#pErr").textContent = "";
+  const tel = $("#pTel").value.replace(/\D/g, "");
+  if (tel.length < 9){ $("#pErr").textContent = "Numéro na9es."; return; }
+  $("#pBtn").disabled = true;
+  try { const j = await call("blockphone", { tel, raison: $("#pWhy").value.trim() }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); $("#pTel").value = ""; $("#pWhy").value = ""; loadPhones(); } else $("#pErr").textContent = "Ma tsjjelch."; }
+  catch(err){ if (err.message !== "auth") $("#pErr").textContent = "Ma kaynach connexion."; }
+  $("#pBtn").disabled = false;
+});
 
 /* ---------- images ---------- */
 function resizeImage(file, max){
@@ -644,7 +774,11 @@ async function loadStats(){
 function start(){
   $("#login").hidden = true; $("#app").hidden = false;
   loadConfig().catch(() => {});
-  load();
+  if (location.hash === "#pending" && tab !== "rdv") setTab("rdv"); else load();
+  if (location.hash === "#pending") setTimeout(() => $("#pendBox").scrollIntoView({ behavior:"smooth" }), 1500);
+  clearInterval(window._poll); window._poll = setInterval(refreshPendingCount, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden){ refreshPendingCount(); if (tab === "rdv") loadPending(); } });
+  try { if (window.Notification && Notification.permission === "default") document.addEventListener("click", () => Notification.requestPermission(), { once:true }); } catch(e){}
 }
 if (PIN) start();
 })();

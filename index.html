@@ -357,6 +357,12 @@ html[lang=ar] h2{font-size:30px;line-height:1.35}
 html[lang=ar] .next .v{font-size:28px}
 html[lang=ar] .block h3{font-size:21px}
 .num{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.stat{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:4px 10px;border-radius:99px;margin-top:8px}
+.stat.p{background:var(--orsoft);color:var(--or2)}
+.stat.c{background:var(--oksoft);color:var(--ok)}
+.stat.x{background:var(--redsoft);color:var(--red)}
+.stat.p::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--or);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
 </style>
 </head>
 <body>
@@ -462,12 +468,14 @@ html[lang=ar] .block h3{font-size:21px}
       <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" maxlength="17" aria-describedby="phoneHelp" dir="ltr">
       <div class="help" id="phoneHelp"></div>
     </div>
+    <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"><label>Website<input id="hp" tabindex="-1" autocomplete="off"></label></div>
     <div class="formerr" id="formErr" role="alert"></div>
   </section>
 
   <!-- ============ 6. TICKET ============ -->
   <section class="screen done" id="s6" aria-labelledby="h6t">
-    <h2 id="h6t" data-t="doneH"></h2>
+    <h2 id="h6t"></h2>
+    <p class="sub" id="doneSub" style="max-width:360px;margin:8px auto 0"></p>
     <div class="ticket" id="ticket"></div>
     <div class="acts">
       <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">
@@ -550,6 +558,9 @@ const I18N = {
     rebook:"Réservi wa9t akhor", reviewT:"Kifach kant l-coupe?", reviewB:"3tina rayek f Google",
     waitT:"Bghiti nkhbbrouk ila t7llat blassa had nhar?", waitB:"Khbbrouni", waitOk:"Tsjjelti f liste d'attente. Ghadi ntsslo bik ila t7llat blassa.",
     galleryT:"L-khdma dyalna", teamT:"L-équipe",
+    doneHPending:"Réservation dyalek wslat ⏳", pendingNote:"Oussama ghadi yconfirmiha lik f a9rab wa9t. Ghadi tchouf l-confirmation hna f l-site w f WhatsApp.",
+    stPending:"Kaytsenna l-confirmation", stConfirmed:"Mconfirmé ✅", stRefused:"Tlghat",
+    errBlocked:"Ma ymkench tréservi b had n-numéro. Tsel b salon f WhatsApp.", errLimit:"3endek deja réservation jaya b had n-numéro. Lghiha 9bel ma tdir wa7da jdida.",
     waMsg:"Salam 👋 3endi réservation f {salon}", calAlarm:"Rendez-vous f {salon}"
   },
   fr: {
@@ -595,6 +606,9 @@ const I18N = {
     rebook:"Réserver un autre créneau", reviewT:"Comment s'est passée votre coupe ?", reviewB:"Laisser un avis Google",
     waitT:"On vous prévient si une place se libère ce jour-là ?", waitB:"Me prévenir", waitOk:"Vous êtes sur la liste d'attente. On vous appelle si une place se libère.",
     galleryT:"Nos réalisations", teamT:"L'équipe",
+    doneHPending:"Demande de réservation envoyée ⏳", pendingNote:"Le salon va la confirmer très vite. Vous verrez la confirmation ici et sur WhatsApp.",
+    stPending:"En attente de confirmation", stConfirmed:"Confirmé ✅", stRefused:"Annulée",
+    errBlocked:"Impossible de réserver avec ce numéro. Contactez le salon sur WhatsApp.", errLimit:"Vous avez déjà une réservation à venir avec ce numéro. Annulez-la avant d'en faire une autre.",
     waMsg:"Bonjour 👋 j'ai une réservation chez {salon}", calAlarm:"Rendez-vous chez {salon}"
   },
   ar: {
@@ -640,6 +654,9 @@ const I18N = {
     rebook:"احجز موعدًا آخر", reviewT:"كيف كانت الحلاقة؟", reviewB:"قيّمنا على Google",
     waitT:"هل نخبرك إذا أصبح موعد متاحًا في هذا اليوم؟", waitB:"أخبروني", waitOk:"تم تسجيلك في قائمة الانتظار. سنتصل بك إذا أصبح موعد متاحًا.",
     galleryT:"أعمالنا", teamT:"الفريق",
+    doneHPending:"تم إرسال طلب الحجز ⏳", pendingNote:"سيؤكد الصالون حجزك قريبًا. ستجد التأكيد هنا في الموقع وعلى واتساب.",
+    stPending:"في انتظار التأكيد", stConfirmed:"مؤكد ✅", stRefused:"ملغى",
+    errBlocked:"لا يمكن الحجز بهذا الرقم. تواصل مع الصالون عبر واتساب.", errLimit:"لديك حجز قادم بهذا الرقم. ألغه قبل أن تحجز موعدًا جديدًا.",
     waMsg:"السلام عليكم 👋 لدي حجز في {salon}", calAlarm:"موعد في {salon}"
   }
 };
@@ -728,7 +745,7 @@ async function book(p){
     const barber = p.candidates.find(c => !overlaps(day, c, p.start, p.dur));
     if (!barber) return { ok:false, error:"taken" };
     all.push({ date:p.date, start:p.start, dur:p.dur, barber }); store.set(demoKey, all);
-    return { ok:true, barber, id: Math.random().toString(36).slice(2,10).toUpperCase() };
+    return { ok:true, barber, id: Math.random().toString(36).slice(2,10).toUpperCase(), statut: "en attente" };
   }
   const r = await fetch(CONFIG.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(p) });
   return r.json();
@@ -1096,12 +1113,12 @@ $("#next").addEventListener("click", async () => {
   btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${t("saving")}`;
   const name = $("#name").value.trim(), phone = $("#phone").value.trim();
   const payload = { date: st.date, start: st.start, dur: duration(), candidates: candidates().filter(c => worksAt(c, st.date, st.start, duration())),
-    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: finalTotal(), discount: promoAmount() + loyalAmount(), lang, name, phone };
+    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: finalTotal(), discount: promoAmount() + loyalAmount(), lang, name, phone, hp: $("#hp").value };
   try {
     const r = await book(payload);
     if (r.ok){
       store.set("ob_me", { name, phone });
-      store.set("ob_last", { id: r.id, phone, date: st.date, start: st.start, dur: duration(), barber: r.barber, services: svcNames(), reviewed: false });
+      store.set("ob_last", { id: r.id, phone, date: st.date, start: st.start, dur: duration(), barber: r.barber, services: svcNames(), reviewed: false, statut: r.statut || "confirmé" });
       track("Schedule", { value: finalTotal(), currency: "MAD", content_name: payload.services });
       delete st.bookings[st.date];
       st.result = { ...r, name, phone }; showTicket(); heroNext(); return;
@@ -1110,7 +1127,7 @@ $("#next").addEventListener("click", async () => {
       $("#formErr").textContent = t("errTaken");
       delete st.bookings[st.date]; st.start = null;
       setTimeout(() => go(4), 1400);
-    } else $("#formErr").textContent = t("errFail");
+    } else $("#formErr").textContent = r.error === "blocked" ? t("errBlocked") : r.error === "limit" ? t("errLimit") : t("errFail");
   } catch(e){ $("#formErr").textContent = t("errNet"); }
   update();
 });
@@ -1129,7 +1146,9 @@ function icsData(){
   return "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
 }
 function showTicket(stay){
-  const r = st.result;
+  const r = st.result, pend = String(r.statut || "").includes("attente");
+  $("#h6t").textContent = pend ? t("doneHPending") : t("doneH");
+  $("#doneSub").textContent = pend ? t("pendingNote") : "";
   $("#ticket").innerHTML = `
     <div class="tp">
       <div class="brand">${esc(CONFIG.salon)}</div>
@@ -1147,7 +1166,7 @@ function showTicket(stay){
     </dl>
     <div class="ref"><span>${t("tRef")}</span><b dir="ltr">#${esc(r.id)}</b></div>
     <div class="barcode" aria-hidden="true"></div>`;
-  const msg = `${t("waMsg", { salon: CONFIG.salon })}
+  const msg = `${t("waMsg", { salon: CONFIG.salon })}${pend ? " (" + t("stPending") + ")" : ""}
 📅 ${longDate(st.date)} · ${hhmm(st.start)}
 💈 ${r.barber}
 ✂️ ${svcNames()} (${price(finalTotal())})
@@ -1183,6 +1202,25 @@ $("#mCancel").addEventListener("click", async e => {
   } catch(err){ $("#mMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
 });
 
+/* ---------- statut dyal réservation ---------- */
+function statPill(s){
+  s = String(s || "");
+  if (s.includes("attente")) return `<span class="stat p">${t("stPending")}</span>`;
+  if (s.startsWith("annul")) return `<span class="stat x">${t("stRefused")}</span>`;
+  if (s) return `<span class="stat c">${t("stConfirmed")}</span>`;
+  return "";
+}
+async function refreshStatus(l){
+  if (DEMO) return;
+  try {
+    const r = await fetch(CONFIG.apiUrl + "?action=status&id=" + encodeURIComponent(l.id) + "&phone=" + encodeURIComponent(l.phone), { cache:"no-store" }).then(x => x.json());
+    if (!r.ok) return;
+    l.statut = r.statut; store.set("ob_last", l);
+    if ($("#homeStat")) $("#homeStat").innerHTML = statPill(r.statut);
+    if (String(r.statut).startsWith("annul") && $("#homeCancel")) $("#homeCancel").remove();
+  } catch(e){}
+}
+
 /* ---------- accueil: rendez-vous jay / avis ---------- */
 function renderHomeCards(){
   const box = $("#homeCards"), l = store.get("ob_last", null);
@@ -1192,7 +1230,9 @@ function renderHomeCards(){
     box.innerHTML = `<div class="card"><div class="k">${t("upcomingT")}</div>
       <div class="v">${esc(relDay(l.date))} ${num(hhmm(l.start))} · ${esc(l.barber)}</div>
       <div class="s">${esc(l.services)} · ${num("#" + esc(l.id))}</div>
+      <div id="homeStat">${statPill(l.statut)}</div>
       <div class="acts2"><button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+    refreshStatus(l);
     $("#homeCancel").onclick = async e => {
       const btn = e.currentTarget; if (!armed(btn, t("cancelBtn"))) return;
       btn.disabled = true;
