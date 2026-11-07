@@ -499,24 +499,14 @@ html[lang=ar] .block h3{font-size:21px}
 .stat.x{background:var(--redsoft);color:var(--red)}
 .stat.p::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--or);animation:blink 1.4s infinite}
 @keyframes blink{50%{opacity:.25}}
-/* ---------- home background animation (barber cutting hair) ---------- */
+/* ---------- home background: real barber photos, slow zoom + crossfade ---------- */
 .home{position:relative;isolation:isolate}
-.home-bg{position:absolute;z-index:-1;top:calc(56px + var(--safe-t));inset-inline-end:-4px;width:min(46%,230px);opacity:.14;pointer-events:none}
-.home-bg svg{display:block;width:100%;height:auto;overflow:visible}
-html[dir=rtl] .home-bg svg{transform:scaleX(-1)}
-.home-bg .hb-arm{transform-box:view-box;transform-origin:160px 98px;animation:hbArm 1.4s ease-in-out infinite alternate}
-.home-bg .hb-hair path{animation:hbHair 2.4s ease-in infinite;opacity:0}
-.home-bg .hb-hair path:nth-child(2){animation-delay:.6s}
-.home-bg .hb-hair path:nth-child(3){animation-delay:1.2s}
-.home-bg .hb-hair path:nth-child(4){animation-delay:1.8s}
-.home-bg .hb-b1{transform-box:view-box;transform-origin:38px 50px;animation:hbSnip1 1.8s ease-in-out infinite}
-.home-bg .hb-b2{transform-box:view-box;transform-origin:38px 50px;animation:hbSnip2 1.8s ease-in-out infinite}
-.home-bg .hb-sc{transform-box:view-box;transform-origin:38px 40px;animation:hbFloat 4s ease-in-out infinite}
-@keyframes hbArm{from{transform:rotate(-5deg)}to{transform:rotate(6deg)}}
-@keyframes hbHair{0%{opacity:0;transform:translate(0,0)}15%{opacity:1}100%{opacity:0;transform:translate(6px,70px) rotate(40deg)}}
-@keyframes hbSnip1{0%,60%,100%{transform:rotate(0)}30%{transform:rotate(-14deg)}}
-@keyframes hbSnip2{0%,60%,100%{transform:rotate(0)}30%{transform:rotate(14deg)}}
-@keyframes hbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hero-bg{position:absolute;z-index:-1;inset:0 0 auto 0;height:calc(250px + var(--safe-t));overflow:hidden;pointer-events:none}
+.hero-bg i{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.05);transition:opacity 1.6s ease;will-change:opacity,transform}
+.hero-bg i.on{opacity:1;animation:heroKb 8s ease-out forwards}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.62) 55%,var(--bg) 100%)}
+@keyframes heroKb{from{transform:scale(1.05) translate(0,0)}to{transform:scale(1.18) translate(-2%,-2%)}}
+@media (prefers-reduced-motion:reduce){.hero-bg i.on{transform:scale(1.05)}}
 </style>
 </head>
 <body>
@@ -524,25 +514,7 @@ html[dir=rtl] .home-bg svg{transform:scaleX(-1)}
 
   <!-- ============ 0. ACCUEIL ============ -->
   <section class="screen home on" id="s0" aria-labelledby="hello">
-    <div class="home-bg" aria-hidden="true">
-      <svg viewBox="0 0 240 260" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <g class="hb-sc"><circle cx="30" cy="54" r="7"/><circle cx="46" cy="54" r="7"/><path class="hb-b1" d="M34 49 L58 22"/><path class="hb-b2" d="M42 49 L18 22"/></g>
-        <path d="M48 168 Q46 120 54 96" opacity=".55"/>
-        <rect x="38" y="168" width="94" height="14" rx="7"/>
-        <path d="M85 182 V214 M56 218 H114"/>
-        <path d="M85 110 L50 170 H122 Z" fill="var(--or)" stroke="var(--ink)"/>
-        <path d="M80 104 V112 M90 104 V112"/>
-        <circle cx="85" cy="90" r="17" fill="var(--bg)"/>
-        <path d="M68 88 Q70 70 85 71 Q101 71 102 88 Q94 80 85 81 Q75 80 68 88 Z" fill="var(--ink)"/>
-        <g class="hb-hair" stroke="var(--ink2)" stroke-width="2.4"><path d="M104 92 l3 4"/><path d="M98 96 l-2 4"/><path d="M108 88 l4 2"/><path d="M101 99 l3 3"/></g>
-        <circle cx="176" cy="66" r="15" fill="var(--bg)"/>
-        <path d="M162 60 Q164 48 176 48 Q189 48 190 60"/>
-        <path d="M158 92 Q176 84 194 92 L200 190 H152 Z" fill="var(--bg)"/>
-        <path d="M166 190 L164 240 M186 190 L188 240"/>
-        <path d="M194 98 L206 140 L192 160"/>
-        <g class="hb-arm"><path d="M160 98 L138 122 L112 98"/><rect x="98" y="86" width="20" height="10" rx="4" fill="var(--or)" transform="rotate(-38 108 91)"/></g>
-      </svg>
-    </div>
+    <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
     <div class="hbar">
       <div class="logo"><div class="pole" aria-hidden="true"></div><div class="sign" id="sign"></div></div>
       <div class="lang" id="lang">
@@ -1023,6 +995,7 @@ async function loadConfig(){
     if (j.salon){ SALON = j.salon; applySalon(); renderStatic(); if (st.step === 3) renderDays(); if (st.step === 4) loadSlots(); }
     st.services = st.services.filter(id => SERVICES.some(s => s.id === id));
     store.set("ob_cfg", { coiffeurs: TEAM, galerie: GALLERY, services: SERVICES, salon: SALON });
+    heroBg();
     renderLinks();
     if (st.step === 1) renderServices();
     renderSvcStrip(); renderLinks(); update();
@@ -1653,6 +1626,19 @@ async function refreshStatus(l){
 }
 
 /* ---------- accueil: rendez-vous jay / avis ---------- */
+/* Hero background: real photos (services + galerie) with slow zoom + crossfade. */
+let heroKey = "", heroTimer = 0;
+function heroBg(){
+  const box = document.getElementById("heroBg"); if (!box) return;
+  const urls = [...new Set([...(SERVICES || []).map(s => s.photo), ...(GALLERY || [])].filter(Boolean))].slice(0, 8);
+  const key = urls.join("|"); if (key === heroKey) return; heroKey = key;
+  clearInterval(heroTimer); box.innerHTML = "";
+  if (!urls.length) return;
+  const L = urls.map(u => { const e = document.createElement("i"); e.style.backgroundImage = `url("${u.replace(/"/g, "%22")}")`; box.appendChild(e); return e; });
+  let k = 0; L[0].classList.add("on");
+  if (L.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  heroTimer = setInterval(() => { if (document.hidden) return; L[k].classList.remove("on"); k = (k + 1) % L.length; void L[k].offsetWidth; L[k].classList.add("on"); }, 6000);
+}
 function renderHomeCards(){
   const box = $("#homeCards"), l = store.get("ob_last", null);
   if (!l){ box.innerHTML = ""; return; }
@@ -1700,7 +1686,7 @@ if ("serviceWorker" in navigator && location.protocol === "https:") window.addEv
 /* ---------- init ---------- */
 document.documentElement.lang = lang === "ar" ? "ar" : "fr";
 document.documentElement.dir = T().dir;
-renderStatic(); renderGallery(); renderTeamStrip();
+renderStatic(); renderGallery(); renderTeamStrip(); heroBg();
 try { history.replaceState({ s:0 }, ""); } catch(e){}
 show(0, { noFocus:true });
 heroNext();
