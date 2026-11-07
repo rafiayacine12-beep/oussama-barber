@@ -382,6 +382,44 @@ html[lang=ar] .how h3{font-family:"Noto Kufi Arabic",sans-serif;letter-spacing:0
 .done{text-align:center;padding-top:calc(30px + var(--safe-t));background:var(--s1)}
 .ticket{position:relative;background:#fff;color:var(--ink);border-radius:16px;margin:20px auto 24px;width:100%;max-width:360px;text-align:start;box-shadow:var(--shadow);overflow:visible;animation:print .6s cubic-bezier(.2,.8,.2,1)}
 @keyframes print{from{transform:translateY(-24px);opacity:0;clip-path:inset(0 0 100% 0)}to{transform:none;opacity:1;clip-path:inset(0 0 0 0)}}
+
+/* ===== imprimante dyal t-ticket ===== */
+.prn{position:relative;width:100%;max-width:380px;margin:18px auto 22px;display:flex;flex-direction:column;align-items:center;isolation:isolate}
+.prn-mach{position:relative;z-index:3;width:100%;border-radius:24px;padding:12px 12px 30px;background:linear-gradient(180deg,#2A251E 0%,#1B1712 100%);border:1px solid #0E0B08;box-shadow:0 22px 38px -20px rgba(23,20,15,.6),0 6px 14px -8px rgba(23,20,15,.3),inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1px 0 rgba(0,0,0,.5)}
+.prn-mach::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.35;mix-blend-mode:overlay;background-image:radial-gradient(rgba(255,255,255,.18) .6px,transparent .7px);background-size:3px 3px}
+.prn-head{position:relative;display:flex;align-items:center;justify-content:space-between;height:34px;padding:0 6px 8px}
+.prn-brand{display:flex;align-items:center;gap:7px;color:#F3EEE6;font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
+.prn-brand i{width:6px;height:18px;border-radius:3px;background:repeating-linear-gradient(-45deg,#fff 0 3px,var(--or) 3px 6px)}
+.prn-leds{display:flex;gap:6px}
+.prn-leds i{width:8px;height:8px;border-radius:50%;background:#3A342B;box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}
+.prn[data-stage=processing] .prn-leds i:first-child,.prn[data-stage=printing] .prn-leds i:first-child{background:var(--or);box-shadow:0 0 8px var(--or);animation:prnBlink 1s infinite}
+.prn[data-stage=complete] .prn-leds i:last-child{background:#2BD47A;box-shadow:0 0 8px #2BD47A}
+.prn-screen{position:relative;overflow:hidden;border-radius:12px;background:#0B0907;border:1px solid #000;padding:13px 14px;box-shadow:inset 0 0 22px 4px rgba(0,0,0,.6)}
+.prn-screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
+.prn-st{position:relative;display:flex;align-items:center;gap:10px;min-height:20px}
+.prn-ic{position:relative;width:18px;height:18px;flex:0 0 18px}
+.prn-ic::before{content:"";position:absolute;inset:1px;border-radius:50%;border:2.4px solid rgba(255,255,255,.18);border-top-color:#F3EEE6;animation:prnSpin .8s linear infinite;transition:opacity .16s,transform .16s}
+.prn-ic::after{content:"";position:absolute;inset:0;border-radius:50%;background:#2BD47A url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B0907' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat;opacity:0;transform:scale(.94);transition:opacity .16s,transform .16s}
+.prn[data-stage=complete] .prn-ic::before{opacity:0;transform:scale(.96)}
+.prn[data-stage=complete] .prn-ic::after{opacity:1;transform:scale(1)}
+.prn-lbl{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:600;color:#CFC7BA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prn-lbl.swap{animation:prnLbl .18s cubic-bezier(.23,1,.32,1)}
+.prn[data-stage=complete] .prn-lbl{color:#F3EEE6}
+.prn-slot{position:absolute;left:22px;right:22px;bottom:12px;height:8px;border-radius:4px;background:#050403;box-shadow:inset 0 2px 3px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.06)}
+.prn-out{position:relative;z-index:4;width:calc(100% - 44px);margin-top:-18px;overflow:hidden;padding:0 4px 18px}
+.prn-out::before{content:"";position:absolute;left:4px;right:4px;top:0;height:8px;z-index:5;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent)}
+.prn-feed{position:relative;filter:drop-shadow(0 10px 18px rgba(23,20,15,.22)) drop-shadow(0 2px 3px rgba(23,20,15,.08))}
+.prn[data-stage=processing] .prn-feed{transform:translateY(calc(-100% + 2px));opacity:0}
+.prn[data-stage=printing] .prn-feed{animation:prnFeed 1.75s linear both}
+.prn .ticket.pro{margin:0;max-width:none;border-radius:0;box-shadow:none;animation:none;clip-path:polygon(0 0,100% 0,100% calc(100% - 5px),98.75% 100%,97.5% calc(100% - 5px),96.25% 100%,95% calc(100% - 5px),93.75% 100%,92.5% calc(100% - 5px),91.25% 100%,90% calc(100% - 5px),88.75% 100%,87.5% calc(100% - 5px),86.25% 100%,85% calc(100% - 5px),83.75% 100%,82.5% calc(100% - 5px),81.25% 100%,80% calc(100% - 5px),78.75% 100%,77.5% calc(100% - 5px),76.25% 100%,75% calc(100% - 5px),73.75% 100%,72.5% calc(100% - 5px),71.25% 100%,70% calc(100% - 5px),68.75% 100%,67.5% calc(100% - 5px),66.25% 100%,65% calc(100% - 5px),63.75% 100%,62.5% calc(100% - 5px),61.25% 100%,60% calc(100% - 5px),58.75% 100%,57.5% calc(100% - 5px),56.25% 100%,55% calc(100% - 5px),53.75% 100%,52.5% calc(100% - 5px),51.25% 100%,50% calc(100% - 5px),48.75% 100%,47.5% calc(100% - 5px),46.25% 100%,45% calc(100% - 5px),43.75% 100%,42.5% calc(100% - 5px),41.25% 100%,40% calc(100% - 5px),38.75% 100%,37.5% calc(100% - 5px),36.25% 100%,35% calc(100% - 5px),33.75% 100%,32.5% calc(100% - 5px),31.25% 100%,30% calc(100% - 5px),28.75% 100%,27.5% calc(100% - 5px),26.25% 100%,25% calc(100% - 5px),23.75% 100%,22.5% calc(100% - 5px),21.25% 100%,20% calc(100% - 5px),18.75% 100%,17.5% calc(100% - 5px),16.25% 100%,15% calc(100% - 5px),13.75% 100%,12.5% calc(100% - 5px),11.25% 100%,10% calc(100% - 5px),8.75% 100%,7.5% calc(100% - 5px),6.25% 100%,5% calc(100% - 5px),3.75% 100%,2.5% calc(100% - 5px),1.25% 100%,0% calc(100% - 5px));padding-bottom:6px}
+.prn .ticket.pro .tp{padding-top:22px}
+@keyframes prnFeed{0%{transform:translateY(calc(-100% + 2px))}7.5%{transform:translateY(-91%)}10.5%{transform:translateY(-91%)}18.0%{transform:translateY(-81%)}21.0%{transform:translateY(-81%)}28.5%{transform:translateY(-70%)}31.5%{transform:translateY(-70%)}39.0%{transform:translateY(-58%)}42.0%{transform:translateY(-58%)}49.5%{transform:translateY(-45%)}52.5%{transform:translateY(-45%)}60.0%{transform:translateY(-32%)}63.0%{transform:translateY(-32%)}70.5%{transform:translateY(-20%)}73.5%{transform:translateY(-20%)}81.0%{transform:translateY(-10%)}84.0%{transform:translateY(-10%)}91.5%{transform:translateY(-3%)}94.5%{transform:translateY(-3%)}100%{transform:translateY(0%)}}
+@keyframes prnSpin{to{transform:rotate(360deg)}}
+@keyframes prnBlink{50%{opacity:.35}}
+@keyframes prnLbl{from{opacity:0;transform:translateY(4px)}}
+#s6 .prn~*,#s6>h2,#s6>#doneSub{transition:opacity .35s ease,transform .35s ease}
+#s6[data-prn=busy] .prn~*,#s6[data-prn=busy]>h2,#s6[data-prn=busy]>#doneSub{opacity:0;transform:translateY(8px);pointer-events:none}
+@media (prefers-reduced-motion:reduce){.prn-ic::before{animation:none}.prn[data-stage=printing] .prn-feed{animation:none}.prn-leds i{animation:none!important}}
 .ticket .tp{padding:20px 22px 18px;text-align:center;background:var(--or);color:#fff;border-radius:16px 16px 0 0}
 .ticket .brand{font-family:var(--display);font-weight:900;font-size:26px;letter-spacing:.06em;text-transform:uppercase}
 .ticket .addr{font-size:12px;color:#FFE3D1}
@@ -662,7 +700,14 @@ html[lang=ar] .block h3{font-size:21px}
   <section class="screen done" id="s6" aria-labelledby="h6t">
     <h2 id="h6t"></h2>
     <p class="sub" id="doneSub" style="max-width:360px;margin:8px auto 0"></p>
-    <div class="ticket" id="ticket"></div>
+    <div class="prn" id="prn" data-stage="complete">
+      <div class="prn-mach">
+        <div class="prn-head"><span class="prn-brand"><i aria-hidden="true"></i><span id="prnBrand"></span></span><span class="prn-leds" aria-hidden="true"><i></i><i></i></span></div>
+        <div class="prn-screen"><div class="prn-st"><span class="prn-ic" aria-hidden="true"></span><span class="prn-lbl" id="prnLbl" role="status" aria-live="polite"></span></div></div>
+        <div class="prn-slot" aria-hidden="true"></div>
+      </div>
+      <div class="prn-out"><div class="prn-feed"><div class="ticket" id="ticket"></div></div></div>
+    </div>
     <div class="tk-tools" id="tkTools">
       <a class="tool" id="calBtn" href="#" download="rendez-vous.ics"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 14v4M10 16h4"/></svg></i><span data-t="tkCal"></span></a>
       <button class="tool" id="imgBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></i><span data-t="tkImg"></span></button>
@@ -754,7 +799,7 @@ const I18N = {
     stPending:"Kaytsenna l-confirmation", stConfirmed:"Mconfirmé ✅", stRefused:"Tlghat",
     errBlocked:"Ma ymkench tréservi b had n-numéro. Tsel b salon f WhatsApp.", errLimit:"3endek deja réservation jaya b had n-numéro. Lghiha 9bel ma tdir wa7da jdida.",
     welcomeT:"Mrehba bik 👋", welcomeS:"Réservi l-blassa dyalek f 30 seconde, bla ma t3ayet wla ttsenna f s-salon.",
-    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal", howT:"Kifach treservi? 4 khotawat sahlin", how1:"Khtar l-service", how1s:"Coupe, dégradé, barbe… l-prix bayn 9bel ma tkhtar.", how2:"Khtar l-coiffeur", how2s:"Wla khtar \"Ay wa7ed\" bach takhod asra3 blassa.", how3:"Khtar n-nhar w s-sa3a", how3s:"Kayban lik ghir l-wa9t l-khawi.", how4:"Kteb smiytek w raqmek", how4s:"Katjik confirmation f WhatsApp. Tkhelles f s-salon.", howCta:"Yallah, bda daba",
+    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal", prnProc:"Kansjlo réservation dyalek…", prnPrint:"Kantb3o l-ticket dyalek…", prnDone:"Ticket dyalek wajed", prnPend:"Ticket wajed · f-ntidar confirmation", howT:"Kifach treservi? 4 khotawat sahlin", how1:"Khtar l-service", how1s:"Coupe, dégradé, barbe… l-prix bayn 9bel ma tkhtar.", how2:"Khtar l-coiffeur", how2s:"Wla khtar \"Ay wa7ed\" bach takhod asra3 blassa.", how3:"Khtar n-nhar w s-sa3a", how3s:"Kayban lik ghir l-wa9t l-khawi.", how4:"Kteb smiytek w raqmek", how4s:"Katjik confirmation f WhatsApp. Tkhelles f s-salon.", howCta:"Yallah, bda daba",
     qMap:"Kifach nwsel", qCall:"3ayet", svcT:"Les services w l-prix", seeAll:"Réservi",
     followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
     tkBarber:"Coiffeur dyalek", tkS1:"Tsjjlat", tkS2:"Confirmation", tkS3:"Nhar r-rendez-vous", tkIn:"Ba9i {x}", tkNow:"Daba! 💈", tkPast:"Daz", tkD:"nhar", tkH:"sa3a", tkM:"dq",
@@ -811,7 +856,7 @@ const I18N = {
     stPending:"En attente de confirmation", stConfirmed:"Confirmé ✅", stRefused:"Annulée",
     errBlocked:"Impossible de réserver avec ce numéro. Contactez le salon sur WhatsApp.", errLimit:"Vous avez déjà une réservation à venir avec ce numéro. Annulez-la avant d'en faire une autre.",
     welcomeT:"Bienvenue 👋", welcomeS:"Réservez votre place en 30 secondes, sans appeler ni attendre au salon.",
-    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon", howT:"Comment réserver ? 4 étapes simples", how1:"Choisis le service", how1s:"Coupe, dégradé, barbe… le prix est affiché.", how2:"Choisis le coiffeur", how2s:"Ou « Peu importe » pour la place la plus rapide.", how3:"Choisis le jour et l\u2019heure", how3s:"Seuls les créneaux libres sont affichés.", how4:"Ton prénom et ton numéro", how4s:"Confirmation sur WhatsApp. Paiement au salon.", howCta:"Commencer maintenant",
+    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon", prnProc:"Enregistrement de ta réservation…", prnPrint:"Impression de ton ticket…", prnDone:"Ton ticket est prêt", prnPend:"Ticket prêt · en attente de confirmation", howT:"Comment réserver ? 4 étapes simples", how1:"Choisis le service", how1s:"Coupe, dégradé, barbe… le prix est affiché.", how2:"Choisis le coiffeur", how2s:"Ou « Peu importe » pour la place la plus rapide.", how3:"Choisis le jour et l\u2019heure", how3s:"Seuls les créneaux libres sont affichés.", how4:"Ton prénom et ton numéro", how4s:"Confirmation sur WhatsApp. Paiement au salon.", howCta:"Commencer maintenant",
     qMap:"Itinéraire", qCall:"Appeler", svcT:"Services & prix", seeAll:"Réserver",
     followT:"Suivez-nous", mapRow:"Comment venir au salon",
     tkBarber:"Votre coiffeur", tkS1:"Envoyée", tkS2:"Confirmation", tkS3:"Jour du rendez-vous", tkIn:"Dans {x}", tkNow:"C'est maintenant ! 💈", tkPast:"Passé", tkD:"j", tkH:"h", tkM:"min",
@@ -868,7 +913,7 @@ const I18N = {
     stPending:"في انتظار التأكيد", stConfirmed:"مؤكد ✅", stRefused:"ملغى",
     errBlocked:"لا يمكن الحجز بهذا الرقم. تواصل مع الصالون عبر واتساب.", errLimit:"لديك حجز قادم بهذا الرقم. ألغه قبل أن تحجز موعدًا جديدًا.",
     welcomeT:"مرحبا بك 👋", welcomeS:"احجز مكانك في 30 ثانية، بدون اتصال ولا انتظار في الصالون.",
-    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل", howT:"كيفاش تحجز؟ 4 خطوات ساهلين", how1:"اختر الخدمة", how1s:"حلاقة، ديگرادي، لحية… الثمن ظاهر.", how2:"اختر الحلاق", how2s:"ولا اختر «أي حلاق» باش تاخد أسرع موعد.", how3:"اختر اليوم والساعة", how3s:"غير المواعيد الخاوية اللي كتبان.", how4:"اكتب سميتك ونمرتك", how4s:"كيوصلك التأكيد فواتساب. الخلاص فالمحل.", howCta:"يالاه، بدا دابا",
+    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل", prnProc:"كنسجلو الحجز ديالك…", prnPrint:"كنطبعو التيكي ديالك…", prnDone:"التيكي ديالك واجد", prnPend:"التيكي واجد · فانتظار التأكيد", howT:"كيفاش تحجز؟ 4 خطوات ساهلين", how1:"اختر الخدمة", how1s:"حلاقة، ديگرادي، لحية… الثمن ظاهر.", how2:"اختر الحلاق", how2s:"ولا اختر «أي حلاق» باش تاخد أسرع موعد.", how3:"اختر اليوم والساعة", how3s:"غير المواعيد الخاوية اللي كتبان.", how4:"اكتب سميتك ونمرتك", how4s:"كيوصلك التأكيد فواتساب. الخلاص فالمحل.", howCta:"يالاه، بدا دابا",
     qMap:"الطريق", qCall:"اتصل", svcT:"الخدمات والأسعار", seeAll:"احجز",
     followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
     tkBarber:"حلاقك", tkS1:"تم الإرسال", tkS2:"التأكيد", tkS3:"يوم الموعد", tkIn:"بعد {x}", tkNow:"حان الوقت! 💈", tkPast:"انتهى", tkD:"يوم", tkH:"س", tkM:"د",
@@ -1532,7 +1577,7 @@ function startTicketLive(){
     try {
       const r = await fetch(CONFIG.apiUrl + "?action=status&id=" + encodeURIComponent(TK.id) + "&phone=" + encodeURIComponent(TK.phone), { cache: "no-store" }).then(x => x.json());
       if (!r.ok || !r.statut || tkState(r.statut) === "p") return;
-      TK.statut = r.statut; saveLast(TK); renderTicket(TK); clearInterval(tkPoll);
+      TK.statut = r.statut; saveLast(TK); renderTicket(TK); clearInterval(tkPoll); if ($("#prn").dataset.stage === "complete") prnStage("complete");
       $("#ticket").classList.add("pop");
       if (tkState(r.statut) === "c"){ confetti(); toastMsg(t("tkConfirmedToast")); try { navigator.vibrate && navigator.vibrate([60, 40, 120]); } catch(e){} }
       else { toastMsg(t("tkRefusedToast")); $("#ticketCancel").hidden = true; }
@@ -1602,7 +1647,30 @@ $("#shareBtn").addEventListener("click", async () => {
   else window.open("https://wa.me/?text=" + encodeURIComponent(txt + "\n" + url), "_blank", "noopener");
 });
 
+let prnTimers = [];
+function prnLabel(stage){
+  if (stage === "processing") return t("prnProc");
+  if (stage === "printing") return t("prnPrint");
+  const sx = TK ? tkState(TK.statut) : "c";
+  return sx === "p" ? t("prnPend") : sx === "x" ? t("stRefused") : t("prnDone");
+}
+function prnStage(stage){
+  const p = $("#prn"), l = $("#prnLbl"); if (!p) return;
+  p.dataset.stage = stage; $("#prnBrand").textContent = CONFIG.salon;
+  l.textContent = prnLabel(stage); l.classList.remove("swap"); void l.offsetWidth; l.classList.add("swap");
+  $("#prn .prn-feed").setAttribute("aria-hidden", stage === "complete" ? "false" : "true");
+  $("#s6").dataset.prn = stage === "complete" ? "" : "busy";
+}
+function prnRun(fresh){
+  prnTimers.forEach(clearTimeout); prnTimers = [];
+  const calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!fresh || calm){ prnStage("complete"); return; }
+  prnStage("processing");
+  prnTimers.push(setTimeout(() => { prnStage("printing"); try { navigator.vibrate && navigator.vibrate([18, 120, 18, 120, 18, 120, 18]); } catch(e){} }, 1100));
+  prnTimers.push(setTimeout(() => { prnStage("complete"); try { navigator.vibrate && navigator.vibrate(40); } catch(e){} }, 1100 + 1800));
+}
 function showTicket(stay, snap){
+  const fresh = !snap && stay !== true;
   TK = snap || ticketSnap(); saveLast(TK);
   const pend = tkState(TK.statut) === "p";
   renderTicket(TK);
@@ -1617,6 +1685,7 @@ function showTicket(stay, snap){
   $("#calBtn").href = icsData(TK); $("#calBtn").setAttribute("download", "rendez-vous-" + TK.id + ".ics");
   $("#ticketMsg").innerHTML = ""; const tc = $("#ticketCancel"); tc.hidden = tkState(TK.statut) === "x"; tc.classList.remove("armed"); tc.textContent = t("cancelTicket"); tc.disabled = false;
   if (stay !== true){ try { history.replaceState({ s:6 }, ""); } catch(e){} show(6); }
+  prnRun(fresh);
   startTicketLive();
 }
 function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1, loyal:null }); }
