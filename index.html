@@ -379,6 +379,75 @@ h2{font-family:var(--display);font-weight:800;font-size:42px;line-height:1;lette
 .ticket dd{text-align:end;font-weight:700}
 .ticket .ref{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 18px;font-size:13px;color:var(--mute)}
 .ticket .ref b{font-family:var(--display);font-weight:800;font-size:21px;color:var(--ink);letter-spacing:.08em}
+/* ticket pro */
+.ticket.pro{border-radius:22px;overflow:hidden;box-shadow:0 18px 40px -18px rgba(23,20,15,.35),0 2px 6px rgba(23,20,15,.06)}
+.ticket.pro .tp{position:relative;padding:18px 20px 22px;border-radius:0;text-align:center;background:linear-gradient(150deg,var(--or) 0%,var(--or2) 100%);overflow:hidden}
+.ticket.pro .tp::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 14px,transparent 14px 28px);pointer-events:none}
+.ticket.pro .tp>*{position:relative}
+.tk-head{display:flex;flex-direction:column;align-items:center;gap:10px}
+.tk-logo{display:flex;align-items:center;gap:8px;min-width:0;text-align:start}
+.tk-logo .pl{width:9px;height:26px;border-radius:5px;flex:0 0 9px;background:repeating-linear-gradient(-45deg,#fff 0 4px,var(--ink) 4px 8px);box-shadow:0 0 0 2px rgba(255,255,255,.5)}
+.tk-logo b{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.06em;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk-st{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;white-space:nowrap;backdrop-filter:blur(4px)}
+.tk-st i{width:8px;height:8px;border-radius:50%;background:#FFD166;box-shadow:0 0 0 0 rgba(255,209,102,.7);animation:pulse 1.6s infinite}
+.tk-st.c{background:#fff;color:var(--ok)}.tk-st.c i{background:var(--ok);animation:none}
+.tk-st.x{background:#fff;color:var(--red)}.tk-st.x i{background:var(--red);animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(255,209,102,0)}100%{box-shadow:0 0 0 0 rgba(255,209,102,0)}}
+.ticket.pro .when{font-size:76px;margin:12px 0 2px;letter-spacing:.01em;text-shadow:0 2px 0 rgba(0,0,0,.08)}
+.ticket.pro .day{font-size:16px;opacity:.95}
+.tk-cd{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 14px;border-radius:999px;background:rgba(23,20,15,.22);font-weight:800;font-size:13.5px}
+.tk-cd svg{width:15px;height:15px}
+.tk-barber{display:flex;align-items:center;gap:12px;padding:16px 20px 4px}
+.tk-barber .av{width:48px;height:48px;flex:0 0 48px;border-radius:50%;background:var(--orsoft);color:var(--or);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:22px;overflow:hidden;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--orline)}
+.tk-barber .av img{width:100%;height:100%;object-fit:cover}
+.tk-barber small{display:block;font-size:12px;font-weight:600;color:var(--mute)}
+.tk-barber b{font-size:17px;font-weight:800}
+.tk-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:16px 16px 18px;position:relative}
+.tk-steps li{list-style:none;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:11.5px;font-weight:700;color:var(--mute);position:relative;line-height:1.25}
+.tk-steps li::before{content:"";position:absolute;top:13px;inset-inline-start:-50%;width:100%;height:3px;background:var(--line);z-index:0}
+.tk-steps li:first-child::before{display:none}
+.tk-steps li.ok::before,.tk-steps li.cur::before{background:var(--ok)}
+.tk-steps li span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--line);position:relative;z-index:1;font-size:13px;color:var(--mute)}
+.tk-steps li.ok{color:var(--ink)}.tk-steps li.ok span{background:var(--ok);border-color:var(--ok);color:#fff}
+.tk-steps li.cur{color:var(--or2)}.tk-steps li.cur span{border-color:var(--or);color:var(--or)}
+.tk-steps li.cur span::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--or);opacity:.35;animation:ring 1.6s infinite}
+.tk-steps li.x{color:var(--red)}.tk-steps li.x span{background:var(--red);border-color:var(--red);color:#fff}
+@keyframes ring{from{transform:scale(.8);opacity:.5}to{transform:scale(1.25);opacity:0}}
+.tk-items{padding:16px 20px 4px;display:grid;gap:9px;font-size:14.5px}
+.tk-items .it{display:flex;justify-content:space-between;gap:12px}
+.tk-items .it span{color:var(--ink2);font-weight:600}.tk-items .it b{font-weight:800;white-space:nowrap}
+.tk-items .it.dc b,.tk-items .it.dc span{color:var(--ok)}
+.tk-items .it.meta span,.tk-items .it.meta b{color:var(--mute);font-weight:600;font-size:13px}
+.tk-tot{display:flex;justify-content:space-between;align-items:baseline;margin:6px 20px 0;padding:12px 0 4px;border-top:1.5px solid var(--line)}
+.tk-tot span{font-weight:700;color:var(--mute);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.tk-tot b{font-family:var(--display);font-weight:900;font-size:34px;line-height:1;color:var(--ink)}
+.tk-ref{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 20px 4px;padding:10px 12px 10px 14px;border-radius:14px;background:var(--s1)}
+.tk-ref small{display:block;font-size:11.5px;font-weight:700;color:var(--mute)}
+.tk-ref b{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.1em}
+.tk-ref button{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.tk-ref button svg{width:15px;height:15px}
+.ticket.pro .barcode{margin:12px 20px 16px;height:42px;background:none;display:flex;align-items:stretch;gap:0;opacity:1}
+.ticket.pro .barcode i{display:block;background:var(--ink);border-radius:1px;min-width:1px}
+.ticket.pro .tk-map{margin:0 14px 14px}
+.ticket.pro.conf .tp{background:linear-gradient(150deg,var(--or) 0%,var(--or2) 100%)}
+.ticket.pro.ref .tp{background:linear-gradient(150deg,#6b655c,#3d3a35)}
+.ticket.pro.pop{animation:tkpop .5s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes tkpop{40%{transform:scale(1.03)}}
+.tk-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:360px;margin:0 auto 14px}
+.tk-tools .tool{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 6px;border-radius:16px;background:#fff;border:1.5px solid var(--line);color:var(--ink);font-weight:700;font-size:12.5px;text-decoration:none;transition:transform .1s,border-color .15s}
+.tk-tools .tool:active{transform:scale(.96)}
+.tk-tools .tool i{width:40px;height:40px;border-radius:50%;background:var(--orsoft);color:var(--or);display:grid;place-items:center}
+.tk-tools .tool i svg{width:20px;height:20px}
+.tk-tips{width:100%;max-width:360px;margin:0 auto 18px;text-align:start;background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:14px 16px}
+.tk-tips b{display:block;font-size:14px;margin-bottom:8px}
+.tk-tips ul{margin:0;padding:0;display:grid;gap:8px}
+.tk-tips li{list-style:none;display:flex;gap:10px;font-size:13.5px;line-height:1.45;color:var(--ink2)}
+.tk-tips li em{font-style:normal;flex:0 0 22px;height:22px;border-radius:50%;background:var(--orsoft);color:var(--or2);display:grid;place-items:center;font-size:12px;font-weight:800}
+.tk-toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:999px;z-index:210;transition:.3s;max-width:90vw;text-align:center;pointer-events:none}
+.tk-toast.on{opacity:1;transform:translate(-50%,0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall 1.8s cubic-bezier(.2,.6,.4,1) forwards}
+@keyframes fall{to{transform:translate3d(var(--dx),105vh,0) rotate(var(--r));opacity:.9}}
 .barcode{height:34px;margin:0 22px 18px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 8px,var(--ink) 8px 11px,transparent 11px 12px);opacity:.85;border-radius:2px}
 .acts{display:grid;gap:10px;width:100%;max-width:360px;margin:0 auto}
 .tk-map{display:flex;align-items:center;gap:12px;margin:0 12px 12px;padding:12px;border-radius:12px;background:var(--s1);text-decoration:none;color:var(--ink);text-align:start}
@@ -556,13 +625,18 @@ html[lang=ar] .block h3{font-size:21px}
     <h2 id="h6t"></h2>
     <p class="sub" id="doneSub" style="max-width:360px;margin:8px auto 0"></p>
     <div class="ticket" id="ticket"></div>
+    <div class="tk-tools" id="tkTools">
+      <a class="tool" id="calBtn" href="#" download="rendez-vous.ics"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 14v4M10 16h4"/></svg></i><span data-t="tkCal"></span></a>
+      <button class="tool" id="imgBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></i><span data-t="tkImg"></span></button>
+      <button class="tool" id="shareBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></i><span data-t="tkShare"></span></button>
+    </div>
+    <div class="tk-tips" id="tkTips"></div>
     <div id="tkSocial"></div>
     <div class="acts">
       <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
         <span data-t="waBtn"></span>
       </a>
-      <a class="btn ghost" id="calBtn" href="#" download="oussama-barber.ics" data-t="calBtn"></a>
       <button class="btn ghost" id="again" type="button" data-t="again"></button>
       <button class="btn danger" id="ticketCancel" type="button" data-t="cancelTicket"></button>
     </div>
@@ -645,6 +719,11 @@ const I18N = {
     openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal",
     qMap:"Kifach nwsel", qCall:"3ayet", svcT:"Les services w l-prix", seeAll:"Réservi",
     followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
+    tkBarber:"Coiffeur dyalek", tkS1:"Tsjjlat", tkS2:"Confirmation", tkS3:"Nhar r-rendez-vous", tkIn:"Ba9i {x}", tkNow:"Daba! 💈", tkPast:"Daz", tkD:"nhar", tkH:"sa3a", tkM:"dq",
+    tkTipsT:"Bach kolchi ydouz mzyan", tkTip1:"Ji 5 dqaye9 9bel l-wa9t dyalek.", tkTip2:"Ila ma t9derch tji, lghi men hna bach t3ti l-blassa l chi wa7ed akhor.", tkTip3:"Werri had t-ticket f s-salon ila tsowlti.",
+    tkCal:"Calendrier", tkImg:"Sjjel tswira", tkShare:"Partager", tkCopied:"Réf tcopiat ✓", tkDisc:"Remise", tkSaved:"Tswira tsjjlat ✓",
+    tkConfirmedToast:"🎉 R-rendez-vous dyalek tconfirma!", tkRefusedToast:"Smh lina, had l-blassa ma b9atch. Réservi wa9t akhor.", tkView:"Chouf t-ticket", tkLive:"Kantsennaw l-confirmation…",
+    tkShareTxt:"3endi rendez-vous f {salon} · {when}",
     waMsg:"Salam 👋 3endi réservation f {salon}", calAlarm:"Rendez-vous f {salon}"
   },
   fr: {
@@ -697,6 +776,11 @@ const I18N = {
     openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon",
     qMap:"Itinéraire", qCall:"Appeler", svcT:"Services & prix", seeAll:"Réserver",
     followT:"Suivez-nous", mapRow:"Comment venir au salon",
+    tkBarber:"Votre coiffeur", tkS1:"Envoyée", tkS2:"Confirmation", tkS3:"Jour du rendez-vous", tkIn:"Dans {x}", tkNow:"C'est maintenant ! 💈", tkPast:"Passé", tkD:"j", tkH:"h", tkM:"min",
+    tkTipsT:"Pour que tout se passe bien", tkTip1:"Arrivez 5 minutes avant l'heure.", tkTip2:"Un empêchement ? Annulez ici pour libérer la place.", tkTip3:"Montrez ce ticket au salon si on vous le demande.",
+    tkCal:"Calendrier", tkImg:"Enregistrer", tkShare:"Partager", tkCopied:"Réf copiée ✓", tkDisc:"Remise", tkSaved:"Image enregistrée ✓",
+    tkConfirmedToast:"🎉 Votre rendez-vous est confirmé !", tkRefusedToast:"Désolé, ce créneau n'est plus disponible. Choisissez un autre horaire.", tkView:"Voir le ticket", tkLive:"En attente de confirmation…",
+    tkShareTxt:"J'ai rendez-vous chez {salon} · {when}",
     waMsg:"Bonjour 👋 j'ai une réservation chez {salon}", calAlarm:"Rendez-vous chez {salon}"
   },
   ar: {
@@ -749,6 +833,11 @@ const I18N = {
     openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل",
     qMap:"الطريق", qCall:"اتصل", svcT:"الخدمات والأسعار", seeAll:"احجز",
     followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
+    tkBarber:"حلاقك", tkS1:"تم الإرسال", tkS2:"التأكيد", tkS3:"يوم الموعد", tkIn:"بعد {x}", tkNow:"حان الوقت! 💈", tkPast:"انتهى", tkD:"يوم", tkH:"س", tkM:"د",
+    tkTipsT:"لكي يمر كل شيء بسلاسة", tkTip1:"احضر قبل موعدك بـ 5 دقائق.", tkTip2:"إذا لم تستطع الحضور، ألغِ من هنا لتترك المكان لغيرك.", tkTip3:"أظهر هذه التذكرة في المحل إن طُلب منك.",
+    tkCal:"التقويم", tkImg:"حفظ كصورة", tkShare:"مشاركة", tkCopied:"تم نسخ الرقم ✓", tkDisc:"تخفيض", tkSaved:"تم حفظ الصورة ✓",
+    tkConfirmedToast:"🎉 تم تأكيد موعدك!", tkRefusedToast:"عذرًا، هذا الموعد لم يعد متاحًا. اختر وقتًا آخر.", tkView:"عرض التذكرة", tkLive:"في انتظار التأكيد…",
+    tkShareTxt:"لدي موعد في {salon} · {when}",
     waMsg:"السلام عليكم 👋 لدي حجز في {salon}", calAlarm:"موعد في {salon}"
   }
 };
@@ -974,7 +1063,7 @@ function setLang(l){
   document.documentElement.lang = l === "ar" ? "ar" : "fr";
   document.documentElement.dir = T().dir;
   renderStatic(); renderHeroNext();
-  if (st.step === 6) showTicket(true); else show(st.step, { noFocus:true });
+  if (st.step === 6 && TK) showTicket(true, TK); else show(st.step, { noFocus:true });
 }
 function langMenu(open){
   $("#langMenu").hidden = !open; $("#langBtn").setAttribute("aria-expanded", open);
@@ -1299,52 +1388,188 @@ $("#next").addEventListener("click", async () => {
 });
 
 /* ---------- 6. ticket ---------- */
-function icsData(){
-  const d = fromIso(st.date), s = st.start, e = s + duration();
+function icsData(tk){
+  const d = fromIso(tk.date), s = tk.start, e = s + tk.dur;
   const f = m => iso(d).replace(/-/g,"") + "T" + pad(Math.floor(m/60)) + pad(m%60) + "00";
   const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Oussama Barber//FR","BEGIN:VEVENT",
-    "UID:" + st.result.id + "@oussama-barber", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
+    "UID:" + tk.id + "@oussama-barber", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
     "DTSTART:" + f(s), "DTEND:" + f(e),
-    "SUMMARY:" + CONFIG.salon + " – " + svcNames(),
-    "LOCATION:" + CONFIG.adresse, "DESCRIPTION:" + t("tBarber") + ": " + st.result.barber + " · #" + st.result.id,
+    "SUMMARY:" + CONFIG.salon + " – " + tk.items.map(i => i.n).join(" + "),
+    "LOCATION:" + CONFIG.adresse, "DESCRIPTION:" + t("tBarber") + ": " + tk.barber + " · #" + tk.id,
     "BEGIN:VALARM","TRIGGER:-PT1H","ACTION:DISPLAY","DESCRIPTION:" + t("calAlarm", { salon: CONFIG.salon }),"END:VALARM",
     "END:VEVENT","END:VCALENDAR"].join("\r\n");
   return "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
 }
-function showTicket(stay){
-  const r = st.result, pend = String(r.statut || "").includes("attente");
-  $("#h6t").textContent = pend ? t("doneHPending") : t("doneH");
-  $("#doneSub").textContent = pend ? t("pendingNote") : "";
-  $("#ticket").innerHTML = `
+/* ticket snapshot: kaytsjjel f ob_last bach l-client y9der y7ell t-ticket men b3d */
+function ticketSnap(){
+  const r = st.result, items = chosen().map(s => ({ id: s.id, n: L(s.nom), p: s.prix }));
+  return { id: r.id, phone: r.phone, name: r.name, barber: r.barber, date: st.date, start: st.start, dur: duration(), items,
+    total: total(), disc: promoAmount() + loyalAmount(), final: finalTotal(), statut: r.statut || "confirmé" };
+}
+let TK = null, tkPoll = null, tkTick = null;
+const tkState = s => { s = String(s || ""); return s.includes("attente") ? "p" : s.startsWith("annul") ? "x" : "c"; };
+function countdown(tk){
+  const d = fromIso(tk.date); d.setHours(0, tk.start, 0, 0);
+  const diff = Math.round((d - Date.now()) / 60000);
+  if (diff < -tk.dur) return t("tkPast");
+  if (diff <= 0) return t("tkNow");
+  const dd = Math.floor(diff / 1440), hh = Math.floor(diff % 1440 / 60), mm = diff % 60;
+  const x = dd ? `${dd} ${t("tkD")} ${hh ? hh + " " + t("tkH") : ""}` : hh ? `${hh} ${t("tkH")} ${mm ? mm + " " + t("tkM") : ""}` : `${mm} ${t("tkM")}`;
+  return t("tkIn", { x: x.trim() });
+}
+function barcodeHtml(id){
+  let s = 0, out = ""; const str = String(id) + "OB";
+  for (let i = 0; i < 46; i++){ s = (s * 31 + str.charCodeAt(i % str.length) + i) % 9973;
+    const w = 1 + s % 3, g = 1 + (s >> 3) % 3; out += `<i style="flex:${w} 1 0;margin-inline-end:${g * 1.4}px"></i>`; }
+  return out;
+}
+const COPY_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const CLOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const itName = i => { const s = (SERVICES || []).find(x => x.id === i.id); return s ? L(s.nom) : i.n; };
+function renderTicket(tk){
+  const sx = tkState(tk.statut), b = (TEAM || []).find(c => c.nom === tk.barber) || { nom: tk.barber, photo: "" };
+  const stTxt = sx === "p" ? t("stPending") : sx === "x" ? t("stRefused") : t("stConfirmed");
+  const steps = sx === "x" ? ["ok", "x", ""] : sx === "p" ? ["ok", "cur", ""] : ["ok", "ok", tk.date === todayIso() ? "cur" : ""];
+  const ic = ["✓", sx === "x" ? "✕" : sx === "c" ? "✓" : "2", "3"];
+  const el = $("#ticket");
+  el.className = "ticket pro " + (sx === "c" ? "conf" : sx === "x" ? "ref" : "pend");
+  el.innerHTML = `
     <div class="tp">
-      <div class="brand">${esc(CONFIG.salon)}</div>
-      <div class="addr">${esc(CONFIG.adresse)}</div>
-      <div class="when" dir="ltr">${hhmm(st.start)}</div>
-      <div class="day">${esc(longDate(st.date))}</div>
+      <div class="tk-head"><div class="tk-logo"><span class="pl"></span><b>${esc(CONFIG.salon)}</b></div>
+        <span class="tk-st ${sx}" id="tkSt"><i></i>${esc(stTxt.replace(/ ✅/, ""))}</span></div>
+      <div class="when" dir="ltr">${hhmm(tk.start)}</div>
+      <div class="day">${esc(longDate(tk.date))}</div>
+      ${sx !== "x" ? `<div class="tk-cd" id="tkCd">${CLOCK_SVG}<span>${esc(countdown(tk))}</span></div>` : ""}
     </div>
+    <div class="tk-barber"><span class="av">${avatar(b)}</span><span><small>${t("tkBarber")}</small><b>${esc(tk.barber)}</b></span></div>
+    <ol class="tk-steps">${[t("tkS1"), t("tkS2"), t("tkS3")].map((n, i) => `<li class="${steps[i]}"><span>${ic[i]}</span>${esc(n)}</li>`).join("")}</ol>
     <div class="tear" aria-hidden="true"></div>
-    <dl>
-      <dt>${t("tName")}</dt><dd>${esc(r.name)}</dd>
-      <dt>${t("tBarber")}</dt><dd>${esc(r.barber)}</dd>
-      <dt>${t("tService")}</dt><dd>${esc(svcNames())}</dd>
-      <dt>${t("tDur")}</dt><dd>${mins(duration())}</dd>
-      <dt>${t("tTotal")}</dt><dd>${price(finalTotal())}</dd>
-    </dl>
-    <div class="ref"><span>${t("tRef")}</span><b dir="ltr">#${esc(r.id)}</b></div>
-    <div class="barcode" aria-hidden="true"></div>
+    <div class="tk-items">
+      <div class="it meta"><span>${t("tName")}</span><b>${esc(tk.name)}</b></div>
+      ${tk.items.map(i => `<div class="it"><span>${esc(itName(i))}</span><b>${price(i.p)}</b></div>`).join("")}
+      ${tk.disc ? `<div class="it dc"><span>${t("tkDisc")}</span><b>−${price(tk.disc)}</b></div>` : ""}
+      <div class="it meta"><span>${t("tDur")}</span><b>${mins(tk.dur)}</b></div>
+    </div>
+    <div class="tk-tot"><span>${t("tTotal")}</span><b dir="ltr">${price(tk.final)}</b></div>
+    <div class="tk-ref"><span><small>${t("tRef")}</small><b dir="ltr">#${esc(tk.id)}</b></span><button type="button" id="tkCopy">${COPY_SVG}Copier</button></div>
+    <div class="barcode" aria-hidden="true">${barcodeHtml(tk.id)}</div>
     <a class="tk-map maplink" href="${esc(mapsLink())}" target="_blank" rel="noopener">
       <i>${PIN_SVG}</i><span><small>${t("mapRow")}</small>${esc(CONFIG.adresse)}</span><b>${NAV_SVG}${t("qMap")}</b></a>`;
+  $("#tkCopy").onclick = () => { try { navigator.clipboard.writeText("#" + tk.id); } catch(e){} toastMsg(t("tkCopied")); };
+  $("#tkTips").innerHTML = sx === "x" ? "" : `<b>💡 ${t("tkTipsT")}</b><ul>${[t("tkTip1"), t("tkTip2"), t("tkTip3")].map((x, i) => `<li><em>${i + 1}</em><span>${esc(x)}</span></li>`).join("")}</ul>`;
+  $("#tkTools").hidden = sx === "x";
+  $("#h6t").textContent = sx === "p" ? t("doneHPending") : sx === "x" ? t("stRefused") : t("doneH");
+  $("#doneSub").textContent = sx === "p" ? t("pendingNote") : sx === "x" ? t("tkRefusedToast") : "";
+}
+function toastMsg(m){
+  let el = $("#tkToast"); if (!el){ el = document.createElement("div"); el.id = "tkToast"; el.className = "tk-toast"; document.body.appendChild(el); }
+  el.textContent = m; el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), 2600);
+}
+function confetti(){
+  const box = document.createElement("div"); box.className = "confetti";
+  const cols = [getComputedStyle(document.documentElement).getPropertyValue("--or").trim() || "#E2560A", "#17140F", "#FFD166", "#1FAF5B", "#fff"];
+  for (let i = 0; i < 70; i++){ const c = document.createElement("i");
+    c.style.cssText = `left:${Math.random() * 100}%;background:${cols[i % cols.length]};--dx:${(Math.random() - .5) * 160}px;--r:${Math.random() * 720 - 360}deg;animation-delay:${Math.random() * .4}s;${i % 5 === 4 ? "outline:1px solid #ddd;" : ""}`;
+    box.appendChild(c); }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 2600);
+}
+function stopTicketLive(){ clearInterval(tkPoll); clearInterval(tkTick); tkPoll = tkTick = null; }
+function startTicketLive(){
+  stopTicketLive();
+  tkTick = setInterval(() => { if (st.step !== 6 || !TK){ stopTicketLive(); return; } const c = $("#tkCd span"); if (c) c.textContent = countdown(TK); }, 30000);
+  if (DEMO || tkState(TK.statut) !== "p") return;
+  tkPoll = setInterval(async () => {
+    if (st.step !== 6 || !TK){ stopTicketLive(); return; }
+    if (document.hidden) return;
+    try {
+      const r = await fetch(CONFIG.apiUrl + "?action=status&id=" + encodeURIComponent(TK.id) + "&phone=" + encodeURIComponent(TK.phone), { cache: "no-store" }).then(x => x.json());
+      if (!r.ok || !r.statut || tkState(r.statut) === "p") return;
+      TK.statut = r.statut; saveLast(TK); renderTicket(TK); clearInterval(tkPoll);
+      $("#ticket").classList.add("pop");
+      if (tkState(r.statut) === "c"){ confetti(); toastMsg(t("tkConfirmedToast")); try { navigator.vibrate && navigator.vibrate([60, 40, 120]); } catch(e){} }
+      else { toastMsg(t("tkRefusedToast")); $("#ticketCancel").hidden = true; }
+    } catch(e){}
+  }, 15000);
+}
+function saveLast(tk){ const l = store.get("ob_last", null) || {}; store.set("ob_last", { ...l, id: tk.id, phone: tk.phone, date: tk.date, start: tk.start, dur: tk.dur, barber: tk.barber,
+  services: tk.items.map(i => i.n).join(" + "), statut: tk.statut, tk }); }
+
+/* tswira dyal t-ticket (PNG) */
+async function ticketPng(tk){
+  try { await document.fonts.ready; } catch(e){}
+  const W = 1080, H = 1500, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d"), css = getComputedStyle(document.documentElement);
+  const OR = css.getPropertyValue("--or").trim() || "#E2560A", OR2 = css.getPropertyValue("--or2").trim() || "#C34807", INK = "#17140F";
+  const disp = '"Big Shoulders Display", Impact, sans-serif', body = lang === "ar" ? '"Noto Kufi Arabic", sans-serif' : '"Instrument Sans", system-ui, sans-serif';
+  const rtl = lang === "ar"; x.direction = rtl ? "rtl" : "ltr";
+  x.fillStyle = "#F6F5F3"; x.fillRect(0, 0, W, H);
+  const rr = (X, Y, w, h, r) => { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); };
+  const M = 70, CW = W - 2 * M, top = 70, headH = 560;
+  x.save(); x.shadowColor = "rgba(23,20,15,.18)"; x.shadowBlur = 50; x.shadowOffsetY = 20; rr(M, top, CW, H - 2 * top, 44); x.fillStyle = "#fff"; x.fill(); x.restore();
+  x.save(); rr(M, top, CW, H - 2 * top, 44); x.clip();
+  const g = x.createLinearGradient(M, top, M + CW, top + headH); g.addColorStop(0, OR); g.addColorStop(1, OR2); x.fillStyle = g; x.fillRect(M, top, CW, headH);
+  x.globalAlpha = .08; x.fillStyle = "#fff"; for (let i = -headH; i < CW; i += 56){ x.beginPath(); x.moveTo(M + i, top + headH); x.lineTo(M + i + 28, top + headH); x.lineTo(M + i + 28 + headH, top); x.lineTo(M + i + headH, top); x.fill(); } x.globalAlpha = 1;
+  x.restore();
+  const cx = W / 2; x.textAlign = "center"; x.fillStyle = "#fff";
+  x.font = `900 52px ${disp}`; x.fillText(String(CONFIG.salon).toUpperCase(), cx, top + 100);
+  const sx = tkState(tk.statut), stTxt = (sx === "p" ? t("stPending") : sx === "x" ? t("stRefused") : t("stConfirmed")).replace(/ ✅/, "");
+  x.font = `800 30px ${body}`; const sw = x.measureText(stTxt).width + 60; rr(cx - sw / 2, top + 130, sw, 56, 28); x.fillStyle = sx === "c" ? "#fff" : "rgba(255,255,255,.2)"; x.fill();
+  x.fillStyle = sx === "c" ? "#1F8A4C" : "#fff"; x.fillText(stTxt, cx, top + 168);
+  x.fillStyle = "#fff"; x.font = `900 210px ${disp}`; x.direction = "ltr"; x.fillText(hhmm(tk.start), cx, top + 400); x.direction = rtl ? "rtl" : "ltr";
+  x.font = `700 44px ${body}`; x.fillText(longDate(tk.date), cx, top + 480);
+  // perforation
+  const py = top + headH + 40; x.fillStyle = "#F6F5F3"; x.beginPath(); x.arc(M, py, 28, 0, 7); x.arc(M + CW, py, 28, 0, 7); x.fill();
+  x.strokeStyle = "#E7E4DF"; x.lineWidth = 4; x.setLineDash([16, 12]); x.beginPath(); x.moveTo(M + 50, py); x.lineTo(M + CW - 50, py); x.stroke(); x.setLineDash([]);
+  const L0 = rtl ? M + CW - 60 : M + 60, R0 = rtl ? M + 60 : M + CW - 60;
+  let y = py + 90;
+  const row = (k, v, big) => { x.textAlign = rtl ? "right" : "left"; x.fillStyle = "#8A847A"; x.font = `600 34px ${body}`; x.fillText(k, L0, y);
+    x.textAlign = rtl ? "left" : "right"; x.fillStyle = INK; x.font = big ? `900 64px ${disp}` : `800 36px ${body}`; x.fillText(v, R0, y); y += big ? 90 : 66; };
+  row(t("tName"), tk.name); row(t("tBarber"), tk.barber);
+  tk.items.forEach(i => row(itName(i), price(i.p)));
+  if (tk.disc) row(t("tkDisc"), "−" + price(tk.disc));
+  x.strokeStyle = "#E7E4DF"; x.lineWidth = 3; x.beginPath(); x.moveTo(M + 60, y - 30); x.lineTo(M + CW - 60, y - 30); x.stroke(); y += 30;
+  row(t("tTotal"), price(tk.final), true);
+  // ref + barcode
+  x.textAlign = "center"; x.fillStyle = "#8A847A"; x.font = `700 30px ${body}`; x.fillText(t("tRef"), cx, y + 10);
+  x.fillStyle = INK; x.font = `800 60px ${disp}`; x.direction = "ltr"; x.fillText("#" + tk.id, cx, y + 80);
+  let s = 0, bx = M + 120; const str = String(tk.id) + "OB", by = y + 115;
+  for (let i = 0; i < 80 && bx < M + CW - 120; i++){ s = (s * 31 + str.charCodeAt(i % str.length) + i) % 9973; const w = 3 + (s % 3) * 3; x.fillRect(bx, by, w, 90); bx += w + 4 + ((s >> 3) % 3) * 3; }
+  x.direction = rtl ? "rtl" : "ltr"; x.fillStyle = "#8A847A"; x.font = `600 30px ${body}`; x.fillText("📍 " + CONFIG.adresse, cx, H - top - 50);
+  return await new Promise(res => c.toBlob(res, "image/png"));
+}
+$("#imgBtn").addEventListener("click", async () => {
+  if (!TK) return; const btn = $("#imgBtn"); btn.disabled = true;
+  try {
+    const blob = await ticketPng(TK), name = "ticket-" + TK.id + ".png", file = new File([blob], name, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: CONFIG.salon }); } catch(e){} }
+    else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toastMsg(t("tkSaved")); }
+  } catch(e){}
+  btn.disabled = false;
+});
+$("#shareBtn").addEventListener("click", async () => {
+  if (!TK) return;
+  const txt = t("tkShareTxt", { salon: CONFIG.salon, when: longDate(TK.date) + " · " + hhmm(TK.start) }) + "\n📍 " + CONFIG.adresse;
+  const url = location.origin + location.pathname;
+  if (navigator.share){ try { await navigator.share({ title: CONFIG.salon, text: txt, url }); } catch(e){} }
+  else window.open("https://wa.me/?text=" + encodeURIComponent(txt + "\n" + url), "_blank", "noopener");
+});
+
+function showTicket(stay, snap){
+  TK = snap || ticketSnap(); saveLast(TK);
+  const pend = tkState(TK.statut) === "p";
+  renderTicket(TK);
   $("#tkSocial").innerHTML = socialHtml();
   const msg = `${t("waMsg", { salon: CONFIG.salon })}${pend ? " (" + t("stPending") + ")" : ""}
-📅 ${longDate(st.date)} · ${hhmm(st.start)}
-💈 ${r.barber}
-✂️ ${svcNames()} (${price(finalTotal())})
-🙍 ${r.name} · ${r.phone}
-🔖 #${r.id}`;
+📅 ${longDate(TK.date)} · ${hhmm(TK.start)}
+💈 ${TK.barber}
+✂️ ${TK.items.map(i => i.n).join(" + ")} (${price(TK.final)})
+🙍 ${TK.name} · ${TK.phone}
+🔖 #${TK.id}`;
   $("#waBtn").href = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(msg);
-  $("#calBtn").href = icsData();
-  $("#ticketMsg").innerHTML = ""; const tc = $("#ticketCancel"); tc.hidden = false; tc.classList.remove("armed"); tc.textContent = t("cancelTicket"); tc.disabled = false;
+  $("#calBtn").href = icsData(TK); $("#calBtn").setAttribute("download", "rendez-vous-" + TK.id + ".ics");
+  $("#ticketMsg").innerHTML = ""; const tc = $("#ticketCancel"); tc.hidden = tkState(TK.statut) === "x"; tc.classList.remove("armed"); tc.textContent = t("cancelTicket"); tc.disabled = false;
   if (stay !== true){ try { history.replaceState({ s:6 }, ""); } catch(e){} show(6); }
+  startTicketLive();
 }
 function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1, loyal:null }); }
 $("#again").addEventListener("click", () => { resetFlow(); go(1); });
@@ -1356,8 +1581,8 @@ function armed(btn, label){ if (!btn.classList.contains("armed")){ btn.classList
 $("#ticketCancel").addEventListener("click", async e => {
   const btn = e.currentTarget; if (!armed(btn, t("cancelTicket"))) return;
   btn.disabled = true;
-  try { const r = await cancelBooking(st.result.id, st.result.phone); $("#ticketMsg").innerHTML = cancelMsg(r);
-    if (r.ok){ btn.hidden = true; forgetLast(st.result.id); delete st.bookings[st.date]; heroNext(); } else btn.disabled = false;
+  try { const r = await cancelBooking(TK.id, TK.phone); $("#ticketMsg").innerHTML = cancelMsg(r);
+    if (r.ok){ btn.hidden = true; stopTicketLive(); TK.statut = "annulé"; renderTicket(TK); forgetLast(TK.id); delete st.bookings[TK.date]; heroNext(); } else btn.disabled = false;
   } catch(err){ $("#ticketMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
 });
 $("#manageLink").addEventListener("click", e => { e.preventDefault(); go(7); });
@@ -1384,7 +1609,7 @@ async function refreshStatus(l){
   try {
     const r = await fetch(CONFIG.apiUrl + "?action=status&id=" + encodeURIComponent(l.id) + "&phone=" + encodeURIComponent(l.phone), { cache:"no-store" }).then(x => x.json());
     if (!r.ok) return;
-    l.statut = r.statut; store.set("ob_last", l);
+    l.statut = r.statut; if (l.tk) l.tk.statut = r.statut; store.set("ob_last", l);
     if ($("#homeStat")) $("#homeStat").innerHTML = statPill(r.statut);
     if (String(r.statut).startsWith("annul") && $("#homeCancel")) $("#homeCancel").remove();
   } catch(e){}
@@ -1400,7 +1625,8 @@ function renderHomeCards(){
       <div class="v">${esc(relDay(l.date))} ${num(hhmm(l.start))} · ${esc(l.barber)}</div>
       <div class="s">${esc(l.services)} · ${num("#" + esc(l.id))}</div>
       <div id="homeStat">${statPill(l.statut)}</div>
-      <div class="acts2"><button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+      <div class="acts2">${l.tk ? `<button class="btn ghost" type="button" id="homeTicket">🎟️ ${t("tkView")}</button>` : ""}<button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+    if (l.tk && $("#homeTicket")) $("#homeTicket").onclick = () => { const s = store.get("ob_last", null); if (s && s.tk){ s.tk.statut = s.statut || s.tk.statut; showTicket(false, s.tk); } };
     refreshStatus(l);
     $("#homeCancel").onclick = async e => {
       const btn = e.currentTarget; if (!armed(btn, t("cancelBtn"))) return;
