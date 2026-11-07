@@ -201,6 +201,15 @@ h2{font-family:var(--display);font-weight:800;font-size:42px;line-height:1;lette
 .quick a i svg{width:21px;height:21px}
 
 .block{margin-top:30px}
+.how{margin-top:26px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-l);padding:18px 18px 16px}
+.how h3{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.2px;margin-bottom:12px}
+.how ol{list-style:none;counter-reset:hw;display:grid;gap:12px;padding:0;margin:0}
+.how li{counter-increment:hw;display:flex;gap:12px;align-items:flex-start}
+.how li::before{content:counter(hw);flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--or);color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center}
+.how li b{display:block;font-size:15px;line-height:1.3}
+.how li span{display:block;font-size:13px;color:var(--mute);line-height:1.35;margin-top:2px}
+.how .cta{margin-top:16px}
+html[lang=ar] .how h3{font-family:"Noto Kufi Arabic",sans-serif;letter-spacing:0}
 .block h3{font-family:var(--display);font-weight:800;font-size:27px;letter-spacing:.2px;margin-bottom:12px}
 .bhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .seeall{color:var(--or2);font-weight:700;font-size:14px}
@@ -550,6 +559,17 @@ html[lang=ar] .block h3{font-size:21px}
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-t="trust3"></span></li>
     </ul>
 
+    <section class="how" id="how" aria-labelledby="howT">
+      <h3 id="howT" data-t="howT"></h3>
+      <ol>
+        <li><div><b data-t="how1"></b><span data-t="how1s"></span></div></li>
+        <li><div><b data-t="how2"></b><span data-t="how2s"></span></div></li>
+        <li><div><b data-t="how3"></b><span data-t="how3s"></span></div></li>
+        <li><div><b data-t="how4"></b><span data-t="how4s"></span></div></li>
+      </ol>
+      <button class="cta block-btn" type="button" data-go="1" data-t="howCta"></button>
+    </section>
+
     <div id="homeCards"></div>
 
     <div class="quick" id="quick"></div>
@@ -725,7 +745,7 @@ const I18N = {
     stPending:"Kaytsenna l-confirmation", stConfirmed:"Mconfirmé ✅", stRefused:"Tlghat",
     errBlocked:"Ma ymkench tréservi b had n-numéro. Tsel b salon f WhatsApp.", errLimit:"3endek deja réservation jaya b had n-numéro. Lghiha 9bel ma tdir wa7da jdida.",
     welcomeT:"Mrehba bik 👋", welcomeS:"Réservi l-blassa dyalek f 30 seconde, bla ma t3ayet wla ttsenna f s-salon.",
-    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal",
+    openNow:"M7loul daba", closedNow:"Msdod daba", trust1:"Bla tsennay", trust2:"Confirmation f WhatsApp", trust3:"Khlas f l-mahal", howT:"Kifach treservi? 4 khotawat sahlin", how1:"Khtar l-service", how1s:"Coupe, dégradé, barbe… l-prix bayn 9bel ma tkhtar.", how2:"Khtar l-coiffeur", how2s:"Wla khtar \"Ay wa7ed\" bach takhod asra3 blassa.", how3:"Khtar n-nhar w s-sa3a", how3s:"Kayban lik ghir l-wa9t l-khawi.", how4:"Kteb smiytek w raqmek", how4s:"Katjik confirmation f WhatsApp. Tkhelles f s-salon.", howCta:"Yallah, bda daba",
     qMap:"Kifach nwsel", qCall:"3ayet", svcT:"Les services w l-prix", seeAll:"Réservi",
     followT:"Tab3ouna", mapRow:"Kifach twsel l s-salon",
     tkBarber:"Coiffeur dyalek", tkS1:"Tsjjlat", tkS2:"Confirmation", tkS3:"Nhar r-rendez-vous", tkIn:"Ba9i {x}", tkNow:"Daba! 💈", tkPast:"Daz", tkD:"nhar", tkH:"sa3a", tkM:"dq",
@@ -782,7 +802,7 @@ const I18N = {
     stPending:"En attente de confirmation", stConfirmed:"Confirmé ✅", stRefused:"Annulée",
     errBlocked:"Impossible de réserver avec ce numéro. Contactez le salon sur WhatsApp.", errLimit:"Vous avez déjà une réservation à venir avec ce numéro. Annulez-la avant d'en faire une autre.",
     welcomeT:"Bienvenue 👋", welcomeS:"Réservez votre place en 30 secondes, sans appeler ni attendre au salon.",
-    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon",
+    openNow:"Ouvert", closedNow:"Fermé", trust1:"Sans attente", trust2:"Confirmation WhatsApp", trust3:"Paiement au salon", howT:"Comment réserver ? 4 étapes simples", how1:"Choisis le service", how1s:"Coupe, dégradé, barbe… le prix est affiché.", how2:"Choisis le coiffeur", how2s:"Ou « Peu importe » pour la place la plus rapide.", how3:"Choisis le jour et l\u2019heure", how3s:"Seuls les créneaux libres sont affichés.", how4:"Ton prénom et ton numéro", how4s:"Confirmation sur WhatsApp. Paiement au salon.", howCta:"Commencer maintenant",
     qMap:"Itinéraire", qCall:"Appeler", svcT:"Services & prix", seeAll:"Réserver",
     followT:"Suivez-nous", mapRow:"Comment venir au salon",
     tkBarber:"Votre coiffeur", tkS1:"Envoyée", tkS2:"Confirmation", tkS3:"Jour du rendez-vous", tkIn:"Dans {x}", tkNow:"C'est maintenant ! 💈", tkPast:"Passé", tkD:"j", tkH:"h", tkM:"min",
@@ -839,7 +859,7 @@ const I18N = {
     stPending:"في انتظار التأكيد", stConfirmed:"مؤكد ✅", stRefused:"ملغى",
     errBlocked:"لا يمكن الحجز بهذا الرقم. تواصل مع الصالون عبر واتساب.", errLimit:"لديك حجز قادم بهذا الرقم. ألغه قبل أن تحجز موعدًا جديدًا.",
     welcomeT:"مرحبا بك 👋", welcomeS:"احجز مكانك في 30 ثانية، بدون اتصال ولا انتظار في الصالون.",
-    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل",
+    openNow:"مفتوح الآن", closedNow:"مغلق الآن", trust1:"بدون انتظار", trust2:"تأكيد عبر واتساب", trust3:"الدفع في المحل", howT:"كيفاش تحجز؟ 4 خطوات ساهلين", how1:"اختر الخدمة", how1s:"حلاقة، ديگرادي، لحية… الثمن ظاهر.", how2:"اختر الحلاق", how2s:"ولا اختر «أي حلاق» باش تاخد أسرع موعد.", how3:"اختر اليوم والساعة", how3s:"غير المواعيد الخاوية اللي كتبان.", how4:"اكتب سميتك ونمرتك", how4s:"كيوصلك التأكيد فواتساب. الخلاص فالمحل.", howCta:"يالاه، بدا دابا",
     qMap:"الطريق", qCall:"اتصل", svcT:"الخدمات والأسعار", seeAll:"احجز",
     followT:"تابعونا", mapRow:"كيف تصل إلى الصالون",
     tkBarber:"حلاقك", tkS1:"تم الإرسال", tkS2:"التأكيد", tkS3:"يوم الموعد", tkIn:"بعد {x}", tkNow:"حان الوقت! 💈", tkPast:"انتهى", tkD:"يوم", tkH:"س", tkM:"د",
