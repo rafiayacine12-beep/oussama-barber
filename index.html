@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#0F1F19">
 <meta name="description" content="Réservi f Oussama Barber, Tabriquet Salé. 24h/24, f 30 seconde.">
 <title>Oussama Barber · Réservation</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Sans:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;800&display=swap" rel="stylesheet">
@@ -55,6 +60,23 @@ const CONFIG = {
 
   coiffeurs: ["Oussama", "Yassine", "Aymane"],
 
+  // Nhar l-ra7a dyal kol coiffeur. Ex: { "Aymane": ["lundi"], "Yassine": ["vendredi"] }
+  reposCoiffeurs: {},
+
+  // Promo f l-wa9t l-khawi. Khlli [] ila ma bghitich promo.
+  promos: [
+    { jours: ["lundi", "mardi"], de: "11:00", a: "14:00", pct: 10 }
+  ],
+
+  // Carte fidélité: f kol "visites" visite, l-client kayakhod "remise" DH.
+  fidelite: { visites: 10, remise: 40 },
+
+  // Tsawer dyal l-khdma: 7ott les photos f dossier "images" f GitHub w kteb smiyathom hna.
+  galerie: [],                     // ex: ["images/degrade-1.jpg", "images/barbe-1.jpg"]
+
+  avisGoogle: "",                  // lien "Écrire un avis" dyal Google Maps
+  metaPixelId: "",                 // ID dyal Pixel Meta (ex: "123456789012345")
+
   // [ouverture, fermeture]. null = msdod.
   horaires: {
     lundi:    ["11:00", "21:00"],
@@ -79,6 +101,7 @@ const CONFIG = {
   --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{background:var(--leather);color:var(--cream);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
 button,input{font:inherit;color:inherit}
@@ -283,6 +306,39 @@ html[lang=ar] h2{font-size:30px;line-height:1.35}
 html[lang=ar] .next .v{font-size:28px}
 html[lang=ar] .block h3{font-size:21px}
 .num{direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+/* ---------- v2 ---------- */
+.times button{position:relative}
+.times button .pr{position:absolute;top:-7px;inset-inline-end:-4px;font-size:10px;font-weight:700;background:var(--pole);color:#fff;border-radius:99px;padding:1px 6px;line-height:1.5}
+.times button:disabled .pr{display:none}
+.promo-hint{font-size:13px;color:var(--brass-2);margin-top:-10px;margin-bottom:6px}
+.card{margin-top:16px;background:var(--leather-2);border:1px solid var(--line);border-radius:var(--r-l);padding:18px 20px}
+.card .k{font-size:13px;color:var(--mute)}
+.card .v{font-weight:600;color:var(--paper);font-size:17px;margin:4px 0 2px}
+.card .s{font-size:14px;color:var(--mute)}
+.card .acts2{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.card .acts2 .btn{flex:1;min-height:46px;padding:12px;font-size:15px}
+.btn.danger{background:transparent;border:1.5px solid #6B3A33;color:#F0A196}
+.btn.danger:hover{background:#2A1B18}
+.btn.danger.armed{background:var(--pole);border-color:var(--pole);color:#fff}
+.textlink{display:inline-block;margin-top:14px;color:var(--mute);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.textlink:hover{color:var(--cream)}
+.gal{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gal img{flex:0 0 72%;max-width:300px;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r-m);scroll-snap-align:start;background:var(--leather-3)}
+.loyal{border-radius:var(--r-m);padding:14px 16px;margin:0 0 16px;background:#22301F;border:1px solid #3F5530;font-size:14px;color:var(--brass-2)}
+.loyal.win{background:#3A2F17;border-color:var(--brass);color:var(--paper);font-weight:600}
+.dots{display:flex;gap:5px;margin-top:9px}
+.dots i{flex:1;height:6px;border-radius:6px;background:var(--line)}
+.dots i.on{background:var(--brass)}
+.recap .disc b{color:var(--ok)}
+.wait{margin-top:14px;text-align:start}
+.wait .field{margin-bottom:10px}
+.ok-msg{background:#1F3A2B;border:1px solid #2F5C43;color:#BDE8CF;border-radius:var(--r-m);padding:14px 16px;font-size:14px;margin-top:14px}
+.err-msg{color:#F08A7E;font-size:14px;margin-top:10px;min-height:20px}
+.manage .backlink{display:inline-flex;align-items:center;gap:8px;color:var(--mute);font-weight:600;margin-bottom:6px;padding:8px 0}
+html[dir=rtl] .manage .backlink svg{transform:scaleX(-1)}
+.team .d.off{color:#C9897F}
 </style>
 </head>
 <body>
@@ -308,6 +364,13 @@ html[lang=ar] .block h3{font-size:21px}
       <button class="cta block-btn" type="button" data-go="1" data-t="cta"></button>
     </div>
 
+    <div id="homeCards"></div>
+    <a href="#" class="textlink" id="manageLink" data-t="manageLink"></a>
+
+    <div class="block" id="galBlock" hidden>
+      <h3 data-t="galleryT"></h3>
+      <div class="gal" id="gal"></div>
+    </div>
     <div class="block">
       <h3 data-t="hoursTitle"></h3>
       <ul class="hours" id="hours"></ul>
@@ -384,8 +447,21 @@ html[lang=ar] .block h3{font-size:21px}
       </a>
       <a class="btn ghost" id="calBtn" href="#" download="oussama-barber.ics" data-t="calBtn"></a>
       <button class="btn ghost" id="again" type="button" data-t="again"></button>
+      <button class="btn danger" id="ticketCancel" type="button" data-t="cancelTicket"></button>
     </div>
+    <div id="ticketMsg"></div>
     <p class="small"><span data-t="changeQ"></span> <a id="waChange" href="#" target="_blank" rel="noopener" data-t="changeL"></a></p>
+  </section>
+
+  <!-- ============ 7. LGHI RÉSERVATION ============ -->
+  <section class="screen manage" id="s7" aria-labelledby="h7t">
+    <button type="button" class="backlink" data-go="0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span data-t="back"></span></button>
+    <h2 id="h7t" data-t="manageH"></h2>
+    <p class="sub" data-t="manageS"></p>
+    <div class="field"><label for="mRef" data-t="refL"></label><input id="mRef" placeholder="#AB12CD34" maxlength="12" dir="ltr" autocapitalize="characters"></div>
+    <div class="field"><label for="mPhone" data-t="phoneL"></label><input id="mPhone" type="tel" inputmode="tel" placeholder="06 12 34 56 78" maxlength="17" dir="ltr"></div>
+    <button class="btn danger" type="button" id="mCancel" data-t="cancelConfirm"></button>
+    <div id="mMsg"></div>
   </section>
 
   <!-- ============ ACTION BAR ============ -->
@@ -436,6 +512,15 @@ const I18N = {
     changeQ:"Bghiti tbeddel wla tlghi?", changeL:"Kteb lina f WhatsApp",
     hoursTitle:"L-wa9t", whereTitle:"Fin kayn?", everyDay:"Kol nhar", dayOff:"Msdod", todayTag:"lyoum",
     cMaps:"Maps", cCall:"3ayet", cWa:"Kteb lina",
+    repos:"Ra7a: {days}", promoHint:"🏷️ -{p}% f les crénaux li fihom l-3alama", rPromo:"Promo -{p}%", rLoyal:"Fidélité",
+    loyalCount:"🎁 Visite {n} mn {m} · ba9i lik {r} w takhod -{d} DH", loyalWin:"🎉 Hadi l-visite {m} dyalek: -{d} DH 3lina",
+    upcomingT:"Rendez-vous dyalek", cancelBtn:"Lghi", cancelConfirm:"Lghi réservation", cancelArmed:"Akked: lghi",
+    cancelled:"Réservation tlghat. L-blassa wllat khawya.", cancelNotFound:"Ma l9inach réservation b had réf w had numéro.",
+    cancelPast:"Had réservation fatt l-wa9t dyalha.", manageLink:"3endi réservation, bghit nlghiha", manageH:"Lghi réservation",
+    manageS:"Kteb réf li kayna f ticket w numéro li réservit bih.", refL:"Réf dyal ticket", cancelTicket:"Lghi had réservation",
+    rebook:"Réservi wa9t akhor", reviewT:"Kifach kant l-coupe?", reviewB:"3tina rayek f Google",
+    waitT:"Bghiti nkhbbrouk ila t7llat blassa had nhar?", waitB:"Khbbrouni", waitOk:"Tsjjelti f liste d'attente. Ghadi ntsslo bik ila t7llat blassa.",
+    galleryT:"L-khdma dyalna",
     waMsg:"Salam 👋 3endi réservation f {salon}", calAlarm:"Rendez-vous f {salon}"
   },
   fr: {
@@ -472,6 +557,15 @@ const I18N = {
     changeQ:"Besoin de modifier ou d'annuler ?", changeL:"Écrivez-nous sur WhatsApp",
     hoursTitle:"Horaires", whereTitle:"Nous trouver", everyDay:"Tous les jours", dayOff:"Fermé", todayTag:"aujourd'hui",
     cMaps:"Maps", cCall:"Appeler", cWa:"Écrire",
+    repos:"Repos : {days}", promoHint:"🏷️ -{p}% sur les créneaux marqués", rPromo:"Promo -{p}%", rLoyal:"Fidélité",
+    loyalCount:"🎁 Visite {n} sur {m} · encore {r} et vous gagnez -{d} DH", loyalWin:"🎉 C'est votre {m}e visite : -{d} DH offerts",
+    upcomingT:"Votre rendez-vous", cancelBtn:"Annuler", cancelConfirm:"Annuler la réservation", cancelArmed:"Confirmer l'annulation",
+    cancelled:"Réservation annulée. Le créneau est libéré.", cancelNotFound:"Aucune réservation avec cette réf et ce numéro.",
+    cancelPast:"Cette réservation est déjà passée.", manageLink:"J'ai une réservation et je veux l'annuler", manageH:"Annuler une réservation",
+    manageS:"Saisissez la réf du ticket et le numéro utilisé pour réserver.", refL:"Réf du ticket", cancelTicket:"Annuler cette réservation",
+    rebook:"Réserver un autre créneau", reviewT:"Comment s'est passée votre coupe ?", reviewB:"Laisser un avis Google",
+    waitT:"On vous prévient si une place se libère ce jour-là ?", waitB:"Me prévenir", waitOk:"Vous êtes sur la liste d'attente. On vous appelle si une place se libère.",
+    galleryT:"Nos réalisations",
     waMsg:"Bonjour 👋 j'ai une réservation chez {salon}", calAlarm:"Rendez-vous chez {salon}"
   },
   ar: {
@@ -508,6 +602,15 @@ const I18N = {
     changeQ:"تريد التغيير أو الإلغاء؟", changeL:"راسلنا على واتساب",
     hoursTitle:"أوقات العمل", whereTitle:"أين نحن؟", everyDay:"كل يوم", dayOff:"مغلق", todayTag:"اليوم",
     cMaps:"الخريطة", cCall:"اتصل", cWa:"راسلنا",
+    repos:"راحة: {days}", promoHint:"🏷️ خصم {p}% على المواعيد المميّزة", rPromo:"تخفيض {p}%", rLoyal:"الوفاء",
+    loyalCount:"🎁 الزيارة {n} من {m} · بقي {r} لتحصل على خصم {d} درهم", loyalWin:"🎉 هذه زيارتك رقم {m}: خصم {d} درهم",
+    upcomingT:"موعدك", cancelBtn:"إلغاء", cancelConfirm:"إلغاء الحجز", cancelArmed:"تأكيد الإلغاء",
+    cancelled:"تم إلغاء الحجز وأصبح الموعد متاحًا.", cancelNotFound:"لم نجد حجزًا بهذا الرقم المرجعي وهذا الهاتف.",
+    cancelPast:"انتهى وقت هذا الحجز.", manageLink:"لدي حجز وأريد إلغاءه", manageH:"إلغاء حجز",
+    manageS:"أدخل الرقم المرجعي الموجود في التذكرة ورقم الهاتف المستعمل في الحجز.", refL:"الرقم المرجعي", cancelTicket:"إلغاء هذا الحجز",
+    rebook:"احجز موعدًا آخر", reviewT:"كيف كانت الحلاقة؟", reviewB:"قيّمنا على Google",
+    waitT:"هل نخبرك إذا أصبح موعد متاحًا في هذا اليوم؟", waitB:"أخبروني", waitOk:"تم تسجيلك في قائمة الانتظار. سنتصل بك إذا أصبح موعد متاحًا.",
+    galleryT:"أعمالنا",
     waMsg:"السلام عليكم 👋 لدي حجز في {salon}", calAlarm:"موعد في {salon}"
   }
 };
@@ -556,7 +659,25 @@ const st = { step:1, maxStep:1, services:[], barber:ANY, date:null, start:null, 
 
 /* ---------- data ---------- */
 const demoKey = "ob_demo";
-const overlaps = (list, b, s, d) => list.some(x => x.barber === b && s < x.start + x.dur && x.start < s + d);
+const overlaps = (list, b, s, d) => list.some(x => (x.barber === "*" || x.barber === b) && s < x.start + x.dur && x.start < s + d);
+async function api(body){
+  const r = await fetch(CONFIG.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(body) });
+  return r.json();
+}
+async function cancelBooking(id, phone){
+  if (DEMO){
+    const last = store.get("ob_last", null);
+    if (last && last.id === id){ store.set(demoKey, store.get(demoKey, []).filter(b => !(b.date === last.date && b.start === last.start && b.barber === last.barber))); return { ok:true }; }
+    return { ok:false, error:"notfound" };
+  }
+  return api({ action:"cancel", id, phone });
+}
+async function waitlist(p){ if (DEMO) return { ok:true }; return api({ action:"waitlist", ...p }); }
+async function loyalty(phone){
+  if (DEMO) return { ok:true, visits: 0 };
+  const r = await fetch(CONFIG.apiUrl + "?action=loyalty&phone=" + encodeURIComponent(phone), { cache:"no-store" });
+  return r.json();
+}
 async function fetchDay(date){
   if (st.bookings[date] && Date.now() - st.bookings[date].t < 30000) return st.bookings[date].list;
   let list;
@@ -589,7 +710,22 @@ const chosen = () => st.services.map(i => CONFIG.services[i]);
 const svcNames = () => chosen().map(s => L(s.nom)).join(" + ");
 const total = () => chosen().reduce((a,s) => a + s.prix, 0);
 const duration = () => chosen().reduce((a,s) => a + s.duree, 0) || CONFIG.creneau;
-const candidates = () => st.barber === ANY ? CONFIG.coiffeurs.slice() : [st.barber];
+const repos = c => (CONFIG.reposCoiffeurs || {})[c] || [];
+const workers = date => CONFIG.coiffeurs.filter(c => !repos(c).includes(DAYKEYS[fromIso(date).getDay()]));
+const candFor = date => (st.barber === ANY ? CONFIG.coiffeurs : [st.barber]).filter(c => workers(date).includes(c));
+const candidates = () => candFor(st.date);
+function promoFor(date, m){
+  const day = DAYKEYS[fromIso(date).getDay()];
+  const p = (CONFIG.promos || []).find(x => (x.jours || []).includes(day) && m >= toMin(x.de) && m < toMin(x.a));
+  return p ? p.pct : 0;
+}
+const promoPct = () => (st.date && st.start !== null) ? promoFor(st.date, st.start) : 0;
+const promoAmount = () => Math.round(total() * promoPct() / 100);
+function loyalAmount(){
+  const f = CONFIG.fidelite; if (!f || !f.visites || st.loyal == null) return 0;
+  return (st.loyal + 1) % f.visites === 0 ? Math.min(f.remise, total() - promoAmount()) : 0;
+}
+const finalTotal = () => Math.max(0, total() - promoAmount() - loyalAmount());
 function slotsFor(date, list, dur, cands){
   const d = fromIso(date), h = hoursFor(d); if (!h) return [];
   const isToday = date === todayIso(), min = nowMin() + CONFIG.delaiMin, out = [];
@@ -658,7 +794,7 @@ async function heroNext(){
       const d = new Date(); d.setDate(d.getDate()+i);
       if (!hoursFor(d)) continue;
       const date = iso(d), list = await fetchDay(date);
-      const s = slotsFor(date, list, CONFIG.creneau, CONFIG.coiffeurs).find(x => x.free);
+      const s = slotsFor(date, list, CONFIG.creneau, workers(date)).find(x => x.free);
       if (s){ st.next = { type:"slot", date, m:s.m }; renderHeroNext(); return; }
     }
     st.next = { type:"full" };
@@ -692,7 +828,7 @@ function renderTeam(){
   $("#team").innerHTML = any + CONFIG.coiffeurs.map(c => `
     <button type="button" role="radio" aria-checked="${st.barber===c}" data-id="${esc(c)}">
       <div class="av" aria-hidden="true">${esc(c[0])}</div>
-      <div><div class="n">${esc(c)}</div><div class="d">${t("barberRole")}</div></div>
+      <div><div class="n">${esc(c)}</div><div class="d${repos(c).length?" off":""}">${repos(c).length ? esc(t("repos", { days: repos(c).map(k => T().days[DAYKEYS.indexOf(k)]).join(", ") })) : t("barberRole")}</div></div>
     </button>`).join("");
 }
 $("#team").addEventListener("click", e => {
@@ -709,7 +845,7 @@ function renderDays(){
     const d = new Date(td); d.setDate(td.getDate()+i);
     const h = hoursFor(d), di = iso(d);
     const late = i === 0 && h && nowMin() + CONFIG.delaiMin > toMin(h[1]) - duration();
-    const off = !h || late;
+    const off = !h || late || !candFor(di).length;
     const w = i === 0 ? t("today") : i === 1 ? t("tomorrow") : T().daysShort[d.getDay()];
     weeks[i < 7 ? 0 : 1].push(`<button type="button" role="radio" aria-checked="${st.date===di}" data-d="${di}" ${off?"disabled":""} aria-label="${esc(longDate(di))}${off?" ("+t("closed")+")":""}">
       <span class="w">${esc(w)}</span><span class="n">${d.getDate()}</span><span class="m">${esc(T().monthsShort[d.getMonth()])}</span></button>`);
@@ -751,15 +887,33 @@ function renderSlots(list, chip){
   const slots = slotsFor(st.date, list, duration(), candidates());
   const free = slots.filter(s => s.free);
   if (!free.length){
-    $("#slots").innerHTML = chip + `<div class="note">${esc(t("full", { day: relDay(st.date) }))}<br><button type="button" class="link" data-go="3">${t("nextDay")}</button></div>`;
+    const me = store.get("ob_me", {}) || {};
+    $("#slots").innerHTML = chip + `<div class="note">${esc(t("full", { day: relDay(st.date) }))}<br><button type="button" class="link" data-go="3">${t("nextDay")}</button></div>
+      <div class="card wait" id="waitBox"><div class="v">${t("waitT")}</div>
+        <div class="field" style="margin-top:12px"><label for="wName">${t("nameL")}</label><input id="wName" maxlength="60" value="${esc(me.name||"")}" placeholder="${esc(t("namePh"))}"></div>
+        <div class="field"><label for="wPhone">${t("phoneL")}</label><input id="wPhone" type="tel" inputmode="tel" maxlength="17" dir="ltr" value="${esc(me.phone||"")}" placeholder="06 12 34 56 78"></div>
+        <button class="cta block-btn" type="button" id="wBtn">${t("waitB")}</button><div id="wMsg"></div></div>`;
+    $("#wBtn").onclick = async () => {
+      const name = $("#wName").value.trim(), phone = $("#wPhone").value.trim();
+      if (name.length < 2 || !/^(?:\+212|212|0)[5-7]\d{8}$/.test(normPhone(phone))){ $("#wMsg").innerHTML = `<div class="err-msg">${t("phoneErr")}</div>`; return; }
+      $("#wBtn").disabled = true;
+      try {
+        const r = await waitlist({ date: st.date, name, phone, services: chosen().map(s => Lfr(s.nom)).join(" + "), barber: st.barber === ANY ? "" : st.barber });
+        if (!r.ok) throw 0;
+        store.set("ob_me", { name, phone }); track("Lead", { content_name: "waitlist" });
+        $("#waitBox").innerHTML = `<div class="ok-msg">${t("waitOk")}</div>`;
+      } catch(e){ $("#wBtn").disabled = false; $("#wMsg").innerHTML = `<div class="err-msg">${t("errNet")}</div>`; }
+    };
     return;
   }
   const groups = [["morning", s => s.m < 720], ["afternoon", s => s.m >= 720 && s.m < 1080], ["evening", s => s.m >= 1080]];
   const firstFree = free[0].m;
+  const promoMax = Math.max(0, ...free.map(s => promoFor(st.date, s.m)));
   $("#slots").innerHTML = chip + `<div class="period">${esc(t("freeCount", { n: free.length }))}</div>` +
+    (promoMax ? `<div class="promo-hint">${esc(t("promoHint", { p: promoMax }))}</div>` : "") +
     groups.map(([key, f]) => { const g = slots.filter(f); if (!g.length) return "";
       return `<div class="period">${t(key)}</div><div class="times" role="radiogroup" aria-label="${t(key)}" dir="ltr">` +
-        g.map(s => `<button type="button" role="radio" data-m="${s.m}" aria-checked="${st.start===s.m}" ${s.free?"":"disabled"} class="${s.m===firstFree?"best":""}">${hhmm(s.m)}</button>`).join("") + "</div>";
+        g.map(s => `<button type="button" role="radio" data-m="${s.m}" aria-checked="${st.start===s.m}" ${s.free?"":"disabled"} class="${s.m===firstFree?"best":""}">${hhmm(s.m)}${promoFor(st.date, s.m) ? `<span class="pr">-${promoFor(st.date, s.m)}%</span>` : ""}</button>`).join("") + "</div>";
     }).join("");
 }
 $("#slots").addEventListener("click", e => {
@@ -775,7 +929,25 @@ function recapHtml(){
     <div><span>${t("rService")}</span><b>${esc(svcNames())}<button type="button" data-go="1">${t("change")}</button></b></div>
     <div><span>${t("rBarber")}</span><b>${st.barber===ANY ? t("anyN") : esc(st.barber)}<button type="button" data-go="2">${t("change")}</button></b></div>
     <div><span>${t("rTime")}</span><b>${esc(relDay(st.date))} ${num(hhmm(st.start))}<button type="button" data-go="4">${t("change")}</button></b></div>
-    <div class="tot"><span>${t("rTotal")}</span><b>${price(total())}</b></div>`;
+    ${promoAmount() ? `<div class="disc"><span>${esc(t("rPromo", { p: promoPct() }))}</span><b>−${price(promoAmount())}</b></div>` : ""}
+    ${loyalAmount() ? `<div class="disc"><span>${t("rLoyal")}</span><b>−${price(loyalAmount())}</b></div>` : ""}
+    <div class="tot"><span>${t("rTotal")}</span><b>${price(finalTotal())}</b></div>`;
+}
+let loyalSeq = 0;
+async function checkLoyalty(){
+  const f = CONFIG.fidelite, box = $("#loyalBox");
+  if (!f || !f.visites || !phoneOk()){ st.loyal = null; if (box) box.remove(); $("#recap").innerHTML = recapHtml(); update(); return; }
+  const my = ++loyalSeq;
+  try {
+    const r = await loyalty(normPhone($("#phone").value));
+    if (my !== loyalSeq || !r.ok) return;
+    st.loyal = r.visits;
+  } catch(e){ return; }
+  const n = st.loyal + 1, m = f.visites, pos = ((n - 1) % m) + 1, win = loyalAmount() > 0;
+  const html = `<div class="loyal${win ? " win" : ""}" id="loyalBox">${esc(win ? t("loyalWin", { m, d: loyalAmount() }) : t("loyalCount", { n: pos, m, r: m - pos, d: f.remise }))}
+    <div class="dots" aria-hidden="true">${Array.from({ length: m }, (_, i) => `<i class="${i < pos ? "on" : ""}"></i>`).join("")}</div></div>`;
+  if ($("#loyalBox")) $("#loyalBox").outerHTML = html; else $("#formErr").insertAdjacentHTML("beforebegin", html);
+  $("#recap").innerHTML = recapHtml(); update();
 }
 const normPhone = v => v.replace(/[\s.\-()]/g,"").replace(/^00/, "+");
 const phoneOk = () => /^(?:\+212|212|0)[5-7]\d{8}$/.test(normPhone($("#phone").value));
@@ -783,7 +955,7 @@ $("#phone").addEventListener("input", e => {
   const raw = e.target.value;
   if (/^0\d*$/.test(raw.replace(/\s/g,""))) { const d = raw.replace(/\D/g,"").slice(0,10); e.target.value = d.replace(/(\d{2})(?=\d)/g,"$1 "); }
   $("#phone").removeAttribute("aria-invalid"); $("#phoneHelp").className = "help"; $("#phoneHelp").textContent = t("phoneHelp");
-  update();
+  update(); clearTimeout(st.lt); st.lt = setTimeout(checkLoyalty, 500);
 });
 $("#phone").addEventListener("blur", () => {
   if ($("#phone").value && !phoneOk()){ $("#phone").setAttribute("aria-invalid","true"); $("#phoneHelp").className = "help err"; $("#phoneHelp").textContent = t("phoneErr"); }
@@ -802,18 +974,21 @@ function show(n, opts = {}){
     $("#count").innerHTML = `<b>${esc(t("stepNames")[n-1])}</b> · ${esc(t("stepCount", { n }))}`;
     document.querySelectorAll("#steps li").forEach((li, i) => li.classList.toggle("on", i < n));
   }
+  if (n === 0) renderHomeCards();
+  if (n === 7){ $("#mMsg").innerHTML = ""; $("#mCancel").disabled = false; const me = store.get("ob_me", null); if (me && !$("#mPhone").value) $("#mPhone").value = me.phone || ""; }
   if (n === 1) renderServices();
   if (n === 2) renderTeam();
   if (n === 3) renderDays();
   if (n === 4) loadSlots();
   if (n === 5){ $("#recap").innerHTML = recapHtml(); $("#formErr").textContent = "";
     const me = store.get("ob_me", null);
-    if (me && !$("#name").value){ $("#name").value = me.name || ""; $("#phone").value = me.phone || ""; } }
+    if (me && !$("#name").value){ $("#name").value = me.name || ""; $("#phone").value = me.phone || ""; }
+    checkLoyalty(); }
   update();
   window.scrollTo(0, 0);
   if (!opts.noFocus){ const h = n === 0 ? $("#sign") : $("#s"+n+" h2"); if (h){ h.setAttribute("tabindex","-1"); h.focus({ preventScroll:true }); } }
 }
-const canReach = n => n === 0 || n === 6 || (n === 1) || (n === 2 && st.services.length) || (n === 3 && st.services.length && st.barber) ||
+const canReach = n => n === 0 || n === 6 || n === 7 || (n === 1) || (n === 2 && st.services.length) || (n === 3 && st.services.length && st.barber) ||
   (n === 4 && st.date) || (n === 5 && st.start !== null);
 function go(n){
   if (!canReach(n)) return;
@@ -831,23 +1006,26 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-go]"
 
 function update(){
   const n = st.step, c = chosen(), btn = $("#next");
-  $("#sum").innerHTML = c.length ? `${esc(T().nServices(c.length))} · ${mins(duration())}<b>${price(total())}</b>` : t("pickFirst");
+  $("#sum").innerHTML = c.length ? `${esc(T().nServices(c.length))} · ${mins(duration())}<b>${price(n >= 4 ? finalTotal() : total())}</b>` : t("pickFirst");
   const ready = { 1: c.length > 0, 2: !!st.barber, 3: !!st.date, 4: st.start !== null, 5: $("#name").value.trim().length > 1 && phoneOk() }[n];
   btn.disabled = !ready;
   btn.textContent = n === 5 ? t("confirm") : t("next");
 }
 
 $("#next").addEventListener("click", async () => {
+  if (st.step === 1) track("InitiateCheckout", { value: total(), currency: "MAD" });
   if (st.step < 5) return go(st.step + 1);
   const btn = $("#next");
   btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${t("saving")}`;
   const name = $("#name").value.trim(), phone = $("#phone").value.trim();
   const payload = { date: st.date, start: st.start, dur: duration(), candidates: candidates(),
-    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: total(), name, phone };
+    services: chosen().map(s => Lfr(s.nom)).join(" + "), price: finalTotal(), discount: promoAmount() + loyalAmount(), lang, name, phone };
   try {
     const r = await book(payload);
     if (r.ok){
       store.set("ob_me", { name, phone });
+      store.set("ob_last", { id: r.id, phone, date: st.date, start: st.start, dur: duration(), barber: r.barber, services: svcNames(), reviewed: false });
+      track("Schedule", { value: finalTotal(), currency: "MAD", content_name: payload.services });
       delete st.bookings[st.date];
       st.result = { ...r, name, phone }; showTicket(); heroNext(); return;
     }
@@ -888,27 +1066,91 @@ function showTicket(stay){
       <dt>${t("tBarber")}</dt><dd>${esc(r.barber)}</dd>
       <dt>${t("tService")}</dt><dd>${esc(svcNames())}</dd>
       <dt>${t("tDur")}</dt><dd>${mins(duration())}</dd>
-      <dt>${t("tTotal")}</dt><dd>${price(total())}</dd>
+      <dt>${t("tTotal")}</dt><dd>${price(finalTotal())}</dd>
     </dl>
     <div class="ref"><span>${t("tRef")}</span><b dir="ltr">#${esc(r.id)}</b></div>
     <div class="barcode" aria-hidden="true"></div>`;
   const msg = `${t("waMsg", { salon: CONFIG.salon })}
 📅 ${longDate(st.date)} · ${hhmm(st.start)}
 💈 ${r.barber}
-✂️ ${svcNames()} (${price(total())})
+✂️ ${svcNames()} (${price(finalTotal())})
 🙍 ${r.name} · ${r.phone}
 🔖 #${r.id}`;
   $("#waBtn").href = "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(msg);
   $("#calBtn").href = icsData();
+  $("#ticketMsg").innerHTML = ""; const tc = $("#ticketCancel"); tc.hidden = false; tc.classList.remove("armed"); tc.textContent = t("cancelTicket"); tc.disabled = false;
   if (stay !== true){ try { history.replaceState({ s:6 }, ""); } catch(e){} show(6); }
 }
-function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1 }); }
+function resetFlow(){ Object.assign(st, { services:[], barber:ANY, date:null, start:null, result:null, maxStep:1, loyal:null }); }
 $("#again").addEventListener("click", () => { resetFlow(); go(1); });
+
+/* ---------- lghi ---------- */
+function cancelMsg(r){ return r.ok ? `<div class="ok-msg">${t("cancelled")}</div>` : `<div class="err-msg">${r.error === "notfound" ? t("cancelNotFound") : r.error === "past" ? t("cancelPast") : t("errNet")}</div>`; }
+function forgetLast(id){ const l = store.get("ob_last", null); if (l && l.id === id) store.set("ob_last", null); }
+function armed(btn, label){ if (!btn.classList.contains("armed")){ btn.classList.add("armed"); btn.textContent = t("cancelArmed"); setTimeout(() => { if (btn.isConnected && !btn.disabled){ btn.classList.remove("armed"); btn.textContent = label; } }, 4000); return false; } return true; }
+$("#ticketCancel").addEventListener("click", async e => {
+  const btn = e.currentTarget; if (!armed(btn, t("cancelTicket"))) return;
+  btn.disabled = true;
+  try { const r = await cancelBooking(st.result.id, st.result.phone); $("#ticketMsg").innerHTML = cancelMsg(r);
+    if (r.ok){ btn.hidden = true; forgetLast(st.result.id); delete st.bookings[st.date]; heroNext(); } else btn.disabled = false;
+  } catch(err){ $("#ticketMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
+});
+$("#manageLink").addEventListener("click", e => { e.preventDefault(); go(7); });
+$("#mCancel").addEventListener("click", async e => {
+  const btn = e.currentTarget, id = $("#mRef").value.replace(/[#\s]/g, "").toUpperCase(), phone = $("#mPhone").value.trim();
+  if (id.length < 6 || !/^(?:\+212|212|0)[5-7]\d{8}$/.test(normPhone(phone))){ $("#mMsg").innerHTML = `<div class="err-msg">${t("cancelNotFound")}</div>`; return; }
+  if (!armed(btn, t("cancelConfirm"))) return;
+  btn.disabled = true;
+  try { const r = await cancelBooking(id, phone); $("#mMsg").innerHTML = cancelMsg(r) + (r.ok ? `<button class="cta block-btn" type="button" data-go="1" style="margin-top:14px">${t("rebook")}</button>` : "");
+    if (r.ok){ forgetLast(id); st.bookings = {}; heroNext(); } else { btn.disabled = false; btn.classList.remove("armed"); btn.textContent = t("cancelConfirm"); }
+  } catch(err){ $("#mMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
+});
+
+/* ---------- accueil: rendez-vous jay / avis ---------- */
+function renderHomeCards(){
+  const box = $("#homeCards"), l = store.get("ob_last", null);
+  if (!l){ box.innerHTML = ""; return; }
+  const end = l.start + l.dur, upcoming = l.date > todayIso() || (l.date === todayIso() && end > nowMin());
+  if (upcoming){
+    box.innerHTML = `<div class="card"><div class="k">${t("upcomingT")}</div>
+      <div class="v">${esc(relDay(l.date))} ${num(hhmm(l.start))} · ${esc(l.barber)}</div>
+      <div class="s">${esc(l.services)} · ${num("#" + esc(l.id))}</div>
+      <div class="acts2"><button class="btn danger" type="button" id="homeCancel">${t("cancelBtn")}</button></div><div id="homeMsg"></div></div>`;
+    $("#homeCancel").onclick = async e => {
+      const btn = e.currentTarget; if (!armed(btn, t("cancelBtn"))) return;
+      btn.disabled = true;
+      try { const r = await cancelBooking(l.id, l.phone); $("#homeMsg").innerHTML = cancelMsg(r);
+        if (r.ok){ forgetLast(l.id); btn.remove(); st.bookings = {}; heroNext(); } else btn.disabled = false;
+      } catch(err){ $("#homeMsg").innerHTML = cancelMsg({ ok:false }); btn.disabled = false; }
+    };
+  } else if (CONFIG.avisGoogle && !l.reviewed){
+    box.innerHTML = `<div class="card"><div class="v">${t("reviewT")}</div><div class="s">${esc(l.services)} · ${esc(l.barber)}</div>
+      <div class="acts2"><a class="btn ghost" id="reviewBtn" href="${esc(CONFIG.avisGoogle)}" target="_blank" rel="noopener">⭐ ${t("reviewB")}</a></div></div>`;
+    $("#reviewBtn").onclick = () => { l.reviewed = true; store.set("ob_last", l); setTimeout(renderHomeCards, 500); };
+  } else box.innerHTML = "";
+}
+function renderGallery(){
+  const g = CONFIG.galerie || [];
+  $("#galBlock").hidden = !g.length;
+  $("#gal").innerHTML = g.map((src, i) => `<img src="${esc(src)}" alt="${esc(CONFIG.salon)} ${i+1}" loading="lazy" decoding="async">`).join("");
+}
+
+/* ---------- Pixel Meta ---------- */
+function track(ev, data){ try { if (window.fbq) fbq("track", ev, data || {}); } catch(e){} }
+if (CONFIG.metaPixelId){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+  fbq("init", CONFIG.metaPixelId); fbq("track", "PageView");
+}
+
+/* ---------- PWA ---------- */
+if ("serviceWorker" in navigator && location.protocol === "https:") window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 
 /* ---------- init ---------- */
 document.documentElement.lang = lang === "ar" ? "ar" : "fr";
 document.documentElement.dir = T().dir;
-renderStatic();
+renderStatic(); renderGallery();
 try { history.replaceState({ s:0 }, ""); } catch(e){}
 show(0, { noFocus:true });
 heroNext();
