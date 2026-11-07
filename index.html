@@ -201,7 +201,14 @@ h2{font-family:var(--display);font-weight:800;font-size:42px;line-height:1;lette
 .quick a i svg{width:21px;height:21px}
 
 .block{margin-top:30px}
-.how{margin-top:26px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-l);padding:18px 18px 16px}
+.how-ov{position:fixed;inset:0;z-index:200;background:rgba(15,10,5,.55);display:flex;align-items:flex-end;justify-content:center;animation:hwf .2s ease}
+.how-ov[hidden]{display:none}
+.how{position:relative;width:100%;max-width:480px;max-height:92vh;overflow:auto;background:var(--bg);border-radius:var(--r-l) var(--r-l) 0 0;padding:22px 20px calc(18px + env(safe-area-inset-bottom));animation:hwu .25s ease}
+.how-x{position:absolute;top:10px;inset-inline-end:10px;width:36px;height:36px;border-radius:50%;background:var(--s1);color:var(--ink);font-size:22px;line-height:1;display:grid;place-items:center}
+.how h3{padding-inline-end:40px}
+@keyframes hwf{from{opacity:0}}
+@keyframes hwu{from{transform:translateY(40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.how-ov,.how{animation:none}}
 .how h3{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.2px;margin-bottom:12px}
 .how ol{list-style:none;counter-reset:hw;display:grid;gap:12px;padding:0;margin:0}
 .how li{counter-increment:hw;display:flex;gap:12px;align-items:flex-start}
@@ -519,6 +526,19 @@ html[lang=ar] .block h3{font-size:21px}
 </style>
 </head>
 <body>
+<div class="how-ov" id="howOv" hidden>
+  <section class="how" id="how" role="dialog" aria-modal="true" aria-labelledby="howT">
+    <button type="button" class="how-x" id="howX" aria-label="Fermer">×</button>
+    <h3 id="howT" data-t="howT"></h3>
+    <ol>
+      <li><div><b data-t="how1"></b><span data-t="how1s"></span></div></li>
+      <li><div><b data-t="how2"></b><span data-t="how2s"></span></div></li>
+      <li><div><b data-t="how3"></b><span data-t="how3s"></span></div></li>
+      <li><div><b data-t="how4"></b><span data-t="how4s"></span></div></li>
+    </ol>
+    <button class="cta block-btn" type="button" id="howGo" data-t="howCta"></button>
+  </section>
+</div>
 <div class="app" id="app">
 
   <!-- ============ 0. ACCUEIL ============ -->
@@ -558,17 +578,6 @@ html[lang=ar] .block h3{font-size:21px}
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-t="trust2"></span></li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-t="trust3"></span></li>
     </ul>
-
-    <section class="how" id="how" aria-labelledby="howT">
-      <h3 id="howT" data-t="howT"></h3>
-      <ol>
-        <li><div><b data-t="how1"></b><span data-t="how1s"></span></div></li>
-        <li><div><b data-t="how2"></b><span data-t="how2s"></span></div></li>
-        <li><div><b data-t="how3"></b><span data-t="how3s"></span></div></li>
-        <li><div><b data-t="how4"></b><span data-t="how4s"></span></div></li>
-      </ol>
-      <button class="cta block-btn" type="button" data-go="1" data-t="howCta"></button>
-    </section>
 
     <div id="homeCards"></div>
 
@@ -1381,7 +1390,16 @@ window.addEventListener("popstate", e => {
   show(n);
 });
 $("#backBtn").addEventListener("click", () => history.length > 1 && history.state ? history.back() : show(Math.max(0, st.step - 1)));
-document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b && !b.disabled) go(+b.dataset.go); });
+let howFrom = null;
+function openHow(from){ howFrom = from; $("#howOv").hidden = false; document.body.style.overflow = "hidden"; $("#howGo").focus(); }
+function closeHow(){ $("#howOv").hidden = true; document.body.style.overflow = ""; if (howFrom) try { howFrom.focus(); } catch(e){} }
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (!b || b.disabled) return;
+  if (b.dataset.go === "1" && st.step === 0){ openHow(b); return; }
+  go(+b.dataset.go); });
+$("#howGo").onclick = () => { closeHow(); go(1); };
+$("#howX").onclick = closeHow;
+$("#howOv").addEventListener("click", e => { if (e.target.id === "howOv") closeHow(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#howOv").hidden) closeHow(); });
 
 function update(){
   const n = st.step, c = chosen(), btn = $("#next");
