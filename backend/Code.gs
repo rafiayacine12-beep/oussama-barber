@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v6
+ * BACKEND — Oussama Barber (Google Apps Script) · v7
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -303,6 +303,21 @@ function admin_(b) {
         .sort((x, y) => (x.date + hh_(x.start)).localeCompare(y.date + hh_(y.start)))
         .map(r => ({ id: r.id, date: r.date, heure: hh_(r.start), dur: r.dur, barber: r.barber, services: r.services, prix: r.prix, nom: r.nom, tel: r.tel, statut: r.statut, langue: r.langue }));
       return { ok: true, list: list };
+    }
+    case 'reschedule': {
+      const r = reservations_().find(x => x.id === String(b.id));
+      if (!r) return { ok: false, error: 'notfound' };
+      if (cancelled_(r.statut)) return { ok: false, error: 'cancelled' };
+      const start = Number(b.start);
+      if (!isDate_(b.date) || !(start >= 0) || b.date < today_()) return { ok: false, error: 'invalid' };
+      if (!worksAt_(r.barber, b.date, start, r.dur)) return { ok: false, error: 'hours' };
+      const busy = reservations_().filter(x => x.row !== r.row && x.date === b.date && !cancelled_(x.statut)).map(x => ({ start: x.start, dur: x.dur, barber: x.barber }))
+        .concat(blocks_().filter(k => k.date === b.date).map(k => ({ start: k.start, dur: k.end - k.start, barber: k.barber })));
+      if (overlaps_(busy, r.barber, start, r.dur)) return { ok: false, error: 'taken' };
+      const sh = sh_('Reservations');
+      sh.getRange(r.row, 1, 1, 3).setValues([[txt_(b.date), txt_(hh_(start)), start]]);
+      if (pending_(r.statut)) sh.getRange(r.row, 10).setValue('confirmé');
+      return { ok: true, date: b.date, heure: hh_(start) };
     }
     case 'pending': {
       const t = today_();

@@ -208,6 +208,27 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 .btn.wa{background:var(--wa);color:#05290F}
 .btn.wa:hover{background:#1FBF5B}
 
+/* action sheet */
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:start;padding:14px;border-radius:16px;background:var(--s1);transition:background .12s}
+.opt:hover{background:var(--s2)}
+.opt i{width:42px;height:42px;flex:0 0 42px;border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:19px;background:#fff}
+.opt b{display:block;font-size:15px}
+.opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:1px}
+.opt.danger i{color:var(--red)}
+.sheet .back{display:inline-flex;align-items:center;gap:6px;color:var(--mute);font-weight:700;font-size:13px;margin-bottom:10px}
+.dgrid{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none}
+.dgrid::-webkit-scrollbar{display:none}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:230px;overflow-y:auto;margin-bottom:12px}
+.tgrid button{padding:11px 0;border-radius:12px;background:var(--s1);font-weight:700;font-size:14px;border:1.5px solid transparent}
+.tgrid button[aria-pressed=true]{background:var(--or);color:#fff}
+.tgrid button:disabled{opacity:.3;text-decoration:line-through}
+.freebox{background:var(--oksoft);color:var(--ok);border-radius:14px;padding:12px 14px;font-weight:700;font-size:14px;margin-bottom:12px}
+.wl{display:grid;gap:8px;margin-bottom:12px}
+.wl a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:#E8F9EE;color:#0B5A2C;font-weight:700;font-size:14px}
+.wl a span{flex:1}
+.wl small{font-weight:600;color:#3E7A55}
+
 /* stats */
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -291,6 +312,7 @@ h2{font-size:32px;margin:14px 0 4px}
 .ns{font-size:13px;color:#FFE3D1;margin-top:1px}
 .ns span{filter:brightness(1.6)}
 .na{display:flex;gap:8px;flex:1 0 100%;margin-top:-2px}
+.na button{flex:1;text-align:center;background:#fff;color:var(--or2);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:800;white-space:nowrap}
 .na a{flex:1;text-align:center;background:rgba(255,255,255,.18);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:700;white-space:nowrap}
 .na a:hover{background:rgba(255,255,255,.28)}
 
@@ -497,6 +519,15 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 </div>
 <div class="toast" id="toast" hidden></div>
 
+<!-- popup dyal l-khiyarat (reporter / lgha / blassa khawya) -->
+<div class="modal" id="actModal" hidden role="dialog" aria-modal="true" aria-labelledby="aTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="aIcon">⋯</span><div><h3 id="aTitle"></h3><p id="aSub"></p></div>
+      <button class="iconbtn" type="button" id="aClose" aria-label="Sedd">✕</button></div>
+    <div id="aBody"></div>
+  </div>
+</div>
+
 <!-- popup dyal message WhatsApp -->
 <div class="modal" id="msgModal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="sheet">
@@ -632,6 +663,7 @@ function rdvCard(r, showDay){
         <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
         <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
         <button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>
+        ${!pend && !String(r.statut).startsWith("annul") ? `<button class="more iconbtn" style="width:38px;height:38px" data-id="${esc(r.id)}" aria-label="Khiyarat okhrin" title="Reporter / Lgha">⋯</button>` : ""}
       </div>
     </div>
     <div class="after" hidden></div>
@@ -660,6 +692,7 @@ function bindCards(container, list, reload){
       } else { toast("Tsjjel ✓"); reload(); }
     } catch(e){ b.disabled = false; }
   });
+  container.querySelectorAll(".more").forEach(b => b.onclick = () => { const r = list.find(x => x.id === b.dataset.id); if (r) openActions(r, reload); });
   container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
     if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
     b.disabled = true;
@@ -668,15 +701,117 @@ function bindCards(container, list, reload){
   });
 }
 
+/* ---------- khiyarat: reporter / lgha / blassa khawya ---------- */
+let actR = null, actReload = null;
+function openAct(){ $("#actModal").hidden = false; document.body.style.overflow = "hidden"; }
+function closeAct(){ $("#actModal").hidden = true; document.body.style.overflow = ""; }
+$("#aClose").addEventListener("click", closeAct);
+$("#actModal").addEventListener("click", e => { if (e.target.id === "actModal") closeAct(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#actModal").hidden) closeAct(); });
+function lgOf(r){ return r.langue === "fr" || r.langue === "ar" ? r.langue : "da"; }
+function reschedMsg(r, date, heure){
+  const lg = lgOf(r), d = fmtDate(date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return { da:`Salam ${r.nom} 👋 rendez-vous dyalek f Oussama Barber tbeddel l ${d} m3a ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nIla ma ynasbekch had l-wa9t, jaweb 3la had l-message.`,
+    fr:`Bonjour ${r.nom} 👋 votre rendez-vous chez Oussama Barber est déplacé au ${d} à ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nSi l'horaire ne vous convient pas, répondez à ce message.`,
+    ar:`مرحبا ${r.nom} 👋 تم تغيير موعدك في Oussama Barber إلى ${d} على ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nإذا لم يناسبك هذا الوقت، أجب على هذه الرسالة.` }[lg];
+}
+function freeMsg(date, heure, name){
+  const d = fmtDate(date, "da");
+  return `Salam${name ? " " + name : ""} 👋 t7llat blassa f Oussama Barber ${d} m3a ${heure} 💈\nBghiti tji? Jaweb 3la had l-message wla réservi hna: ${SITE}`;
+}
+function openActions(r, reload){
+  actR = r; actReload = reload;
+  $("#aIcon").textContent = "⋯"; $("#aIcon").className = "mic";
+  $("#aTitle").textContent = r.nom + " · " + r.heure;
+  $("#aSub").textContent = `${label(r.date)} · ${r.services} · ${r.barber}`;
+  $("#aBody").innerHTML = `<div class="opts">
+    <button class="opt" type="button" data-a="resched"><i>⏱</i><span><b>Reporter</b><small>Bddel l nhar wla sa3a okhra w sift lih l-wa9t jdid</small></span></button>
+    <button class="opt danger" type="button" data-a="absent"><i>✗</i><span><b>Ma jach / ma jawebch</b><small>Kat7sab absent w l-blassa katwelli khawya</small></span></button>
+    <button class="opt danger" type="button" data-a="cancel"><i>🗑</i><span><b>Lgha l-rendez-vous</b><small>Chi 7aja urgente — l-blassa katwelli khawya</small></span></button>
+  </div>`;
+  $("#aBody").querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+    if (b.dataset.a === "resched") reschedView(r.date);
+    else freeSlot(b.dataset.a === "absent" ? "absent" : "annulé");
+  });
+  openAct();
+}
+async function freeSlot(statut){
+  const r = actR;
+  $("#aBody").innerHTML = `<div class="empty"><span class="spin"></span>Kansjjlo…</div>`;
+  try {
+    const j = await call("status", { id: r.id, statut });
+    if (!j.ok){ $("#aBody").innerHTML = `<div class="err">Ma tsjjelch. 3awed.</div>`; return; }
+    actReload && actReload();
+    let wl = [];
+    try { const w = await call("waitlist"); wl = (w.list || []).filter(x => x.date === r.date && x.statut.includes("attente")); } catch(e){}
+    $("#aIcon").textContent = "✓"; $("#aIcon").className = "mic";
+    $("#aTitle").textContent = "L-blassa wllat khawya";
+    $("#aSub").textContent = `${label(r.date)} · ${r.heure} · ${r.barber}`;
+    $("#aBody").innerHTML = `
+      <div class="freebox">${statut === "absent" ? r.nom + " tsjjel absent." : "Rendez-vous dyal " + esc(r.nom) + " tlgha."} 3ti had l-blassa l chi wa7ed akhor 👇</div>
+      ${wl.length ? `<div class="lbl">F liste d'attente dyal had nhar</div><div class="wl">${wl.map(w => `<a href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent(freeMsg(r.date, r.heure, w.nom))}" target="_blank" rel="noopener"><span>${esc(w.nom)}<br><small>${esc(w.services)}</small></span>💬 Sift</a>`).join("")}</div>` : ""}
+      <label class="lbl" for="fText">Message</label>
+      <textarea id="fText" rows="4" style="width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14px;margin-bottom:12px">${esc(freeMsg(r.date, r.heure))}</textarea>
+      <a class="btn full wa" id="fShare" href="#" target="_blank" rel="noopener">📣 Sift l chi wa7ed f WhatsApp</a>
+      <button class="btn ghost full" type="button" id="fDone" style="margin-top:8px">Safi</button>`;
+    const upd = () => $("#fShare").href = "https://wa.me/?text=" + encodeURIComponent($("#fText").value);
+    upd(); $("#fText").oninput = upd; $("#fDone").onclick = closeAct;
+  } catch(e){ if (e.message !== "auth") $("#aBody").innerHTML = `<div class="err">Ma kaynach connexion.</div>`; }
+}
+let rsDate = null, rsStart = null;
+async function reschedView(date){
+  const r = actR; rsDate = date; rsStart = null;
+  const t = today(), days = Array.from({ length: 14 }, (_, i) => addDays(t, i));
+  $("#aIcon").textContent = "⏱";
+  $("#aTitle").textContent = "Reporter " + r.nom;
+  $("#aSub").textContent = `Daba: ${label(r.date)} · ${r.heure} · ${r.barber}`;
+  $("#aBody").innerHTML = `<button class="back" type="button" id="rsBack">‹ Rje3</button>
+    <div class="dgrid">${days.map(d => { const x = fromIso(d); return `<button type="button" class="dchip" data-d="${d}" aria-pressed="${d === date}"><small>${d === t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("")}</div>
+    <div class="tgrid" id="rsTimes"><div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanchoufou les blayes…</div></div>
+    <button class="btn full" type="button" id="rsGo" disabled>Reporter</button><div class="err" id="rsErr"></div>`;
+  $("#rsBack").onclick = () => openActions(r, actReload);
+  $("#aBody").querySelectorAll(".dgrid .dchip").forEach(b => b.onclick = () => reschedView(b.dataset.d));
+  const on = $("#aBody .dgrid [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
+  try {
+    const res = await fetch(ADMIN.apiUrl + "?date=" + date, { cache:"no-store" }).then(x => x.json());
+    let busy = res.bookings || [];
+    if (date === r.date){ const i = busy.findIndex(x => x.barber === r.barber && x.start === hm2m(r.heure) && x.dur === r.dur); if (i >= 0) busy.splice(i, 1); }
+    const c = (CFG.coiffeurs || []).find(x => x.nom === r.barber) || { de:"11:00", a:"21:00", repos:[] };
+    const dk = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][fromIso(date).getDay()];
+    if ((c.repos || []).includes(dk)){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(r.barber)} kayrta7 had nhar.</div>`; return; }
+    const min = date === today() ? nowM() + 15 : 0, out = [];
+    for (let m = hm2m(c.de); m + r.dur <= hm2m(c.a); m += 30){
+      const free = m >= min && !busy.some(x => (x.barber === "*" || x.barber === r.barber) && m < x.start + x.dur && x.start < m + r.dur);
+      out.push(`<button type="button" data-m="${m}" ${free ? "" : "disabled"}>${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</button>`);
+    }
+    $("#rsTimes").innerHTML = out.join("") || `<div class="empty" style="grid-column:1/-1">Ma kayn 7ta blassa.</div>`;
+    $("#rsTimes").querySelectorAll("button[data-m]").forEach(b => b.onclick = () => {
+      rsStart = +b.dataset.m; $("#rsTimes").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      $("#rsGo").disabled = false; $("#rsGo").textContent = `Reporter l ${label(date)} · ${b.textContent}`;
+    });
+  } catch(e){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+  $("#rsGo").onclick = async () => {
+    if (rsStart === null) return;
+    $("#rsGo").disabled = true; $("#rsErr").textContent = "";
+    try {
+      const j = await call("reschedule", { id: r.id, date: rsDate, start: rsStart });
+      if (!j.ok){ $("#rsErr").textContent = j.error === "taken" ? "Had sa3a t7jzat daba. Khtar wa7da okhra." : j.error === "hours" ? "Had sa3a barra l-wa9t dyal l-coiffeur." : "Ma tsjjelch."; $("#rsGo").disabled = false; return; }
+      closeAct(); actReload && actReload(); toast("Treporta ✓");
+      const nr = { ...r, date: j.date, heure: j.heure };
+      openMsgModal(nr, true, reschedMsg(r, j.date, j.heure), "Rendez-vous treporta");
+    } catch(e){ if (e.message !== "auth"){ $("#rsErr").textContent = "Ma kaynach connexion."; $("#rsGo").disabled = false; } }
+  };
+}
+
 /* ---------- popup message ---------- */
 let modalR = null;
 function waHref(){ return `https://wa.me/${waNum(modalR.tel)}?text=${encodeURIComponent($("#mText").value)}`; }
-function openMsgModal(r, ok){
+function openMsgModal(r, ok, text, title){
   modalR = r;
   $("#mIcon").textContent = ok ? "✓" : "✕"; $("#mIcon").classList.toggle("no", !ok);
-  $("#mTitle").textContent = ok ? "Réservation tvalidat" : "Réservation trefdat";
+  $("#mTitle").textContent = title || (ok ? "Réservation tvalidat" : "Réservation trefdat");
   $("#mSub").textContent = `${r.nom} · ${label(r.date)} · ${r.heure} — sift lih l-message`;
-  $("#mText").value = clientMsg(r, ok);
+  $("#mText").value = text || clientMsg(r, ok);
   $("#mSend").href = waHref();
   $("#msgModal").hidden = false; document.body.style.overflow = "hidden";
   setTimeout(() => $("#mSend").focus(), 50);
@@ -747,7 +882,8 @@ function renderNext(live){
   const when = diff <= 0 ? "Daba" : diff < 60 ? `F ${diff} dqi9a` : `F ${Math.floor(diff/60)}h${String(diff%60).padStart(2,"0")}`;
   box.innerHTML = `<div class="nextc"><div class="nl"><small>${ICO.clock} L-client jay · ${when}</small><b>${esc(nx.heure)}</b></div>
     <div class="nr"><div class="nn">${esc(nx.nom)}</div><div class="ns">${esc(nx.services)} · <span style="color:${barberColor(nx.barber)}">●</span> ${esc(nx.barber)}</div>
-    </div><div class="na"><a href="tel:${esc(nx.tel.length === 9 ? "0" + nx.tel : nx.tel)}">📞 3ayet</a><a href="https://wa.me/${waNum(nx.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a></div></div>`;
+    </div><div class="na"><a href="tel:${esc(nx.tel.length === 9 ? "0" + nx.tel : nx.tel)}">📞 3ayet</a><a href="https://wa.me/${waNum(nx.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a><button type="button" id="nxMore">Ma jawebch?</button></div></div>`;
+  $("#nxMore").onclick = () => openActions(nx, () => loadRdv());
 }
 function setHello(){
   const d = new Date(), H = d.getHours();
