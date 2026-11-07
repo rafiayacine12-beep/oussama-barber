@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v4
+ * BACKEND — Oussama Barber (Google Apps Script) · v5
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -33,6 +33,15 @@ const SALON = 'Oussama Barber';
 const DEFAULT_TEAM = ['Oussama', 'Yassine', 'Aymane'];
 const DEFAULT_HOURS = ['11:00', '21:00'];
 const DAYKEYS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+// Services par défaut (mra lowla). Mn b3d katbeddlo men page admin → "Salon" → "Services".
+const DEFAULT_SERVICES = [
+  { id: 's1', prix: 40, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Coupe', da: 'Coupe', ar: 'حلاقة الشعر' }, desc: { fr: 'Coupe + shampoing', da: 'Coupe + lavage', ar: 'قص وغسل' } },
+  { id: 's2', prix: 50, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Dégradé', da: 'Dégradé', ar: 'ديغرادي' }, desc: { fr: 'Fade bas, mid ou high', da: 'Fade bas, mid wla high', ar: 'منخفض، متوسط أو عالي' } },
+  { id: 's3', prix: 25, duree: 20, top: false, actif: true, photo: '', nom: { fr: 'Barbe', da: 'Barbe', ar: 'اللحية' }, desc: { fr: 'Taille, contours et serviette chaude', da: 'Taille, contours w serviette skhouna', ar: 'تشذيب وتحديد ومنشفة ساخنة' } },
+  { id: 's4', prix: 60, duree: 45, top: true,  actif: true, photo: '', nom: { fr: 'Coupe + Barbe', da: 'Coupe + Barbe', ar: 'شعر + لحية' }, desc: { fr: 'La formule complète', da: 'L-pack kamel', ar: 'الباقة الكاملة' } },
+  { id: 's5', prix: 60, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Soin visage', da: 'Soin visage', ar: 'عناية بالوجه' }, desc: { fr: 'Masque et nettoyage', da: 'Masque w nettoyage', ar: 'قناع وتنظيف' } },
+  { id: 's6', prix: 30, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Coupe enfant', da: 'Coupe enfant', ar: 'حلاقة الأطفال' }, desc: { fr: 'Moins de 12 ans', da: '9el mn 12 3am', ar: 'أقل من 12 سنة' } }
+];
 const SITE_URL = 'https://oussama-barber.vercel.app';
 
 const SHEETS = {
@@ -110,13 +119,15 @@ function config_() {
   let c = null; try { c = raw ? JSON.parse(raw) : null; } catch (e) {}
   if (!c) c = { coiffeurs: DEFAULT_TEAM.map((n, i) => ({ id: 'c' + (i + 1), nom: n, actif: true, photo: '', de: DEFAULT_HOURS[0], a: DEFAULT_HOURS[1], repos: [] })), galerie: [] };
   c.coiffeurs = c.coiffeurs || []; c.galerie = c.galerie || [];
+  if (!Array.isArray(c.services) || !c.services.length) c.services = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
   return c;
 }
 function saveConfig_(c) { PropertiesService.getScriptProperties().setProperty('config', JSON.stringify(c)); }
 function publicConfig_() {
   const c = config_();
   return { ok: true, coiffeurs: c.coiffeurs.filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, photo: x.photo || '', de: x.de, a: x.a, repos: x.repos || [] })),
-    galerie: c.galerie.map(g => g.url) };
+    galerie: c.galerie.map(g => g.url),
+    services: c.services.filter(s => s.actif).map(s => ({ id: s.id, nom: s.nom, desc: s.desc, prix: s.prix, duree: s.duree, top: !!s.top, photo: s.photo || '' })) };
 }
 function worksAt_(name, date, start, dur) {
   const c = config_().coiffeurs.find(x => x.nom === name);
@@ -367,7 +378,20 @@ function admin_(b) {
         clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
         services: svc, barbers: brb, days: days } };
     }
-    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie }; }
+    case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services }; }
+    case 'saveservices': {
+      if (!Array.isArray(b.services)) return { ok: false, error: 'services' };
+      const str = (v, n) => String(v || '').trim().slice(0, n);
+      const lang = (o, n) => ({ fr: str(o && o.fr, n), da: str(o && o.da, n), ar: str(o && o.ar, n) });
+      const list = b.services.slice(0, 30).map((s, i) => ({
+        id: str(s.id, 40) || ('s' + Date.now() + i), prix: Math.max(0, Math.min(5000, Math.round(Number(s.prix) || 0))),
+        duree: Math.max(5, Math.min(240, Math.round((Number(s.duree) || 30) / 5) * 5)), top: !!s.top, actif: s.actif !== false,
+        photo: str(s.photo, 300), nom: lang(s.nom, 40), desc: lang(s.desc, 90)
+      })).filter(s => s.nom.da || s.nom.fr || s.nom.ar);
+      if (!list.length) return { ok: false, error: 'empty' };
+      const c = config_(); c.services = list; saveConfig_(c);
+      return { ok: true, services: list };
+    }
     case 'saveteam': {
       if (!Array.isArray(b.coiffeurs)) return { ok: false, error: 'team' };
       const hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
