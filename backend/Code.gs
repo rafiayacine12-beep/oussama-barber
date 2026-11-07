@@ -76,7 +76,7 @@ function doPost(e) {
     sheet_().appendRow([
       "'" + b.date, "'" + hh, b.start, b.dur, String(barber),
       String(b.services || '').slice(0, 300), Number(b.price) || 0,
-      String(b.name).slice(0, 80), String(b.phone).slice(0, 30),
+      String(b.name).slice(0, 80), "'" + String(b.phone).slice(0, 30),
       'confirmé', new Date(), id
     ]);
     return json_({ ok: true, barber: String(barber), id: id });
