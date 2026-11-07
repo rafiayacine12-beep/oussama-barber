@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<script src="mock-api.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>Admin · Votre Salon (démo)</title>
+<link rel="icon" href="../icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+/* Nefs l-URL li f index.html */
+const ADMIN = {
+  apiUrl: "https://demo.api/exec"
+};
+</script>
+<style>
+:root{
+  --bg:#FFFFFF; --s1:#F6F5F3; --s2:#EEECE8; --line:#E4E1DB; --ink:#17140F; --ink2:#3B362E; --mute:#716B62;
+  --or:#E2560A; --or2:#C34807; --orsoft:#FFF1E7; --orline:#F6C9AA;
+  --ok:#14874C; --oksoft:#E6F5EC; --red:#C8322A; --redsoft:#FCEBEA; --wa:#25D366;
+  --display:"Big Shoulders Display",Impact,sans-serif; --body:"Instrument Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{background:var(--s1);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top)) 0 12px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand i{width:8px;height:26px;border-radius:5px;background:repeating-linear-gradient(-45deg,var(--or) 0 5px,#fff 5px 10px,var(--ink) 10px 15px,#fff 15px 20px);box-shadow:0 0 0 1.5px var(--ink)}
+.brand small{color:var(--or);font-size:14px;letter-spacing:.14em}
+.iconbtn{width:40px;height:40px;border-radius:50%;background:var(--s1);border:1px solid var(--line);display:grid;place-items:center;font-size:17px}
+h2{font-family:var(--display);font-weight:800;font-size:34px;margin:20px 0 6px;line-height:1}
+.sub{color:var(--mute);font-size:14px;margin:0 0 14px}
+.section-t{font-size:13px;color:var(--mute);margin:18px 0 8px;font-weight:600}
+
+/* login */
+.login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px;max-width:380px;margin:0 auto;text-align:center;background:var(--bg)}
+.login h1{font-family:var(--display);font-weight:900;font-size:60px;line-height:.9;text-transform:uppercase}
+.login h1 small{display:block;color:var(--or);font-size:22px;letter-spacing:.22em;margin-top:8px}
+.login p{color:var(--mute);margin:18px 0}
+.pin{width:100%;text-align:center;letter-spacing:.5em;font-size:28px;padding:16px;border-radius:16px;background:var(--s1);border:1.5px solid var(--line)}
+.pin:focus{outline:none;border-color:var(--or);background:#fff}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:11px 18px;border-radius:999px;font-weight:700;background:var(--or);color:#fff;transition:background .15s}
+.btn:hover{background:var(--or2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.full{width:100%;margin-top:12px;min-height:54px;font-size:16px}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink2)}
+.btn.sm{min-height:36px;padding:7px 13px;font-size:13px}
+.err{color:var(--red);font-size:14px;min-height:20px;margin-top:10px}
+
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:0}
+nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:12px;font-size:11.5px;font-weight:600;color:var(--mute);position:relative}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
+.badge{position:absolute;top:3px;inset-inline-end:calc(50% - 20px);min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:10.5px;line-height:17px;font-style:normal}
+
+/* date strip */
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip button{flex:0 0 auto;padding:9px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:14px;white-space:nowrap}
+.strip button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.strip input{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 14px}
+.summary div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.summary b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1.05}
+.summary div:last-child b{color:var(--or)}
+.summary span{font-size:12px;color:var(--mute)}
+
+/* attente banner */
+.waitbar{display:flex;align-items:center;gap:12px;background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:12px 14px;margin-bottom:12px;width:100%;text-align:start}
+.waitbar b{color:var(--or2)}
+.waitbar span{flex:1;font-size:14px}
+
+/* rdv cards */
+.list{display:grid;gap:10px}
+.rdv{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;display:grid;grid-template-columns:66px 1fr;gap:3px 12px;border-inline-start:4px solid var(--or)}
+.rdv.venu{border-inline-start-color:var(--ok)}
+.rdv.absent{border-inline-start-color:var(--red)}
+.rdv.annulé{opacity:.55;border-inline-start-color:var(--line)}
+.rdv .h{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;grid-row:span 2}
+.rdv .h small{display:block;font-family:var(--body);font-size:12px;color:var(--mute);font-weight:500;margin-top:4px}
+.rdv .who{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rdv .what{color:var(--mute);font-size:14px}
+.rdv .row{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;align-items:center}
+.pill{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--mute)}
+.pill.confirmé{background:var(--orsoft);color:var(--or2)}
+.pill.venu{background:var(--oksoft);color:var(--ok)}
+.pill.absent{background:var(--redsoft);color:var(--red)}
+.pill.annulé{text-decoration:line-through}
+.st{min-height:36px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--s1);border:1px solid var(--line)}
+.st.venu.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.absent.on{background:var(--red);border-color:var(--red);color:#fff}
+.st.annulé.on{background:var(--ink2);border-color:var(--ink2);color:#fff}
+.contact{margin-inline-start:auto;display:flex;gap:6px}
+.contact a{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--s1);border:1px solid var(--line);font-size:16px}
+.contact a.wa{background:#E8F9EE;border-color:#BFE9CF}
+.empty{background:#fff;border:1px dashed var(--line);border-radius:16px;padding:28px;text-align:center;color:var(--mute)}
+
+/* forms */
+.form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;margin-bottom:14px}
+.form label,.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.form input,.form select{width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.form input:focus,.form select:focus{outline:none;border-color:var(--or);background:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle{display:flex;gap:6px}
+.toggle button{flex:1;padding:11px;border-radius:12px;background:var(--s1);border:1.5px solid var(--line);font-weight:600;font-size:14px}
+.toggle button[aria-pressed=true]{border-color:var(--or);background:var(--orsoft);color:var(--or2)}
+.days7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.days7 button{padding:10px 0;border-radius:10px;background:var(--s1);border:1.5px solid var(--line);font-weight:700;font-size:12.5px}
+.days7 button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.item .tx{flex:1;min-width:0}
+.item b{font-weight:700}
+.item .s{font-size:13px;color:var(--mute)}
+.del{color:var(--red);font-weight:700;font-size:13px;padding:8px 12px;border-radius:999px;background:var(--redsoft)}
+
+/* team */
+.member{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.member .top{display:flex;align-items:center;gap:14px;padding:14px}
+.av{width:58px;height:58px;border-radius:50%;flex:0 0 58px;background:var(--orsoft);color:var(--or2);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px;overflow:hidden;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--orline)}
+.av img{width:100%;height:100%;object-fit:cover}
+.member .tx{flex:1;min-width:0}
+.member .n{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.member .s{font-size:13px;color:var(--mute)}
+.member.off .av{filter:grayscale(1);opacity:.6}
+.member .edit{border-top:1px solid var(--line);padding:14px;display:grid;gap:12px;background:var(--s1)}
+.member .edit input{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.member .edit input:focus{outline:none;border-color:var(--or)}
+.member .edit input[readonly]{background:var(--s2);color:var(--mute)}
+.photo-pick{display:flex;align-items:center;gap:12px}
+.photo-pick label{cursor:pointer}
+.file{position:absolute;width:1px;height:1px;opacity:0}
+
+/* segmented */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px;margin:4px 0 16px}
+.seg button{padding:11px 4px;border-radius:10px;font-weight:700;font-size:13px;color:var(--mute)}
+.seg button[aria-selected=true]{background:var(--ink);color:#fff}
+/* services admin */
+.svcthumb{width:64px;height:64px;border-radius:14px;flex:0 0 64px;background:var(--orsoft);overflow:hidden;display:grid;place-items:center;color:var(--or2);font-family:var(--display);font-weight:900;font-size:24px}
+.svcthumb img{width:100%;height:100%;object-fit:cover}
+.member .price{font-family:var(--display);font-weight:800;font-size:24px;color:var(--or2);white-space:nowrap}
+.order{display:flex;flex-direction:column;gap:4px}
+.order button{width:30px;height:26px;border-radius:8px;background:var(--s1);border:1px solid var(--line);font-size:11px}
+.order button:disabled{opacity:.3}
+.three{display:grid;grid-template-columns:1fr;gap:8px}
+.lang-tag{font-size:11px;font-weight:800;background:var(--s2);color:var(--mute);border-radius:6px;padding:1px 6px;margin-inline-start:6px}
+.member .edit select{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.member .edit input[dir=rtl]{font-family:"Noto Kufi Arabic",var(--body)}
+
+/* gallery admin */
+.upl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;border:2px dashed var(--orline);border-radius:18px;padding:26px;text-align:center;cursor:pointer;color:var(--or2);font-weight:700;margin-bottom:12px}
+.upl:hover{background:var(--orsoft)}
+.upl small{color:var(--mute);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:520px){.grid{grid-template-columns:repeat(3,1fr)}}
+.ph{position:relative;border-radius:14px;overflow:hidden;background:var(--s2);aspect-ratio:4/5}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .ctl{position:absolute;left:6px;right:6px;bottom:6px;display:flex;gap:5px;justify-content:flex-end}
+.ph .ctl button{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ph .ctl .x{color:var(--red);margin-inline-end:auto}
+.ph.loading::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.6) url() center no-repeat}
+.progress{height:6px;border-radius:6px;background:var(--s2);overflow:hidden;margin:6px 0 12px}
+.progress i{display:block;height:100%;background:var(--or);width:0;transition:width .3s}
+
+/* pending */
+.pend{background:#fff;border:1.5px solid var(--orline);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(226,86,10,.10)}
+.pend h3{font-family:var(--display);font-weight:800;font-size:24px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pend h3 i{font-style:normal;font-family:var(--body);font-size:13px;background:var(--or);color:#fff;border-radius:99px;padding:2px 9px}
+.pend .list{gap:8px}
+.rdv.en.attente,.rdv[data-pending="1"]{border-inline-start-color:var(--or);background:#FFFBF8}
+.pill.attente{background:var(--or);color:#fff}
+.st.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.no{background:#fff;border-color:#F0C3BF;color:var(--red)}
+.after{grid-column:1/-1;margin-top:8px}
+.after a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:999px;background:#E8F9EE;border:1px solid #BFE9CF;color:#0B5A2C;font-weight:700;font-size:14px}
+.contact .blk{background:var(--redsoft);border-color:#F0C3BF;font-size:15px}
+.contact .blk.armed{background:var(--red);color:#fff}
+.dayof{font-size:12px;color:var(--or2);font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(23,20,15,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .25s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.mhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mhead>div{flex:1;min-width:0}
+.mhead h3{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.mhead p{font-size:13px;color:var(--mute)}
+.mic{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px;background:var(--oksoft);color:var(--ok)}
+.mic.no{background:var(--redsoft);color:var(--red)}
+.sheet textarea{width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14.5px;line-height:1.5;resize:vertical;margin-bottom:12px}
+.sheet textarea:focus{outline:none;border-color:var(--or);background:#fff}
+.btn.wa{background:var(--wa);color:#05290F}
+.btn.wa:hover{background:#1FBF5B}
+
+/* paramètres */
+.fsec{font-family:var(--display);font-weight:800;font-size:20px;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)}
+.fsec:first-child{border-top:0;padding-top:0;margin-top:0}
+.hint{font-size:12px;color:var(--mute);margin-top:5px}
+.hrs{display:grid;gap:8px}
+.hr{display:grid;grid-template-columns:62px 92px 1fr 1fr;gap:8px;align-items:center}
+.hr b{font-size:14px}
+.hr .tg{height:40px;border-radius:12px;font-weight:700;font-size:12.5px;background:var(--oksoft);color:var(--ok);border:1.5px solid transparent}
+.hr .tg[aria-pressed=false]{background:var(--redsoft);color:var(--red)}
+.hr input{min-height:40px!important;padding:8px!important}
+.hr.off input{opacity:.35;pointer-events:none}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swatches button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line)}
+.swatches button[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
+.colrow{display:flex;align-items:center;gap:12px}
+.colrow label{margin:0!important}
+.colrow input[type=color]{width:52px!important;height:40px!important;min-height:40px!important;padding:2px!important;border-radius:10px}
+.colrow .prev{margin-inline-start:auto;background:var(--or);color:#fff;font-weight:700;border-radius:999px;padding:9px 16px;font-size:14px}
+
+/* action sheet */
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:start;padding:14px;border-radius:16px;background:var(--s1);transition:background .12s}
+.opt:hover{background:var(--s2)}
+.opt i{width:42px;height:42px;flex:0 0 42px;border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:19px;background:#fff}
+.opt b{display:block;font-size:15px}
+.opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:1px}
+.opt.danger i{color:var(--red)}
+.sheet .back{display:inline-flex;align-items:center;gap:6px;color:var(--mute);font-weight:700;font-size:13px;margin-bottom:10px}
+.dgrid{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none}
+.dgrid::-webkit-scrollbar{display:none}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:230px;overflow-y:auto;margin-bottom:12px}
+.tgrid button{padding:11px 0;border-radius:12px;background:var(--s1);font-weight:700;font-size:14px;border:1.5px solid transparent}
+.tgrid button[aria-pressed=true]{background:var(--or);color:#fff}
+.tgrid button:disabled{opacity:.3;text-decoration:line-through}
+.freebox{background:var(--oksoft);color:var(--ok);border-radius:14px;padding:12px 14px;font-weight:700;font-size:14px;margin-bottom:12px}
+.wl{display:grid;gap:8px;margin-bottom:12px}
+.wl a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:#E8F9EE;color:#0B5A2C;font-weight:700;font-size:14px}
+.wl a span{flex:1}
+.wl small{font-weight:600;color:#3E7A55}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi b{display:block;font-family:var(--display);font-weight:800;font-size:34px;line-height:1.05}
+.kpi span{font-size:13px;color:var(--mute)}
+.kpi.main{grid-column:1/-1;background:var(--or);border-color:var(--or);color:#fff}
+.kpi.main b{font-size:46px}
+.kpi.main span{color:#FFE3D1}
+.bars{display:grid;gap:9px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.bars h3{font-size:14px;margin-bottom:2px}
+.bar{display:grid;grid-template-columns:110px 1fr 34px;align-items:center;gap:10px;font-size:13px}
+.bar .t{height:10px;border-radius:6px;background:var(--s2);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--or);border-radius:6px}
+.bar .n{text-align:end;font-weight:700}
+.bar .l{color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart{display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:8px}
+.chart div{flex:1;background:var(--or);border-radius:5px 5px 0 0;min-height:2px;position:relative}
+.chart div:hover::after{content:attr(data-v);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:11px;background:var(--ink);color:#fff;padding:2px 6px;border-radius:6px;white-space:nowrap}
+.chartx{display:flex;gap:4px;font-size:10px;color:var(--mute);margin-top:4px}
+.chartx span{flex:1;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-inline-end:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ================= PRO ================= */
+body{background:#F4F3F0}
+.wrap{padding:0 16px}
+header{background:rgba(244,243,240,.9);border-bottom:0;padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+.brand{font-size:22px;gap:11px}
+.brand i{width:9px;height:30px}
+.brand span{display:flex;flex-direction:column;line-height:.9}
+.brand small{font-size:11px;letter-spacing:.24em;margin-top:3px}
+.iconbtn{background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.iconbtn svg{width:19px;height:19px}
+h2{font-size:32px;margin:14px 0 4px}
+
+/* login */
+.login{max-width:none;padding:0;justify-content:flex-start;background:#fff;text-align:center}
+.lg-top{background:var(--or);color:#fff;padding:calc(54px + env(safe-area-inset-top)) 24px 46px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.lg-top::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08);top:-70px;right:-60px}
+.lg-pole{width:14px;height:58px;margin:0 auto 18px;border-radius:8px;background:repeating-linear-gradient(-45deg,#fff 0 7px,var(--ink) 7px 14px,#fff 14px 21px,#FFB98A 21px 28px);background-size:100% 40px;animation:lgp 2.4s linear infinite;box-shadow:0 0 0 2.5px var(--ink)}
+@keyframes lgp{to{background-position:0 40px}}
+.login h1{color:#fff;font-size:58px}
+.login h1 small{color:var(--ink);font-size:15px;letter-spacing:.3em;margin-top:10px}
+.lg-body{max-width:340px;margin:0 auto;width:100%;padding:28px 24px calc(24px + env(safe-area-inset-bottom))}
+.lg-body p{margin:0 0 16px;font-weight:600;color:var(--ink2)}
+.dots{display:flex;justify-content:center;gap:14px;height:18px;margin-bottom:6px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid #CFCAC1;transition:.15s}
+.dots i.on{background:var(--or);border-color:var(--or);transform:scale(1.08)}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pin-hidden{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.pad button{height:64px;border-radius:20px;background:var(--s1);font-size:26px;font-weight:600;transition:background .1s,transform .08s}
+.pad button:active{transform:scale(.94);background:var(--s2)}
+.pad .go{background:var(--ink);color:#fff;font-size:26px}
+.pad .go:disabled{opacity:.5}
+
+/* dashboard */
+.hello{margin-top:6px}
+.hello small{font-size:13px;font-weight:600;color:var(--mute);text-transform:capitalize}
+.hello h2{margin:2px 0 14px}
+.kpis3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kp{background:#fff;border-radius:18px;padding:13px 12px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04)}
+.kp i{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;margin-bottom:8px}
+.kp i svg{width:18px;height:18px}
+.kp .k1{background:#EEF2FF;color:#4338CA}.kp .k2{background:var(--oksoft);color:var(--ok)}.kp .k3{background:rgba(255,255,255,.18);color:#fff}
+.kp b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.kp b small{font-size:14px}
+.kp span{font-size:12px;color:var(--mute);font-weight:600}
+.kp.main{background:var(--ink);color:#fff}
+.kp.main span{color:#B9B3A9}
+.rem{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.rem summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:15px;cursor:pointer}
+.rem summary::-webkit-details-marker{display:none}
+.rem summary small{font-weight:700;color:var(--or);font-size:13px}
+.rem .rl{display:grid;gap:8px;margin-top:12px}
+.rem .ri{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#FAF8F5}
+.rem .ri .tm{font-weight:900;font-size:16px;min-width:48px}
+.rem .ri .nm{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.25}
+.rem .ri .nm small{display:block;font-weight:600;color:#7A736A;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rem .ri a{flex:0 0 auto;padding:9px 12px;border-radius:999px;background:#25D366;color:#fff;font-weight:800;font-size:13px;text-decoration:none}
+.rem .ri.sent a{background:#E8E4DE;color:#5B554C}
+.nextc{display:flex;flex-wrap:wrap;gap:14px;background:linear-gradient(135deg,var(--or),#F07A2E);color:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 12px 28px rgba(226,86,10,.25)}
+.nl{flex:0 0 auto;border-inline-end:1px solid rgba(255,255,255,.3);padding-inline-end:14px;display:flex;flex-direction:column;justify-content:center}
+.nl small{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#FFE3D1;white-space:nowrap}
+.nl small svg{width:13px;height:13px}
+.nl b{font-family:var(--display);font-weight:900;font-size:42px;line-height:1}
+.nr{flex:1;min-width:0}
+.nn{font-weight:800;font-size:17px}
+.ns{font-size:13px;color:#FFE3D1;margin-top:1px}
+.ns span{filter:brightness(1.6)}
+.na{display:flex;gap:8px;flex:1 0 100%;margin-top:-2px}
+.na button{flex:1;text-align:center;background:#fff;color:var(--or2);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:800;white-space:nowrap}
+.na a{flex:1;text-align:center;background:rgba(255,255,255,.18);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.na a:hover{background:rgba(255,255,255,.28)}
+
+/* date chips */
+.strip{gap:8px;padding:2px 0 14px;margin:0 -16px;padding-inline:16px;scroll-padding-inline:16px}
+.dchip{flex:0 0 58px;height:72px;border-radius:16px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0}
+.dchip small{font-size:11px;font-weight:700;color:var(--mute)}
+.dchip b{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.05}
+.dchip i{font-style:normal;font-size:10.5px;color:var(--mute)}
+.dchip.is-today small{color:var(--or2)}
+.strip .dchip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.strip .dchip[aria-pressed=true] small,.strip .dchip[aria-pressed=true] i{color:#B9B3A9}
+.dchip.pick{position:relative;color:var(--mute)}
+.dchip.pick svg{width:22px;height:22px}
+.dchip.pick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.strip input{padding:0;border:0}
+
+/* timeline */
+.dayhead2{display:flex;align-items:baseline;justify-content:space-between;margin:6px 0 10px}
+.dayhead2 h3{font-family:var(--display);font-weight:800;font-size:24px}
+.dayhead2 span{font-size:13px;color:var(--mute);font-weight:600}
+.timeline{display:grid;gap:10px;position:relative}
+.timeline .rdv{border:0;border-radius:18px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.05);border-inline-start:0;position:relative;padding-inline-start:18px;grid-template-columns:62px 1fr}
+.timeline .rdv::before{content:"";position:absolute;inset-block:14px;inset-inline-start:0;width:4px;border-radius:0 4px 4px 0;background:var(--bc,var(--or))}
+.rdv .h{font-size:27px}
+.rdv .who{font-size:15.5px;gap:8px}
+.ava{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-size:12px;font-weight:800;flex:0 0 26px}
+.rdv .what{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:3px}
+.rdv .what b{color:var(--ink);font-weight:700}
+.bar-tag{font-size:12px;font-weight:700;border-radius:99px;padding:2px 8px}
+.rdv.venu{background:#FBFEFC}
+.rdv.annulé{opacity:.5}
+.st{border-radius:12px;min-height:38px}
+.contact a,.contact .blk{border-radius:12px!important}
+.empty.big{display:flex;flex-direction:column;align-items:center;gap:6px;padding:34px 20px;border:0;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.empty.big span{width:54px;height:54px;border-radius:16px;background:var(--orsoft);color:var(--or);display:grid;place-items:center;margin-bottom:4px}
+.empty.big span svg{width:26px;height:26px}
+.empty.big b{color:var(--ink);font-size:16px}
+.pend{border:0;box-shadow:0 0 0 1.5px var(--orline),0 10px 26px rgba(226,86,10,.10)}
+.pend .rdv{box-shadow:none;border:1px solid var(--line)}
+
+/* forms/cards general */
+.form,.member,.item,.bars,.kpi,.summary div{border:0;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04)}
+.kpi.main{box-shadow:0 12px 28px rgba(226,86,10,.22)}
+.seg{border:0;box-shadow:0 1px 2px rgba(23,20,15,.05)}
+
+/* bottom nav flottante */
+nav.tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;border:0;border-radius:24px;background:rgba(23,20,15,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 14px 34px rgba(23,20,15,.28);max-width:560px;margin:0 auto}
+nav.tabs button{color:#A9A398;border-radius:18px;white-space:nowrap;font-size:11px;letter-spacing:-.1px}
+nav.tabs button[aria-selected=true]{color:#fff;background:var(--or)}
+body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.badge{box-shadow:0 0 0 2px var(--ink)}
+.toast{bottom:calc(100px + env(safe-area-inset-bottom))}
+.nstat{font-weight:700;font-size:13.5px;padding:10px 12px;border-radius:12px;margin:10px 0 2px}
+.nstat.on{background:#E8F6EE;color:#0E7C4A}.nstat.off{background:var(--s1);color:#6b655c}
+.steps{background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:10px 14px;margin:8px 0}
+.steps summary{font-weight:700;cursor:pointer;font-size:14px}
+.steps ol{margin:10px 0 2px;padding-inline-start:20px;display:grid;gap:8px;font-size:13.5px;line-height:1.45}
+.steps a{color:var(--or2);font-weight:700}.steps code{background:#fff;border:1px dashed var(--orline);padding:2px 6px;border-radius:6px;font-size:12.5px;display:inline-block;margin-top:4px}
+.nchk{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:4px 0 8px}.nchk label{display:flex;align-items:center;gap:6px;font-weight:600}
+.nchk input{width:18px;height:18px;accent-color:var(--or)}
+</style>
+</head>
+<body>
+<style>
+.dm-bar{position:sticky;top:0;z-index:9999;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:#17140F;color:#fff;font:600 13px/1.3 'Instrument Sans',system-ui,sans-serif;text-align:center}
+.dm-bar b{color:#FFB37A}
+.dm-bar a,.dm-bar button{color:#17140F;background:#fff;border:0;border-radius:999px;padding:5px 12px;font:700 12px/1 inherit;font-family:inherit;text-decoration:none;cursor:pointer}
+.dm-fab{position:fixed;left:14px;bottom:88px;z-index:9998;display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:999px;background:#17140F;color:#fff;font:700 14px/1 'Instrument Sans',system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.dm-hint{margin:10px auto 0;padding:10px 14px;max-width:300px;border-radius:12px;background:#FFF1E7;border:1px dashed #E2560A;color:#C34807;font:700 14px/1.4 'Instrument Sans',system-ui,sans-serif}
+</style>
+<div class="dm-bar"><span>🎬 <b>Admin démo</b></span>
+  <a href="./" target="_blank" rel="noopener">👀 Chouf s-site</a>
+  <button type="button" onclick="DEMO_RESET()">↺ Réinitialiser</button></div>
+
+
+<!-- ============ LOGIN ============ -->
+<section class="login" id="login">
+  <div class="lg-top">
+    <div class="lg-pole" aria-hidden="true"></div>
+    <h1>Votre<small>Salon · Admin</small></h1>
+  </div>
+  <form id="loginForm" class="lg-body">
+    <p>Dkhel l-code dyalek</p>
+    <div class="dm-hint">🎬 Démo · Code: <b>1234</b></div>
+    <div class="dots" id="pinDots" aria-hidden="true"></div>
+    <input class="pin-hidden" id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" aria-label="Code">
+    <div class="err" id="loginErr" role="alert"></div>
+    <div class="pad" id="pad">
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+      <button type="button" data-k="del" aria-label="Ms7">⌫</button><button type="button" data-k="0">0</button>
+      <button type="submit" class="go" id="loginBtn" aria-label="Dkhel">→</button>
+    </div>
+  </form>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header><div class="wrap">
+    <div class="brand"><i aria-hidden="true"></i><span>Démo<small>Admin</small></span></div>
+    <div style="display:flex;gap:8px">
+      <a class="iconbtn" href="./" target="_blank" rel="noopener" aria-label="Chouf l-site" title="Chouf l-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg></a>
+      <button class="iconbtn" id="refresh" aria-label="Actualiser" title="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
+      <button class="iconbtn" id="logout" aria-label="Khrej" title="Khrej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <!-- RDV -->
+    <section id="t-rdv">
+      <div class="hello"><small id="todayLbl"></small><h2 id="helloT"></h2></div>
+      <div class="kpis3" id="daySum"></div>
+      <div id="nextBox"></div>
+      <div id="remBox"></div>
+      <div class="pend" id="pendBox" hidden>
+        <h3>Khasshom validation <i id="pendN"></i></h3>
+        <div class="list" id="pendList"></div>
+      </div>
+      <div class="strip" id="dayStrip"></div>
+      <button class="waitbar" id="waitBar" hidden type="button"><span>⏳ <b id="waitN"></b> f liste d'attente</span>Chouf</button>
+      <div class="dayhead2"><h3 id="dayTitle">Lyoum</h3><span id="dayCount"></span></div>
+      <div class="timeline" id="rdvList"></div>
+      <div id="waitSec" hidden>
+        <div class="section-t">Liste d'attente</div>
+        <div class="list" id="waitList"></div>
+      </div>
+    </section>
+
+    <!-- BLOCAGES -->
+    <section id="t-block" hidden>
+      <h2>Sedd l-wa9t</h2>
+      <p class="sub">Pause, nhar 3otla, l-3id, coiffeur ghayb… L-site kaysedd had l-wa9t direct.</p>
+      <form class="form" id="blockForm">
+        <div><label for="bDate">Nhar</label><input type="date" id="bDate" required></div>
+        <div class="toggle" role="group" aria-label="Mudda">
+          <button type="button" data-full="1" aria-pressed="true">Nhar kamel</button>
+          <button type="button" data-full="0" aria-pressed="false">Men sa3a l sa3a</button>
+        </div>
+        <div class="two" id="bTimes" hidden>
+          <div><label for="bDe">Men</label><input type="time" id="bDe" step="1800"></div>
+          <div><label for="bA">7ta</label><input type="time" id="bA" step="1800"></div>
+        </div>
+        <div><label for="bWho">Chkoun</label><select id="bWho"></select></div>
+        <div><label for="bWhy">Sabab (optionnel)</label><input id="bWhy" maxlength="80" placeholder="Ex: Pause dyal l-ghda"></div>
+        <button class="btn full" type="submit" id="bBtn">Sedd had l-wa9t</button>
+        <div class="err" id="bErr"></div>
+      </form>
+      <div class="section-t">Les blocages jayin</div>
+      <div class="list" id="blockList"></div>
+
+      <h2 style="margin-top:30px">Numéros bloqués</h2>
+      <p class="sub">Had les numéros ma y9derouch yréserviw. Numéro li ma ja 2 merrat kaytbloka b wa7du.</p>
+      <form class="form" id="phoneForm">
+        <div class="two">
+          <div><label for="pTel">Numéro</label><input id="pTel" type="tel" inputmode="tel" placeholder="06 12 34 56 78" maxlength="17"></div>
+          <div><label for="pWhy">Sabab</label><input id="pWhy" maxlength="80" placeholder="Ex: fake"></div>
+        </div>
+        <button class="btn full" type="submit" id="pBtn" style="margin-top:0">🚫 Bloqui had n-numéro</button>
+        <div class="err" id="pErr"></div>
+      </form>
+      <div class="list" id="phoneList"></div>
+    </section>
+
+    <!-- SALON: SERVICES + ÉQUIPE -->
+    <section id="t-team" hidden>
+      <h2>Salon</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-seg="svc" aria-selected="true">✂️ Services</button>
+        <button role="tab" data-seg="team" aria-selected="false">👤 L-équipe</button>
+        <button role="tab" data-seg="info" aria-selected="false">⚙️ Paramètres</button>
+      </div>
+      <div id="segSvc">
+        <p class="sub">L-prix, l-wa9t, smiya w tswira dyal kol service. Kaybanou f étape 1 dyal réservation.</p>
+        <div class="list" id="svcList"></div>
+        <button class="btn ghost full" type="button" id="addSvc">＋ Zid service</button>
+      </div>
+      <div id="segInfo" hidden>
+        <p class="sub">Smiya, numéro, adresse, l-wa9t w lon dyal l-site. Ay tbdil kayban f l-site direct.</p>
+        <form class="form" id="salonForm">
+          <div class="fsec">🏪 L-ma7al</div>
+          <div><label for="iNom">Smiyt l-ma7al</label><input id="iNom" maxlength="40" placeholder="Votre Salon"></div>
+          <div class="two">
+            <div><label for="iAdr">Adresse</label><input id="iAdr" maxlength="80" placeholder="Votre adresse"></div>
+            <div><label for="iVille">L-mdina</label><input id="iVille" maxlength="40" placeholder="Votre ville"></div>
+          </div>
+          <div><label for="iWa">Numéro (WhatsApp w téléphone)</label><input id="iWa" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99">
+            <div class="hint">Les clients kaysifto l had n-numéro w kay3aytou lih.</div></div>
+
+          <div class="fsec">🕐 L-wa9t dyal l-khdma</div>
+          <div class="hrs" id="hrs"></div>
+          <button type="button" class="btn sm ghost" id="hrsCopy">Nefs l-wa9t dyal Tnin l kol nhar</button>
+
+          <div class="fsec">🎨 Lon dyal l-site</div>
+          <div class="swatches" id="sw"></div>
+          <div class="colrow"><label for="iCol">Lon akhor</label><input id="iCol" type="color" value="#E2560A"><span class="prev" id="colPrev">Réservi</span></div>
+
+          <div class="fsec">🔗 Les liens</div>
+          <div><label for="iMaps">Lien Google Maps</label><input id="iMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…">
+            <div class="hint">F Google Maps: 7el s-salon → Partager → Copier le lien.</div></div>
+          <div class="two">
+            <div><label for="iIg">Instagram</label><input id="iIg" placeholder="@oussama.barber"></div>
+            <div><label for="iFb">Facebook</label><input id="iFb" type="url" inputmode="url" placeholder="https://facebook.com/…"></div>
+          </div>
+          <button class="btn full" type="submit" id="iSave">Sjjel les paramètres</button>
+          <div class="err" id="iErr"></div>
+        </form>
+
+        <form class="form" id="notifForm" style="margin-top:14px">
+          <div class="fsec">🔔 Notifications f WhatsApp</div>
+          <p class="hint" style="margin:0">Kaywslek msg f WhatsApp mli client <b>yréservi</b>, <b>y-annuli</b> wla ytsjjel f liste d'attente. Khddam m3a WhatsApp 3adi w WhatsApp Business.</p>
+          <div class="nstat" id="nStat"></div>
+          <details class="steps" id="nSteps">
+            <summary>Kifach tfa33lha (merra wa7da, 2 dqaye9)</summary>
+            <ol>
+              <li>7el <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener">had l-page dyal CallMeBot</a> w nqel n-numéro dyal l-bot li fiha (kaybda b +34).</li>
+              <li>Zid had n-numéro f les contacts dyalek (smmih "Notif Salon").</li>
+              <li>Sift lih f WhatsApp, men n-numéro li bghiti ywslouk fih les msg, had l-jomla b-dabt:<br><code id="nPhrase">I allow callmebot to send me messages</code> <button type="button" class="btn sm ghost" id="nCopy">Copier</button></li>
+              <li>Ghadi yjawbek b <b>APIKEY</b> (ar9am). Koubih l-te7t w brek "Jrreb".</li>
+            </ol>
+          </details>
+          <div class="two">
+            <div><label for="nPhone">Numéro dyalek</label><input id="nPhone" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99"></div>
+            <div><label for="nKey">APIKEY</label><input id="nKey" inputmode="numeric" maxlength="40" autocomplete="off" placeholder="1234567"></div>
+          </div>
+          <div class="nchk">
+            <label><input type="checkbox" id="nBook" checked> Réservation jdida</label>
+            <label><input type="checkbox" id="nCancel" checked> Annulation</label>
+            <label><input type="checkbox" id="nWait" checked> Liste d'attente</label>
+          </div>
+          <button class="btn full" type="button" id="nTest">📲 Jrreb w sjjel</button>
+          <button class="btn ghost full" type="submit" id="nSave">Sjjel bla test</button>
+          <div class="err" id="nErr"></div>
+        </form>
+      </div>
+      <div id="segTeam" hidden>
+        <p class="sub">Les coiffeurs li kaybanou f l-site, l-wa9t dyal l-khdma w nhar l-ra7a dyal kol wa7ed.</p>
+        <div class="list" id="teamList"></div>
+        <button class="btn ghost full" type="button" id="addMember">＋ Zid coiffeur</button>
+      </div>
+    </section>
+
+    <!-- PHOTOS -->
+    <section id="t-photos" hidden>
+      <h2>Tsawer dyal l-khdma</h2>
+      <p class="sub">Katban f l-accueil dyal l-site. Tsawer w9ofin (portrait) kaybanou a7ssan.</p>
+      <label class="upl" for="galFile">
+        <span style="font-size:28px">＋</span>Zid tsawer
+        <small>Tqder tkhtar bzaf mra wa7da</small>
+      </label>
+      <input class="file" type="file" id="galFile" accept="image/*" multiple>
+      <div id="uplState" hidden><div class="progress"><i id="uplBar"></i></div></div>
+      <div class="grid" id="galGrid"></div>
+    </section>
+
+    <!-- STATS -->
+    <section id="t-stats" hidden>
+      <h2>Statistiques</h2>
+      <div class="strip" id="periodStrip"></div>
+      <div id="statsBox"></div>
+    </section>
+  </main>
+
+  <nav class="tabs" role="tablist"><div class="wrap">
+    <button role="tab" data-tab="rdv" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Rendez-vous<i class="badge" id="waitBadge" hidden></i></button>
+    <button role="tab" data-tab="block" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>Sedd</button>
+    <button role="tab" data-tab="team" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5c2.3.2 4 1.8 4.5 4.5"/></svg>Salon</button>
+    <button role="tab" data-tab="photos" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>Photos</button>
+    <button role="tab" data-tab="stats" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
+  </div></nav>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<!-- popup dyal l-khiyarat (reporter / lgha / blassa khawya) -->
+<div class="modal" id="actModal" hidden role="dialog" aria-modal="true" aria-labelledby="aTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="aIcon">⋯</span><div><h3 id="aTitle"></h3><p id="aSub"></p></div>
+      <button class="iconbtn" type="button" id="aClose" aria-label="Sedd">✕</button></div>
+    <div id="aBody"></div>
+  </div>
+</div>
+
+<!-- popup dyal message WhatsApp -->
+<div class="modal" id="msgModal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="mIcon">✓</span><div><h3 id="mTitle"></h3><p id="mSub"></p></div>
+      <button class="iconbtn" type="button" id="mClose" aria-label="Sedd">✕</button></div>
+    <label class="lbl" for="mText">Message (tqder tbeddlo)</label>
+    <textarea id="mText" rows="7"></textarea>
+    <a class="btn full wa" id="mSend" href="#" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
+      Sift f WhatsApp</a>
+    <button class="btn ghost full" type="button" id="mLater" style="margin-top:8px">Mn b3d</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const DAYKEYS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const DAYS = ["L-7ed","Tnin","Tlat","Larb3","Lkhmis","Jjem3a","Ssebt"];
+const D2 = ["7ed","Tni","Tla","Arb","Khm","Jem","Seb"];
+const ORDER = [1,2,3,4,5,6,0];
+const MONTHS = ["jan","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
+const pad = n => String(n).padStart(2,"0");
+const iso = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const fromIso = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const addDays = (s, n) => { const d = fromIso(s); d.setDate(d.getDate()+n); return iso(d); };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today = () => iso(new Date());
+const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === addDays(t,1)) return "Ghedda"; if (s === addDays(t,-1)) return "L-bare7"; const d = fromIso(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
+const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
+let PIN = ""; try { PIN = sessionStorage.getItem("dm_pin") || ""; } catch(e){}
+let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
+const SN = () => (CFG.salon && CFG.salon.nom) || "Votre Salon";
+const MAPS_DEFAULT = "https://maps.google.com/";
+
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
+async function call(op, extra){
+  const r = await fetch(ADMIN.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify({ action:"admin", pin: PIN, op, ...(extra||{}) }) });
+  const j = await r.json();
+  if (!j.ok && (j.error === "pin" || j.error === "locked")){ logout(j.error === "locked" ? "Bzaf dyal l-mo7awalat. Tsenna 15 dqi9a." : "Code ghalat."); throw new Error("auth"); }
+  return j;
+}
+
+/* ---------- login (clavier) ---------- */
+function paintDots(){ const n = $("#pin").value.length; $("#pinDots").innerHTML = Array.from({ length: Math.max(4, n) }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join(""); }
+$("#pad").addEventListener("click", e => {
+  const b = e.target.closest("button[data-k]"); if (!b) return;
+  const p = $("#pin"); $("#loginErr").textContent = "";
+  if (b.dataset.k === "del") p.value = p.value.slice(0, -1); else if (p.value.length < 12) p.value += b.dataset.k;
+  paintDots();
+});
+$("#pin").addEventListener("input", paintDots);
+document.addEventListener("keydown", e => {
+  if ($("#login").hidden || document.activeElement === $("#pin")) return;
+  if (/^\d$/.test(e.key)){ $("#pin").value += e.key; paintDots(); }
+  else if (e.key === "Backspace"){ $("#pin").value = $("#pin").value.slice(0, -1); paintDots(); }
+  else if (e.key === "Enter"){ $("#loginForm").requestSubmit(); }
+});
+paintDots();
+
+/* ---------- login ---------- */
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  PIN = $("#pin").value.trim(); if (!PIN) return;
+  $("#loginBtn").disabled = true; $("#loginErr").textContent = "";
+  try {
+    const j = await call("login");
+    if (j.ok){ try { sessionStorage.setItem("dm_pin", PIN); } catch(e){} start(); }
+    else $("#loginErr").textContent = "Backend 9dim: khass déploiement jdid f Apps Script.";
+  } catch(err){ if (err.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; }
+  $("#loginBtn").disabled = false;
+});
+function logout(msg){
+  PIN = ""; try { sessionStorage.removeItem("dm_pin"); } catch(e){}
+  $("#app").hidden = true; $("#login").hidden = false; $("#pin").value = ""; paintDots(); $("#loginErr").textContent = msg || "";
+  if (msg){ $("#pinDots").classList.remove("shake"); void $("#pinDots").offsetWidth; $("#pinDots").classList.add("shake"); }
+}
+$("#logout").addEventListener("click", () => logout());
+
+/* ---------- tabs ---------- */
+let tab = "rdv";
+function setTab(t){
+  tab = t;
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === t));
+  ["rdv","block","team","photos","stats"].forEach(k => $("#t-"+k).hidden = k !== t);
+  load(); window.scrollTo(0,0);
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+$("#refresh").addEventListener("click", () => load());
+function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loadPhotos, stats: loadStats })[tab](); }
+
+async function loadConfig(){
+  const j = await call("getconfig");
+  if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); loadNotif(); }
+  return CFG;
+}
+function fillBarberSelect(){
+  $("#bWho").innerHTML = `<option value="tous">Salon kamel</option>` + CFG.coiffeurs.filter(c => c.actif).map(c => `<option>${esc(c.nom)}</option>`).join("");
+}
+
+/* ---------- messages l l-client ---------- */
+const SITE = location.origin + location.pathname.replace(/admin\.html$/, "");
+function fmtDate(s, lg){
+  const d = fromIso(s);
+  if (lg === "fr") return d.toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
+  if (lg === "ar") return d.toLocaleDateString("ar-MA", { weekday:"long", day:"numeric", month:"long" });
+  return label(s).toLowerCase() === "lyoum" ? "lyoum" : label(s);
+}
+function clientMsg(r, ok){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  if (ok) return {
+    da: `Salam ${r.nom} 👋 réservation dyalek f ${SN()} tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Kifach twsel: ${maps}\nNtsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 votre réservation chez ${SN()} est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Itinéraire : ${maps}\nÀ bientôt !`,
+    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في ${SN()} ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 الموقع: ${maps}\nفي انتظارك!` }[lg];
+  return {
+    da: `Salam ${r.nom}, smeh lina 🙏 ma qdernach nconfirmiw réservation dyal ${d} m3a ${r.heure}. Tqder tkhtar wa9t akhor hna: ${SITE}`,
+    fr: `Bonjour ${r.nom}, désolé 🙏 nous ne pouvons pas confirmer votre réservation du ${d} à ${r.heure}. Choisissez un autre créneau ici : ${SITE}`,
+    ar: `مرحبا ${r.nom}، نعتذر 🙏 لم نتمكن من تأكيد حجزك ليوم ${d} على ${r.heure}. يمكنك اختيار موعد آخر هنا: ${SITE}` }[lg];
+}
+const isPend = s => String(s).includes("attente");
+function rdvCard(r, showDay){
+  const pend = isPend(r.statut);
+  const col = barberColor(r.barber);
+  return `<article class="rdv ${esc(r.statut)}" data-pending="${pend ? 1 : 0}" data-id="${esc(r.id)}" style="--bc:${col}">
+    <div class="h">${esc(r.heure)}<small>${r.dur} min</small></div>
+    <div class="who"><span class="ava" style="background:${col}">${esc((r.nom||"?")[0].toUpperCase())}</span>${esc(r.nom)} <span class="pill ${pend ? "attente" : esc(r.statut)}">${esc(r.statut)}</span></div>
+    <div class="what">${showDay ? `<span class="dayof">${esc(label(r.date))}</span> · ` : ""}${esc(r.services)} · <b>${r.prix} DH</b><span class="bar-tag" style="color:${col};background:${col}14">● ${esc(r.barber)}</span></div>
+    <div class="row">
+      ${pend
+        ? `<button class="st ok" data-id="${esc(r.id)}" data-s="confirmé">✓ Valider</button><button class="st no" data-id="${esc(r.id)}" data-s="annulé" data-refuse="1">✗ Refuser</button>`
+        : ["venu","absent","annulé"].map(s => `<button class="st ${s} ${r.statut===s?"on":""}" data-id="${esc(r.id)}" data-s="${s}">${{venu:"✓ Ja",absent:"✗ Ma jach",annulé:"Lgha"}[s]}</button>`).join("")}
+      <div class="contact">
+        <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
+        <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
+        <button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>
+        ${!pend && !String(r.statut).startsWith("annul") ? `<button class="more iconbtn" style="width:38px;height:38px" data-id="${esc(r.id)}" aria-label="Khiyarat okhrin" title="Reporter / Lgha">⋯</button>` : ""}
+      </div>
+    </div>
+    <div class="after" hidden></div>
+  </article>`;
+}
+let LISTS = {};
+function bindCards(container, list, reload){
+  container.querySelectorAll(".st").forEach(b => b.onclick = async () => {
+    const r = list.find(x => x.id === b.dataset.id); if (!r) return;
+    const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
+    const decide = isPend(r.statut) && (s === "confirmé" || b.dataset.refuse);
+    b.disabled = true;
+    try {
+      const j = await call("status", { id: r.id, statut: s });
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
+      if (decide){
+        const card = b.closest(".rdv"), ok = s === "confirmé";
+        const wa = `https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}`;
+        openMsgModal(r, ok);
+        card.querySelector(".row").innerHTML = `<span class="pill ${ok ? "venu" : "annulé"}">${ok ? "✓ Tvalidat" : "Trefdat"}</span>`;
+        const af = card.querySelector(".after"); af.hidden = false;
+        af.innerHTML = `<a href="#" data-remsg="1">💬 Sift l-message l ${esc(r.nom)} f WhatsApp</a>`;
+        af.querySelector("[data-remsg]").onclick = e => { e.preventDefault(); openMsgModal(r, ok); };
+        toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
+        setTimeout(() => { if (tab === "rdv") reload(); }, 15000);
+      } else { toast("Tsjjel ✓"); reload(); }
+    } catch(e){ b.disabled = false; }
+  });
+  container.querySelectorAll(".more").forEach(b => b.onclick = () => { const r = list.find(x => x.id === b.dataset.id); if (r) openActions(r, reload); });
+  container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
+    if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
+    b.disabled = true;
+    try { const j = await call("blockphone", { tel: b.dataset.tel, raison: "men l-admin" }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); reload(); refreshPendingCount(); } }
+    catch(e){ b.disabled = false; }
+  });
+}
+
+/* ---------- khiyarat: reporter / lgha / blassa khawya ---------- */
+let actR = null, actReload = null;
+function openAct(){ $("#actModal").hidden = false; document.body.style.overflow = "hidden"; }
+function closeAct(){ $("#actModal").hidden = true; document.body.style.overflow = ""; }
+$("#aClose").addEventListener("click", closeAct);
+$("#actModal").addEventListener("click", e => { if (e.target.id === "actModal") closeAct(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#actModal").hidden) closeAct(); });
+function lgOf(r){ return r.langue === "fr" || r.langue === "ar" ? r.langue : "da"; }
+function reschedMsg(r, date, heure){
+  const lg = lgOf(r), d = fmtDate(date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return { da:`Salam ${r.nom} 👋 rendez-vous dyalek f ${SN()} tbeddel l ${d} m3a ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nIla ma ynasbekch had l-wa9t, jaweb 3la had l-message.`,
+    fr:`Bonjour ${r.nom} 👋 votre rendez-vous chez ${SN()} est déplacé au ${d} à ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nSi l'horaire ne vous convient pas, répondez à ce message.`,
+    ar:`مرحبا ${r.nom} 👋 تم تغيير موعدك في ${SN()} إلى ${d} على ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nإذا لم يناسبك هذا الوقت، أجب على هذه الرسالة.` }[lg];
+}
+function freeMsg(date, heure, name){
+  const d = fmtDate(date, "da");
+  return `Salam${name ? " " + name : ""} 👋 t7llat blassa f ${SN()} ${d} m3a ${heure} 💈\nBghiti tji? Jaweb 3la had l-message wla réservi hna: ${SITE}`;
+}
+function openActions(r, reload){
+  actR = r; actReload = reload;
+  $("#aIcon").textContent = "⋯"; $("#aIcon").className = "mic";
+  $("#aTitle").textContent = r.nom + " · " + r.heure;
+  $("#aSub").textContent = `${label(r.date)} · ${r.services} · ${r.barber}`;
+  $("#aBody").innerHTML = `<div class="opts">
+    <button class="opt" type="button" data-a="resched"><i>⏱</i><span><b>Reporter</b><small>Bddel l nhar wla sa3a okhra w sift lih l-wa9t jdid</small></span></button>
+    <button class="opt danger" type="button" data-a="absent"><i>✗</i><span><b>Ma jach / ma jawebch</b><small>Kat7sab absent w l-blassa katwelli khawya</small></span></button>
+    <button class="opt danger" type="button" data-a="cancel"><i>🗑</i><span><b>Lgha l-rendez-vous</b><small>Chi 7aja urgente — l-blassa katwelli khawya</small></span></button>
+  </div>`;
+  $("#aBody").querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+    if (b.dataset.a === "resched") reschedView(r.date);
+    else freeSlot(b.dataset.a === "absent" ? "absent" : "annulé");
+  });
+  openAct();
+}
+async function freeSlot(statut){
+  const r = actR;
+  $("#aBody").innerHTML = `<div class="empty"><span class="spin"></span>Kansjjlo…</div>`;
+  try {
+    const j = await call("status", { id: r.id, statut });
+    if (!j.ok){ $("#aBody").innerHTML = `<div class="err">Ma tsjjelch. 3awed.</div>`; return; }
+    actReload && actReload();
+    let wl = [];
+    try { const w = await call("waitlist"); wl = (w.list || []).filter(x => x.date === r.date && x.statut.includes("attente")); } catch(e){}
+    $("#aIcon").textContent = "✓"; $("#aIcon").className = "mic";
+    $("#aTitle").textContent = "L-blassa wllat khawya";
+    $("#aSub").textContent = `${label(r.date)} · ${r.heure} · ${r.barber}`;
+    $("#aBody").innerHTML = `
+      <div class="freebox">${statut === "absent" ? r.nom + " tsjjel absent." : "Rendez-vous dyal " + esc(r.nom) + " tlgha."} 3ti had l-blassa l chi wa7ed akhor 👇</div>
+      ${wl.length ? `<div class="lbl">F liste d'attente dyal had nhar</div><div class="wl">${wl.map(w => `<a href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent(freeMsg(r.date, r.heure, w.nom))}" target="_blank" rel="noopener"><span>${esc(w.nom)}<br><small>${esc(w.services)}</small></span>💬 Sift</a>`).join("")}</div>` : ""}
+      <label class="lbl" for="fText">Message</label>
+      <textarea id="fText" rows="4" style="width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14px;margin-bottom:12px">${esc(freeMsg(r.date, r.heure))}</textarea>
+      <a class="btn full wa" id="fShare" href="#" target="_blank" rel="noopener">📣 Sift l chi wa7ed f WhatsApp</a>
+      <button class="btn ghost full" type="button" id="fDone" style="margin-top:8px">Safi</button>`;
+    const upd = () => $("#fShare").href = "https://wa.me/?text=" + encodeURIComponent($("#fText").value);
+    upd(); $("#fText").oninput = upd; $("#fDone").onclick = closeAct;
+  } catch(e){ if (e.message !== "auth") $("#aBody").innerHTML = `<div class="err">Ma kaynach connexion.</div>`; }
+}
+let rsDate = null, rsStart = null;
+async function reschedView(date){
+  const r = actR; rsDate = date; rsStart = null;
+  const t = today(), days = Array.from({ length: 14 }, (_, i) => addDays(t, i));
+  $("#aIcon").textContent = "⏱";
+  $("#aTitle").textContent = "Reporter " + r.nom;
+  $("#aSub").textContent = `Daba: ${label(r.date)} · ${r.heure} · ${r.barber}`;
+  $("#aBody").innerHTML = `<button class="back" type="button" id="rsBack">‹ Rje3</button>
+    <div class="dgrid">${days.map(d => { const x = fromIso(d); return `<button type="button" class="dchip" data-d="${d}" aria-pressed="${d === date}"><small>${d === t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("")}</div>
+    <div class="tgrid" id="rsTimes"><div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanchoufou les blayes…</div></div>
+    <button class="btn full" type="button" id="rsGo" disabled>Reporter</button><div class="err" id="rsErr"></div>`;
+  $("#rsBack").onclick = () => openActions(r, actReload);
+  $("#aBody").querySelectorAll(".dgrid .dchip").forEach(b => b.onclick = () => reschedView(b.dataset.d));
+  const on = $("#aBody .dgrid [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
+  try {
+    const res = await fetch(ADMIN.apiUrl + "?date=" + date, { cache:"no-store" }).then(x => x.json());
+    let busy = res.bookings || [];
+    if (date === r.date){ const i = busy.findIndex(x => x.barber === r.barber && x.start === hm2m(r.heure) && x.dur === r.dur); if (i >= 0) busy.splice(i, 1); }
+    const c = (CFG.coiffeurs || []).find(x => x.nom === r.barber) || { de:"11:00", a:"21:00", repos:[] };
+    const dk = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][fromIso(date).getDay()];
+    if ((c.repos || []).includes(dk)){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(r.barber)} kayrta7 had nhar.</div>`; return; }
+    const min = date === today() ? nowM() + 15 : 0, out = [];
+    for (let m = hm2m(c.de); m + r.dur <= hm2m(c.a); m += 30){
+      const free = m >= min && !busy.some(x => (x.barber === "*" || x.barber === r.barber) && m < x.start + x.dur && x.start < m + r.dur);
+      out.push(`<button type="button" data-m="${m}" ${free ? "" : "disabled"}>${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</button>`);
+    }
+    $("#rsTimes").innerHTML = out.join("") || `<div class="empty" style="grid-column:1/-1">Ma kayn 7ta blassa.</div>`;
+    $("#rsTimes").querySelectorAll("button[data-m]").forEach(b => b.onclick = () => {
+      rsStart = +b.dataset.m; $("#rsTimes").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      $("#rsGo").disabled = false; $("#rsGo").textContent = `Reporter l ${label(date)} · ${b.textContent}`;
+    });
+  } catch(e){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+  $("#rsGo").onclick = async () => {
+    if (rsStart === null) return;
+    $("#rsGo").disabled = true; $("#rsErr").textContent = "";
+    try {
+      const j = await call("reschedule", { id: r.id, date: rsDate, start: rsStart });
+      if (!j.ok){ $("#rsErr").textContent = j.error === "taken" ? "Had sa3a t7jzat daba. Khtar wa7da okhra." : j.error === "hours" ? "Had sa3a barra l-wa9t dyal l-coiffeur." : "Ma tsjjelch."; $("#rsGo").disabled = false; return; }
+      closeAct(); actReload && actReload(); toast("Treporta ✓");
+      const nr = { ...r, date: j.date, heure: j.heure };
+      openMsgModal(nr, true, reschedMsg(r, j.date, j.heure), "Rendez-vous treporta");
+    } catch(e){ if (e.message !== "auth"){ $("#rsErr").textContent = "Ma kaynach connexion."; $("#rsGo").disabled = false; } }
+  };
+}
+
+/* ---------- popup message ---------- */
+let modalR = null;
+function waHref(){ return `https://wa.me/${waNum(modalR.tel)}?text=${encodeURIComponent($("#mText").value)}`; }
+function openMsgModal(r, ok, text, title){
+  modalR = r;
+  $("#mIcon").textContent = ok ? "✓" : "✕"; $("#mIcon").classList.toggle("no", !ok);
+  $("#mTitle").textContent = title || (ok ? "Réservation tvalidat" : "Réservation trefdat");
+  $("#mSub").textContent = `${r.nom} · ${label(r.date)} · ${r.heure} — sift lih l-message`;
+  $("#mText").value = text || clientMsg(r, ok);
+  $("#mSend").href = waHref();
+  $("#msgModal").hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(() => $("#mSend").focus(), 50);
+}
+function closeMsgModal(){ $("#msgModal").hidden = true; document.body.style.overflow = ""; }
+$("#mText").addEventListener("input", () => { $("#mSend").href = waHref(); });
+$("#mSend").addEventListener("click", () => { $("#mSend").href = waHref(); setTimeout(closeMsgModal, 300); toast("WhatsApp t7el ✓"); });
+$("#mClose").addEventListener("click", closeMsgModal);
+$("#mLater").addEventListener("click", closeMsgModal);
+$("#msgModal").addEventListener("click", e => { if (e.target.id === "msgModal") closeMsgModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#msgModal").hidden) closeMsgModal(); });
+
+/* ---------- en attente ---------- */
+let lastPending = -1;
+async function loadPending(){
+  try {
+    if (!CFG.salon || CFG.salon.maps === undefined) loadConfig().catch(() => {});
+    const j = await call("pending"), list = j.list || [];
+    LISTS.pending = list;
+    $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
+    $("#pendList").innerHTML = list.map(r => rdvCard(r, true)).join("");
+    bindCards($("#pendList"), list, () => { loadPending(); loadRdv(true); });
+    setPendingBadge(list.length);
+  } catch(e){}
+}
+function paintBadge(n){
+  const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
+  $("#waitBadge").hidden = !tot; $("#waitBadge").textContent = tot;
+  document.title = (n ? `(${n}) ` : "") + "Admin · Votre Salon";
+}
+function setPendingBadge(n){
+  paintBadge(n);
+  if (lastPending >= 0 && n > lastPending){
+    toast("🔔 Réservation jdida kaytsenna l-validation");
+    try { if (window.Notification && Notification.permission === "granted") new Notification("Votre Salon", { body:"Réservation jdida kaytsenna l-validation", icon:"../icons/icon-192.png" }); } catch(e){}
+    if (tab === "rdv") loadPending();
+  }
+  lastPending = n;
+}
+async function refreshPendingCount(){ try { const j = await call("pending"); setPendingBadge((j.list || []).length); } catch(e){} }
+
+/* ---------- rendez-vous ---------- */
+let day = today();
+function renderStrip(){
+  const t = today(), days = [-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13].map(n => addDays(t, n));
+  $("#dayStrip").innerHTML = days.map(d => { const x = fromIso(d);
+    return `<button type="button" class="dchip${d===t?" is-today":""}" data-d="${d}" aria-pressed="${d===day}" aria-label="${esc(label(d))}"><small>${d===t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("") +
+    `<label class="dchip pick" title="Khtar nhar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><input type="date" id="pickDay" value="${day}" aria-label="Khtar nhar"></label>`;
+  const on = $("#dayStrip [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
+  $("#dayStrip").querySelectorAll("button").forEach(b => b.onclick = () => { day = b.dataset.d; loadRdv(); });
+  $("#pickDay").onchange = e => { if (e.target.value){ day = e.target.value; loadRdv(); } };
+}
+const ICO = {
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+const BCOL = ["#E2560A","#2563EB","#0E9F6E","#9333EA","#DB2777","#CA8A04","#0891B2"];
+const barberColor = n => { const i = (CFG.coiffeurs || []).findIndex(c => c.nom === n); let x = i; if (x < 0){ x = 0; for (const ch of String(n)) x = (x + ch.charCodeAt(0)) % 97; } return BCOL[x % BCOL.length]; };
+const nowM = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+const hm2m = s => { const [a,b] = String(s).split(":").map(Number); return a*60 + b; };
+function renderNext(live){
+  const box = $("#nextBox"); if (!box) return;
+  const n = nowM(), nx = live.filter(r => !isPend(r.statut) && r.statut !== "venu" && !r.statut.startsWith("absent") && hm2m(r.heure) + r.dur > n).sort((a,b) => a.heure.localeCompare(b.heure))[0];
+  if (!nx){ box.innerHTML = ""; return; }
+  const diff = hm2m(nx.heure) - n;
+  const when = diff <= 0 ? "Daba" : diff < 60 ? `F ${diff} dqi9a` : `F ${Math.floor(diff/60)}h${String(diff%60).padStart(2,"0")}`;
+  box.innerHTML = `<div class="nextc"><div class="nl"><small>${ICO.clock} L-client jay · ${when}</small><b>${esc(nx.heure)}</b></div>
+    <div class="nr"><div class="nn">${esc(nx.nom)}</div><div class="ns">${esc(nx.services)} · <span style="color:${barberColor(nx.barber)}">●</span> ${esc(nx.barber)}</div>
+    </div><div class="na"><a href="tel:${esc(nx.tel.length === 9 ? "0" + nx.tel : nx.tel)}">📞 3ayet</a><a href="https://wa.me/${waNum(nx.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a><button type="button" id="nxMore">Ma jawebch?</button></div></div>`;
+  $("#nxMore").onclick = () => openActions(nx, () => loadRdv());
+}
+function setHello(){
+  const d = new Date(), H = d.getHours();
+  $("#helloT").textContent = (H < 12 ? "Sba7 l-khir" : H < 18 ? "Mbrouk l-3chiya" : "Msa l-khir") + " 👋";
+  $("#todayLbl").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
+}
+/* ---------- rappels dyal ghedda ---------- */
+function remMsg(r){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return {
+    da: `Salam ${r.nom} 👋 kanfekrouk b rendez-vous dyalek f ${SN()} ghedda:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nIla ma t9derch tji, golha lina 🙏 Ntsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 petit rappel de votre rendez-vous chez ${SN()} demain :\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nSi vous ne pouvez pas venir, prévenez-nous 🙏 À demain !`,
+    ar: `مرحبا ${r.nom} 👋 كنفكروك بالموعد ديالك في ${SN()} غدا:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nإلا ما تقدرش تجي، علمنا 🙏 في انتظارك!` }[lg];
+}
+async function loadReminders(){
+  const box = $("#remBox"); if (!box) return;
+  if (day !== today()){ box.innerHTML = ""; return; }
+  const d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
+  try {
+    const j = await call("list", { from: tmr, to: tmr });
+    const list = (j.list || []).filter(r => !String(r.statut).startsWith("annul") && !String(r.statut).startsWith("absent")).sort((a,b) => a.heure.localeCompare(b.heure));
+    if (!list.length){ box.innerHTML = ""; return; }
+    const sent = id => { try { return localStorage.getItem("rem_" + id) === "1"; } catch(e){ return false; } };
+    const left = list.filter(r => !sent(r.id)).length;
+    box.innerHTML = `<details class="rem" ${left ? "open" : ""}><summary>🔔 Rappels dyal ghedda (${list.length})<small>${left ? left + " mazal" : "Kolchi tsifet ✓"}</small></summary>
+      <div class="rl">${list.map(r => `<div class="ri ${sent(r.id) ? "sent" : ""}" data-id="${esc(r.id)}"><span class="tm">${esc(r.heure)}</span>
+        <span class="nm">${esc(r.nom)}<small>${esc(r.services)} · ${esc(r.barber)}</small></span>
+        <a href="https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(remMsg(r))}" target="_blank" rel="noopener">${sent(r.id) ? "✓ Tsifet" : "💬 Sift rappel"}</a></div>`).join("")}</div></details>`;
+    box.querySelectorAll(".ri a").forEach(a => a.addEventListener("click", () => {
+      const row = a.closest(".ri"); try { localStorage.setItem("rem_" + row.dataset.id, "1"); } catch(e){}
+      setTimeout(() => { row.classList.add("sent"); a.textContent = "✓ Tsifet"; const n = box.querySelectorAll(".ri:not(.sent)").length; box.querySelector("summary small").textContent = n ? n + " mazal" : "Kolchi tsifet ✓"; }, 400);
+    }));
+  } catch(e){ box.innerHTML = ""; }
+}
+async function loadRdv(skipPending){
+  setHello(); renderStrip(); loadWait(); loadReminders(); if (skipPending !== true) loadPending();
+  $("#rdvList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`; $("#daySum").innerHTML = "";
+  try {
+    const j = await call("list", { from: day, to: day });
+    const list = j.list || [], live = list.filter(r => !r.statut.startsWith("annul"));
+    const ca = live.filter(r => !r.statut.startsWith("absent") && !isPend(r.statut)).reduce((a,r) => a + r.prix, 0);
+    $("#daySum").innerHTML = `
+      <div class="kp"><i class="k1">${ICO.cal}</i><b>${live.length}</b><span>Rendez-vous</span></div>
+      <div class="kp"><i class="k2">${ICO.check}</i><b>${live.filter(r => r.statut === "venu").length}</b><span>Jaw</span></div>
+      <div class="kp main"><i class="k3">${ICO.cash}</i><b>${ca}<small> DH</small></b><span>Prévu</span></div>`;
+    $("#dayTitle").textContent = day === today() ? "Lyoum" : label(day);
+    $("#dayCount").textContent = live.length ? `${live.length} rendez-vous` : "";
+    renderNext(day === today() ? live : []);
+    if (!list.length){ $("#rdvList").innerHTML = `<div class="empty big"><span>${ICO.cal}</span><b>Ma kayn 7ta rendez-vous</b>${day === today() ? "lyoum" : "f had nhar"}. Les réservations jdad ghadi ybanou hna.</div>`; return; }
+    $("#rdvList").innerHTML = list.map(r => rdvCard(r, false)).join("");
+    bindCards($("#rdvList"), list, () => loadRdv());
+  } catch(e){ if (e.message !== "auth") $("#rdvList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
+/* ---------- attente (f rendez-vous) ---------- */
+$("#waitBar").addEventListener("click", () => { $("#waitSec").hidden = false; $("#waitSec").scrollIntoView({ behavior:"smooth" }); });
+async function loadWait(){
+  try {
+    const j = await call("waitlist"), list = j.list || [];
+    const pending = list.filter(w => w.statut.includes("attente"));
+    $("#waitBadge").dataset.wait = pending.length; paintBadge(Math.max(0, lastPending));
+    $("#waitBar").hidden = !pending.length; $("#waitN").textContent = pending.length;
+    $("#waitSec").hidden = !list.length || $("#waitSec").hidden;
+    $("#waitList").innerHTML = list.map(w => `<div class="item"><div class="tx">
+        <b>${esc(w.nom)}</b> <span class="pill ${w.statut.includes("attente") ? "confirmé" : "venu"}">${esc(w.statut)}</span>
+        <div class="s">${esc(label(w.date))} · ${esc(w.services)}${w.barber ? " · " + esc(w.barber) : ""}</div></div>
+        <div class="contact"><a href="tel:${esc(w.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent("Salam " + w.nom + " 👋 t7llat blassa f " + SN() + " " + label(w.date).toLowerCase() + ". Mazal bghiti?")}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div>
+        ${w.statut.includes("attente") ? `<button class="btn sm ghost" data-id="${esc(w.id)}">Tsselt</button>` : ""}</div>`).join("");
+    $("#waitList").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const j = await call("waitdone", { id: b.dataset.id }); if (j.ok) loadWait(); } catch(e){ b.disabled = false; }
+    });
+  } catch(e){}
+}
+
+/* ---------- blocages ---------- */
+let fullDay = true;
+$("#bDate").value = today(); $("#bDate").min = today();
+document.querySelectorAll("[data-full]").forEach(b => b.onclick = () => {
+  fullDay = b.dataset.full === "1";
+  document.querySelectorAll("[data-full]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $("#bTimes").hidden = fullDay;
+});
+$("#blockForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#bErr").textContent = "";
+  const de = fullDay ? "" : $("#bDe").value, a = fullDay ? "" : $("#bA").value;
+  if (!fullDay && (!de || !a || a <= de)){ $("#bErr").textContent = "Sa3a dyal l-bdya khass tkoun 9bel sa3a dyal l-akhir."; return; }
+  $("#bBtn").disabled = true;
+  try {
+    const j = await call("block", { date: $("#bDate").value, de, a, coiffeur: $("#bWho").value, raison: $("#bWhy").value.trim() });
+    if (j.ok){ toast("Tsedd ✓"); $("#bWhy").value = ""; loadBlocks(); } else $("#bErr").textContent = "Ma tsjjelch. Tchecki l-nhar w s-sa3a.";
+  } catch(err){ if (err.message !== "auth") $("#bErr").textContent = "Ma kaynach connexion."; }
+  $("#bBtn").disabled = false;
+});
+async function loadBlocks(){
+  loadPhones();
+  $("#blockList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    if (!CFG.coiffeurs.length) await loadConfig();
+    const j = await call("blocks"), list = j.list || [];
+    if (!list.length){ $("#blockList").innerHTML = `<div class="empty">Ma kayn 7ta blocage jay.</div>`; return; }
+    $("#blockList").innerHTML = list.map(b => `<div class="item"><div class="tx">
+        <b>${esc(label(b.date))} · ${b.de ? esc(b.de) + "–" + esc(b.a) : "nhar kamel"}</b>
+        <div class="s">${b.coiffeur === "tous" ? "Salon kamel" : esc(b.coiffeur)}${b.raison ? " · " + esc(b.raison) : ""}</div></div>
+        <button class="del" data-id="${esc(b.id)}">7ayed</button></div>`).join("");
+    $("#blockList").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Akked?"; return; }
+      b.disabled = true;
+      try { const j = await call("unblock", { id: b.dataset.id }); if (j.ok){ toast("Tm7a ✓"); loadBlocks(); } } catch(e){ b.disabled = false; }
+    });
+  } catch(e){ if (e.message !== "auth") $("#blockList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
+/* ---------- numéros bloqués ---------- */
+async function loadPhones(){
+  try {
+    const j = await call("blocked"), list = j.list || [];
+    $("#phoneList").innerHTML = list.length ? list.map(p => `<div class="item"><div class="tx"><b>${esc(p.tel)}</b><div class="s">${esc(p.raison || "—")}</div></div>
+      <button class="del" data-tel="${esc(p.tel)}">Debloqui</button></div>`).join("") : `<div class="empty">Ma kayn 7ta numéro bloqué.</div>`;
+    $("#phoneList").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const j = await call("unblockphone", { tel: b.dataset.tel }); if (j.ok){ toast("Tdebloqua ✓"); loadPhones(); } } catch(e){ b.disabled = false; }
+    });
+  } catch(e){}
+}
+$("#phoneForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#pErr").textContent = "";
+  const tel = $("#pTel").value.replace(/\D/g, "");
+  if (tel.length < 9){ $("#pErr").textContent = "Numéro na9es."; return; }
+  $("#pBtn").disabled = true;
+  try { const j = await call("blockphone", { tel, raison: $("#pWhy").value.trim() }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); $("#pTel").value = ""; $("#pWhy").value = ""; loadPhones(); } else $("#pErr").textContent = "Ma tsjjelch."; }
+  catch(err){ if (err.message !== "auth") $("#pErr").textContent = "Ma kaynach connexion."; }
+  $("#pBtn").disabled = false;
+});
+
+/* ---------- images ---------- */
+function resizeImage(file, max){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL("image/jpeg", 0.84).split(",")[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.src = url;
+  });
+}
+
+/* ---------- équipe ---------- */
+let team = [], openId = null;
+async function loadTeam(){
+  $("#teamList").innerHTML = $("#svcList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    await loadConfig();
+    team = JSON.parse(JSON.stringify(CFG.coiffeurs)); renderTeam();
+    svcs = JSON.parse(JSON.stringify(CFG.services)); renderSvcs();
+  } catch(e){ if (e.message !== "auth") $("#teamList").innerHTML = $("#svcList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+document.querySelectorAll("[data-seg]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-seg]").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#segSvc").hidden = b.dataset.seg !== "svc"; $("#segTeam").hidden = b.dataset.seg !== "team"; $("#segInfo").hidden = b.dataset.seg !== "info";
+});
+
+/* ---------- paramètres dyal salon ---------- */
+const DK = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const DKL = { lundi:"Tnin", mardi:"Tlat", mercredi:"Larb3", jeudi:"Lkhmis", vendredi:"Jjem3a", samedi:"Ssebt", dimanche:"L-7ed" };
+const PALETTE = ["#E2560A","#C8322A","#D97706","#0E7C4A","#0F766E","#1D4ED8","#6D28D9","#BE185D","#17140F"];
+let setCol = "#E2560A";
+function shade(hex, amt){ const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt); return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+function applyColor(hex){
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex || "")) return;
+  const s = document.documentElement.style;
+  s.setProperty("--or", hex); s.setProperty("--or2", shade(hex, -0.16)); s.setProperty("--orsoft", shade(hex, 0.92)); s.setProperty("--orline", shade(hex, 0.65));
+}
+function hrsRows(hz){
+  $("#hrs").innerHTML = DK.map(d => { const v = hz && hz[d]; return `<div class="hr ${v ? "" : "off"}" data-d="${d}"><b>${DKL[d]}</b>
+    <button type="button" class="tg" aria-pressed="${!!v}">${v ? "M7loul" : "Msdod"}</button>
+    <input type="time" step="1800" value="${v ? v[0] : "11:00"}" aria-label="${DKL[d]} men"><input type="time" step="1800" value="${v ? v[1] : "21:00"}" aria-label="${DKL[d]} 7ta"></div>`; }).join("");
+  $("#hrs").querySelectorAll(".tg").forEach(b => b.onclick = () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on); b.textContent = on ? "M7loul" : "Msdod"; b.closest(".hr").classList.toggle("off", !on); });
+}
+$("#hrsCopy").addEventListener("click", () => {
+  const first = $("#hrs .hr"), [a, b] = first.querySelectorAll("input"), on = first.querySelector(".tg").getAttribute("aria-pressed") === "true";
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const [x, y] = r.querySelectorAll("input"); x.value = a.value; y.value = b.value; const tg = r.querySelector(".tg"); tg.setAttribute("aria-pressed", on); tg.textContent = on ? "M7loul" : "Msdod"; r.classList.toggle("off", !on); });
+});
+function swatches(){
+  $("#sw").innerHTML = PALETTE.map(c => `<button type="button" style="background:${c}" data-c="${c}" aria-label="${c}" aria-pressed="${c.toLowerCase() === setCol.toLowerCase()}"></button>`).join("");
+  $("#sw").querySelectorAll("button").forEach(b => b.onclick = () => pickCol(b.dataset.c));
+}
+function pickCol(c){ setCol = c; $("#iCol").value = c; applyColor(c); swatches(); }
+$("#iCol").addEventListener("input", e => pickCol(e.target.value));
+const fmtTel = wa => { const d = String(wa || "").replace(/\D/g, ""); const l = d.startsWith("212") ? "0" + d.slice(3) : d; return l.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); };
+/* ---------- notifications WhatsApp ---------- */
+let NOTIF = null;
+function paintNotif(){
+  const n = NOTIF || {}, on = n.phone && n.hasKey;
+  $("#nStat").className = "nstat " + (on ? "on" : "off");
+  $("#nStat").textContent = on ? "✅ Mfa33la · kaywslo l " + fmtTel(n.phone) : "⚪ Mazal ma mfa33lach";
+  $("#nPhone").value = n.phone ? fmtTel(n.phone) : (CFG.salon && CFG.salon.whatsapp ? fmtTel(CFG.salon.whatsapp) : "");
+  $("#nKey").value = ""; $("#nKey").placeholder = n.hasKey ? "•••••• (mkhbiya)" : "1234567";
+  $("#nBook").checked = n.book !== false; $("#nCancel").checked = n.cancel !== false; $("#nWait").checked = n.wait !== false;
+  $("#nSteps").open = !on;
+}
+async function loadNotif(){ try { const j = await call("getnotif"); if (j.ok){ NOTIF = j; paintNotif(); } } catch(e){} }
+async function sendNotif(op){
+  $("#nErr").textContent = "";
+  const phone = $("#nPhone").value.replace(/\D/g, ""), apikey = $("#nKey").value.trim();
+  if (phone.length < 10){ $("#nErr").textContent = "Kteb n-numéro dyalek."; return; }
+  if (!apikey && !(NOTIF && NOTIF.hasKey)){ $("#nErr").textContent = "Kteb l-APIKEY li sift lik l-bot."; return; }
+  const btn = op === "testnotif" ? $("#nTest") : $("#nSave"), lab = btn.textContent;
+  btn.disabled = true; btn.textContent = op === "testnotif" ? "Kansifto test…" : "…";
+  try {
+    const j = await call(op, { phone, apikey, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked });
+    if (j.ok){ NOTIF = { ...(NOTIF || {}), phone: j.phone, hasKey: true, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked }; paintNotif();
+      toast(op === "testnotif" ? "Tsift ✓ · chouf WhatsApp dyalek" : "Tsjjel ✓"); }
+    else $("#nErr").textContent = j.error === "phone" ? "Numéro machi sa7i7." : j.error === "apikey" ? "Kteb l-APIKEY." :
+      j.error === "send" ? "Ma wslch l-msg. Tchecki l-APIKEY w n-numéro (khass ykoun nefs n-numéro li sift mno l-bot)." + (j.detail ? " · " + j.detail : "") : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#nErr").textContent = "Ma kaynach connexion."; }
+  btn.disabled = false; btn.textContent = lab;
+}
+$("#nTest").addEventListener("click", () => sendNotif("testnotif"));
+$("#notifForm").addEventListener("submit", e => { e.preventDefault(); sendNotif("savenotif"); });
+$("#nCopy").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText($("#nPhrase").textContent).then(() => toast("Tcopia ✓")); });
+
+function fillSalon(){
+  const s = CFG.salon || {};
+  if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
+  $("#iNom").value = s.nom || "Votre Salon"; $("#iAdr").value = s.adresse || "Votre adresse"; $("#iVille").value = s.ville || "Votre ville";
+  $("#iWa").value = fmtTel(s.whatsapp || "212655778899");
+  hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
+  setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
+  $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
+  if (s.nom) document.querySelector(".brand span").firstChild.textContent = s.nom.split(/\s+/)[0];
+}
+$("#salonForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#iErr").textContent = "";
+  const maps = $("#iMaps").value.trim(), fb = $("#iFb").value.trim(), wa = $("#iWa").value.replace(/\D/g, "");
+  if ((maps && !maps.startsWith("https://")) || (fb && !fb.startsWith("https://"))){ $("#iErr").textContent = "L-liens khasshom ybdaw b https://"; return; }
+  if (!$("#iNom").value.trim()){ $("#iErr").textContent = "Kteb smiyt l-ma7al."; return; }
+  if (!/^(0[5-7]\d{8}|212[5-7]\d{8})$/.test(wa)){ $("#iErr").textContent = "Numéro machi sa7i7 (ex: 06 55 77 88 99)."; return; }
+  const horaires = {}; let bad = false;
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const on = r.querySelector(".tg").getAttribute("aria-pressed") === "true", [a, b] = r.querySelectorAll("input");
+    if (on && !(a.value && b.value && b.value > a.value)) bad = true; horaires[r.dataset.d] = on ? [a.value, b.value] : null; });
+  if (bad){ $("#iErr").textContent = "Tchecki l-wa9t: sa3a dyal l-bdya khass tkoun 9bel l-akhir."; return; }
+  if (!Object.values(horaires).some(Boolean)){ $("#iErr").textContent = "Khass nhar wa7ed 3la l-a9al ykoun m7loul."; return; }
+  $("#iSave").disabled = true;
+  try {
+    const j = await call("savesalon", { nom: $("#iNom").value.trim(), adresse: $("#iAdr").value.trim(), ville: $("#iVille").value.trim(),
+      whatsapp: wa, tel: fmtTel(wa), horaires, couleur: setCol, maps, instagram: $("#iIg").value.trim(), facebook: fb });
+    if (j.ok){ CFG.salon = j.salon; fillSalon(); toast("Tsjjel ✓ · l-site tbeddel"); } else $("#iErr").textContent = j.error === "horaires" ? "Tchecki l-wa9t." : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#iErr").textContent = "Ma kaynach connexion."; }
+  $("#iSave").disabled = false;
+});
+
+/* ---------- services ---------- */
+let svcs = [], openSvc = null;
+const sName = s => (s.nom && (s.nom.da || s.nom.fr || s.nom.ar)) || "Service jdid";
+const DUR = [10,15,20,25,30,35,40,45,50,60,75,90,105,120];
+function renderSvcs(){
+  if (!svcs.length){ $("#svcList").innerHTML = `<div class="empty">Ma kayn 7ta service. Zid wa7ed.</div>`; return; }
+  $("#svcList").innerHTML = svcs.map((s, i) => `
+    <article class="member ${s.actif ? "" : "off"}">
+      <div class="top">
+        <div class="order"><button type="button" data-up="${i}" ${i === 0 ? "disabled" : ""} aria-label="Tla3">▲</button><button type="button" data-down="${i}" ${i === svcs.length - 1 ? "disabled" : ""} aria-label="Hbet">▼</button></div>
+        <div class="svcthumb">${s.photo ? `<img src="${esc(s.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "✂"}</div>
+        <div class="tx"><div class="n">${esc(sName(s))} ${s.top ? '<span class="pill confirmé">Ktar talab</span>' : ""} ${s.actif ? "" : '<span class="pill">Mkhbbi</span>'}</div>
+          <div class="s">${s.duree} min</div></div>
+        <div class="price">${s.prix} DH</div>
+      </div>
+      <div style="padding:0 14px 14px"><button class="btn sm ghost" style="width:100%" type="button" data-sedit="${esc(s.id)}">${openSvc === s.id ? "Sedd" : "Bddel l-prix / tswira / smiya"}</button></div>
+      ${openSvc === s.id ? svcForm(s) : ""}
+    </article>`).join("");
+  $("#svcList").querySelectorAll("[data-sedit]").forEach(b => b.onclick = () => { openSvc = openSvc === b.dataset.sedit ? null : b.dataset.sedit; renderSvcs(); });
+  $("#svcList").querySelectorAll("[data-up],[data-down]").forEach(b => b.onclick = async () => {
+    const i = +(b.dataset.up ?? b.dataset.down), j = b.dataset.up != null ? i - 1 : i + 1;
+    [svcs[i], svcs[j]] = [svcs[j], svcs[i]]; renderSvcs(); await saveSvcs("Tbeddel t-tartib ✓");
+  });
+  if (openSvc) bindSvc(svcs.find(s => s.id === openSvc));
+}
+function svcForm(s){
+  const isNew = !CFG.services.some(x => x.id === s.id);
+  return `<div class="edit">
+    <div class="photo-pick"><div class="svcthumb" id="sThumb">${s.photo ? `<img src="${esc(s.photo)}" alt="" referrerpolicy="no-referrer">` : "✂"}</div>
+      <label class="btn sm ghost" for="sFile">📷 ${s.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="sFile" accept="image/*">
+      ${s.photo ? `<button class="btn sm ghost" type="button" id="sNoPhoto">7ayed</button>` : ""}</div>
+    <div class="two">
+      <div><label class="lbl" for="sPrix">Prix (DH)</label><input id="sPrix" type="number" inputmode="numeric" min="0" max="5000" value="${s.prix}"></div>
+      <div><label class="lbl" for="sDur">L-wa9t</label><select id="sDur">${DUR.concat(DUR.includes(s.duree) ? [] : [s.duree]).sort((a,b) => a-b).map(d => `<option value="${d}" ${d === s.duree ? "selected" : ""}>${d} min</option>`).join("")}</select></div>
+    </div>
+    <div class="three">
+      <span class="lbl" style="margin:0">Smiya</span>
+      <input id="sNda" value="${esc(s.nom.da)}" maxlength="40" placeholder="Darija · ex: Coupe" aria-label="Smiya b Darija">
+      <input id="sNfr" value="${esc(s.nom.fr)}" maxlength="40" placeholder="Français · ex: Coupe" aria-label="Nom en français">
+      <input id="sNar" value="${esc(s.nom.ar)}" maxlength="40" placeholder="العربية · مثال: حلاقة" dir="rtl" aria-label="الاسم بالعربية">
+    </div>
+    <div class="three">
+      <span class="lbl" style="margin:0">Description (sghira)</span>
+      <input id="sDda" value="${esc(s.desc.da)}" maxlength="90" placeholder="Darija · ex: Coupe + lavage" aria-label="Description b Darija">
+      <input id="sDfr" value="${esc(s.desc.fr)}" maxlength="90" placeholder="Français · ex: Coupe + shampoing" aria-label="Description en français">
+      <input id="sDar" value="${esc(s.desc.ar)}" maxlength="90" placeholder="العربية · مثال: قص وغسل" dir="rtl" aria-label="الوصف بالعربية">
+    </div>
+    <div class="toggle" role="group" aria-label="Ktar talab">
+      <button type="button" data-top="1" aria-pressed="${!!s.top}">⭐ Ktar talab</button>
+      <button type="button" data-top="0" aria-pressed="${!s.top}">3adi</button>
+    </div>
+    <div class="toggle" role="group" aria-label="Statut">
+      <button type="button" data-sact="1" aria-pressed="${s.actif}">Kayban f l-site</button>
+      <button type="button" data-sact="0" aria-pressed="${!s.actif}">Mkhbbi</button>
+    </div>
+    <button class="btn full" type="button" id="sSave">Sjjel</button>
+    ${isNew ? `<button class="btn ghost full" type="button" id="sCancel" style="margin-top:0">Lgha</button>` : ""}
+    <div class="err" id="sErr"></div>
+  </div>`;
+}
+async function saveSvcs(okMsg){
+  try {
+    const j = await call("saveservices", { services: svcs });
+    if (j.ok){ CFG.services = j.services; svcs = JSON.parse(JSON.stringify(j.services)); renderSvcs(); toast(okMsg || "Tsjjel ✓ · l-site tbeddel"); return true; }
+    toast("Ma tsjjelch"); return false;
+  } catch(e){ return false; }
+}
+function bindSvc(s){
+  $("#sFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#sThumb").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 900);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "service-" + sName(s) });
+      if (!j.ok) throw new Error("up");
+      s.photo = j.url; renderSvcs(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#sThumb").innerHTML = "✂"; $("#sErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#sNoPhoto")) $("#sNoPhoto").onclick = () => { s.photo = ""; renderSvcs(); };
+  const bind = (id, fn) => { $(id).oninput = $(id).onchange = e => fn(e.target.value); };
+  bind("#sPrix", v => s.prix = Number(v)); bind("#sDur", v => s.duree = Number(v));
+  bind("#sNda", v => s.nom.da = v); bind("#sNfr", v => s.nom.fr = v); bind("#sNar", v => s.nom.ar = v);
+  bind("#sDda", v => s.desc.da = v); bind("#sDfr", v => s.desc.fr = v); bind("#sDar", v => s.desc.ar = v);
+  document.querySelectorAll("[data-top]").forEach(b => b.onclick = () => { s.top = b.dataset.top === "1"; document.querySelectorAll("[data-top]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  document.querySelectorAll("[data-sact]").forEach(b => b.onclick = () => { s.actif = b.dataset.sact === "1"; document.querySelectorAll("[data-sact]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  if ($("#sCancel")) $("#sCancel").onclick = () => { svcs = svcs.filter(x => x.id !== s.id); openSvc = null; renderSvcs(); };
+  $("#sSave").onclick = async () => {
+    $("#sErr").textContent = "";
+    if (!(s.nom.da || s.nom.fr || s.nom.ar).trim()){ $("#sErr").textContent = "Kteb smiya dyal s-service (3la l-a9al b Darija)."; return; }
+    if (!(s.prix >= 0)){ $("#sErr").textContent = "Kteb prix sa7i7."; return; }
+    if (!s.actif && svcs.filter(x => x.actif).length === 0){ $("#sErr").textContent = "Khass service wa7ed 3la l-a9al ykoun kayban."; return; }
+    $("#sSave").disabled = true;
+    openSvc = null; const ok = await saveSvcs();
+    if (!ok){ openSvc = s.id; renderSvcs(); }
+  };
+}
+$("#addSvc").addEventListener("click", () => {
+  if (svcs.some(s => !CFG.services.some(x => x.id === s.id))) return;
+  const id = "s" + Date.now();
+  svcs.push({ id, prix: 0, duree: 30, top: false, actif: true, photo: "", nom: { fr:"", da:"", ar:"" }, desc: { fr:"", da:"", ar:"" } });
+  openSvc = id; renderSvcs();
+  setTimeout(() => { const n = $("#sNda"); if (n){ n.focus(); n.scrollIntoView({ behavior:"smooth", block:"center" }); } }, 50);
+});
+const reposTxt = r => r && r.length ? "Ra7a: " + ORDER.filter(d => r.includes(DAYKEYS[d])).map(d => DAYS[d]).join(", ") : "Kaykhdem kol nhar";
+const avatar = c => c.photo ? `<img src="${esc(c.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : esc((c.nom || "?")[0].toUpperCase());
+function renderTeam(){
+  if (!team.length){ $("#teamList").innerHTML = `<div class="empty">Ma kayn 7ta coiffeur. Zid wa7ed.</div>`; return; }
+  $("#teamList").innerHTML = team.map(c => `
+    <article class="member ${c.actif ? "" : "off"}" data-id="${esc(c.id)}">
+      <div class="top">
+        <div class="av">${avatar(c)}</div>
+        <div class="tx"><div class="n">${esc(c.nom || "Coiffeur jdid")} ${c.actif ? "" : '<span class="pill">Ma b9ach</span>'}</div>
+          <div class="s">${esc(c.de)}–${esc(c.a)} · ${esc(reposTxt(c.repos))}</div></div>
+        <button class="btn sm ghost" type="button" data-edit="${esc(c.id)}">${openId === c.id ? "Sedd" : "Bddel"}</button>
+      </div>
+      ${openId === c.id ? editForm(c) : ""}
+    </article>`).join("");
+  $("#teamList").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { openId = openId === b.dataset.edit ? null : b.dataset.edit; renderTeam(); });
+  if (openId) bindEdit(team.find(c => c.id === openId));
+}
+const canRename = () => (CFG.v || 0) >= 9;
+function editForm(c){
+  const isNew = !CFG.coiffeurs.some(x => x.id === c.id);
+  return `<div class="edit">
+    <div class="photo-pick"><div class="av" id="eAv">${avatar(c)}</div>
+      <label class="btn sm ghost" for="eFile">📷 ${c.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="eFile" accept="image/*">
+      ${c.photo ? `<button class="btn sm ghost" type="button" id="eNoPhoto">7ayed</button>` : ""}</div>
+    <div><label class="lbl" for="eName">Smiya</label><input id="eName" value="${esc(c.nom)}" maxlength="40" ${isNew || canRename() ? "" : "readonly"} placeholder="Ex: Hamza">
+      ${isNew ? "" : canRename() ? `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Ila beddelti s-smiya, les rendez-vous dyalo kaytbeddlo m3aha.</div>`
+        : `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Bach tbeddel s-smiya, khass t-mettre à jour Code.gs f Apps Script (v9).</div>`}</div>
+    <div class="two">
+      <div><label class="lbl" for="eDe">Kaybda m3a</label><input type="time" id="eDe" value="${esc(c.de)}" step="1800"></div>
+      <div><label class="lbl" for="eA">Kaysali m3a</label><input type="time" id="eA" value="${esc(c.a)}" step="1800"></div>
+    </div>
+    <div><span class="lbl">Nhar l-ra7a (fix kol simana)</span>
+      <div class="days7" role="group" aria-label="Nhar l-ra7a">${ORDER.map(d => `<button type="button" data-day="${DAYKEYS[d]}" aria-pressed="${(c.repos||[]).includes(DAYKEYS[d])}" aria-label="${DAYS[d]}">${D2[d]}</button>`).join("")}</div></div>
+    <div class="toggle" role="group" aria-label="Statut">
+      <button type="button" data-act="1" aria-pressed="${c.actif}">Kaykhdem</button>
+      <button type="button" data-act="0" aria-pressed="${!c.actif}">Ma b9ach (khbbih)</button>
+    </div>
+    <button class="btn full" type="button" id="eSave">Sjjel</button>
+    ${isNew ? `<button class="btn ghost full" type="button" id="eCancel" style="margin-top:0">Lgha</button>` : ""}
+    <div class="err" id="eErr"></div>
+  </div>`;
+}
+function bindEdit(c){
+  $("#eFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#eAv").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 600);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "coiffeur-" + (c.nom || c.id) });
+      if (!j.ok) throw new Error("up");
+      c.photo = j.url; renderTeam(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#eAv").innerHTML = avatar(c); $("#eErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#eNoPhoto")) $("#eNoPhoto").onclick = () => { c.photo = ""; renderTeam(); };
+  $("#eName").oninput = e => { c.nom = e.target.value; };
+  $("#eDe").onchange = e => { c.de = e.target.value; };
+  $("#eA").onchange = e => { c.a = e.target.value; };
+  document.querySelectorAll(".days7 button").forEach(b => b.onclick = () => {
+    const k = b.dataset.day; c.repos = c.repos || [];
+    c.repos = c.repos.includes(k) ? c.repos.filter(x => x !== k) : [...c.repos, k];
+    b.setAttribute("aria-pressed", c.repos.includes(k));
+  });
+  document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => { c.actif = b.dataset.act === "1"; document.querySelectorAll("[data-act]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  if ($("#eCancel")) $("#eCancel").onclick = () => { team = team.filter(x => x.id !== c.id); openId = null; renderTeam(); };
+  $("#eSave").onclick = async () => {
+    $("#eErr").textContent = "";
+    if (!String(c.nom || "").trim()){ $("#eErr").textContent = "Kteb smiya dyal l-coiffeur."; return; }
+    if (!c.de || !c.a || c.a <= c.de){ $("#eErr").textContent = "Sa3a dyal l-bdya khass tkoun 9bel sa3a dyal l-akhir."; return; }
+    if (c.repos && c.repos.length === 7){ $("#eErr").textContent = "Ma ymkench ykoun kol nhar ra7a. Ila ma b9ach, khtar \"Ma b9ach\"."; return; }
+    $("#eSave").disabled = true;
+    try {
+      const prev = (CFG.coiffeurs.find(x => x.id === c.id) || {}).nom;
+      const j = await call("saveteam", { coiffeurs: team });
+      if (j.ok && prev && prev !== c.nom.trim()){ toast(`${prev} → ${c.nom.trim()} ✓ · ${j.renamed || 0} rendez-vous tbeddlo`); }
+      else if (j.ok) toast("Tsjjel ✓ · l-site tbeddel");
+      if (j.ok){ CFG.coiffeurs = j.coiffeurs; team = JSON.parse(JSON.stringify(j.coiffeurs)); openId = null; fillBarberSelect(); renderTeam(); }
+      else $("#eErr").textContent = j.error === "dup" ? "Had s-smiya deja kayna." : j.error === "hours" ? "Tchecki les heures." : "Ma tsjjelch.";
+    } catch(err){ if (err.message !== "auth") $("#eErr").textContent = "Ma kaynach connexion."; }
+    if ($("#eSave")) $("#eSave").disabled = false;
+  };
+}
+$("#addMember").addEventListener("click", () => {
+  if (team.some(c => !CFG.coiffeurs.some(x => x.id === c.id))) return;          // deja kayn wa7ed jdid ma tsjjelch
+  const id = "c" + Date.now();
+  const base = CFG.coiffeurs[0] || { de:"11:00", a:"21:00" };
+  team.push({ id, nom:"", actif:true, photo:"", de: base.de, a: base.a, repos:[] });
+  openId = id; renderTeam();
+  setTimeout(() => { const n = $("#eName"); if (n){ n.focus(); n.scrollIntoView({ behavior:"smooth", block:"center" }); } }, 50);
+});
+
+/* ---------- photos ---------- */
+async function loadPhotos(){
+  $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
+  try { await loadConfig(); renderGallery(); }
+  catch(e){ if (e.message !== "auth") $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+}
+function renderGallery(){
+  const g = CFG.galerie;
+  if (!g.length){ $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kayn 7ta tswira. Zid tsawer dyal l-khdma bach ybanou f l-site.</div>`; return; }
+  $("#galGrid").innerHTML = g.map((p, i) => `<div class="ph"><img src="${esc(p.url)}" alt="Tswira ${i+1}" loading="lazy" referrerpolicy="no-referrer">
+    <div class="ctl"><button class="x" data-del="${esc(p.id)}" aria-label="7ayed">🗑</button>
+      ${i > 0 ? `<button data-mv="${esc(p.id)}" data-dir="up" aria-label="9eddem">◀</button>` : ""}
+      ${i < g.length - 1 ? `<button data-mv="${esc(p.id)}" data-dir="down" aria-label="Wekh-khar">▶</button>` : ""}</div></div>`).join("");
+  $("#galGrid").querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "?"; b.style.background = "var(--red)"; b.style.color = "#fff"; setTimeout(() => { if (b.isConnected){ b.dataset.armed = ""; b.textContent = "🗑"; b.style.cssText = ""; } }, 3000); return; }
+    b.disabled = true;
+    try { const j = await call("delphoto", { id: b.dataset.del }); if (j.ok){ CFG.galerie = j.galerie; renderGallery(); toast("Tm7at ✓"); } } catch(e){ b.disabled = false; }
+  });
+  $("#galGrid").querySelectorAll("[data-mv]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try { const j = await call("movephoto", { id: b.dataset.mv, dir: b.dataset.dir }); if (j.ok){ CFG.galerie = j.galerie; renderGallery(); } } catch(e){ b.disabled = false; }
+  });
+}
+$("#galFile").addEventListener("change", async e => {
+  const files = [...e.target.files]; e.target.value = ""; if (!files.length) return;
+  $("#uplState").hidden = false; let done = 0, failed = 0;
+  for (const f of files){
+    try {
+      const data = await resizeImage(f, 1400);
+      const j = await call("addphoto", { data, mime:"image/jpeg", name:"khdma" });
+      if (j.ok){ CFG.galerie = j.galerie; renderGallery(); } else failed++;
+    } catch(err){ if (err.message === "auth") return; failed++; }
+    done++; $("#uplBar").style.width = Math.round(done / files.length * 100) + "%";
+  }
+  setTimeout(() => { $("#uplState").hidden = true; $("#uplBar").style.width = "0"; }, 600);
+  toast(failed ? `${done - failed} tzadou · ${failed} ma tzadouch` : `${done} tswira tzadat ✓`);
+});
+
+/* ---------- stats ---------- */
+let period = "week";
+function range(p){
+  const t = today(), d = new Date();
+  if (p === "week"){ const dow = (d.getDay() + 6) % 7; return [addDays(t, -dow), t]; }
+  if (p === "month") return [iso(new Date(d.getFullYear(), d.getMonth(), 1)), t];
+  if (p === "last") return [iso(new Date(d.getFullYear(), d.getMonth()-1, 1)), iso(new Date(d.getFullYear(), d.getMonth(), 0))];
+  return [addDays(t, -29), t];
+}
+function renderPeriods(){
+  const P = { week:"Had s-simana", month:"Had ch-chhar", last:"Ch-chhar li fat", d30:"30 yawm" };
+  $("#periodStrip").innerHTML = Object.entries(P).map(([k,v]) => `<button type="button" data-p="${k}" aria-pressed="${k===period}">${v}</button>`).join("");
+  $("#periodStrip").querySelectorAll("button").forEach(b => b.onclick = () => { period = b.dataset.p; loadStats(); });
+}
+function barsHtml(title, obj){
+  const e = Object.entries(obj).sort((a,b) => b[1]-a[1]); if (!e.length) return "";
+  const max = e[0][1];
+  return `<div class="bars"><h3>${title}</h3>${e.map(([k,v]) => `<div class="bar"><span class="l">${esc(k)}</span><span class="t"><i style="width:${Math.round(v/max*100)}%"></i></span><span class="n">${v}</span></div>`).join("")}</div>`;
+}
+async function loadStats(){
+  renderPeriods();
+  $("#statsBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
+  const [from, to] = range(period);
+  try {
+    const j = await call("stats", { from, to }), s = j.stats;
+    const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+    const maxV = Math.max(1, ...days.map(d => s.days[d] || 0));
+    const absRate = s.confirmed ? Math.round(s.absent / s.confirmed * 100) : 0;
+    $("#statsBox").innerHTML = `
+      <div class="kpis">
+        <div class="kpi main"><b>${s.revenue} DH</b><span>Dkhal (bla les absents w les annulations)</span></div>
+        <div class="kpi"><b>${s.confirmed}</b><span>Réservations</span></div>
+        <div class="kpi"><b>${s.clients}</b><span>Clients mkhtalfin</span></div>
+        <div class="kpi"><b>${s.cancelled}</b><span>Tlghaw</span></div>
+        <div class="kpi"><b>${absRate}%</b><span>Ma jawch (${s.absent})</span></div>
+      </div>
+      ${days.length <= 31 ? `<div class="bars"><h3>Dkhal kol nhar (DH)</h3>
+        <div class="chart">${days.map(d => `<div style="height:${Math.round((s.days[d]||0)/maxV*100)}%" data-v="${label(d)}: ${s.days[d]||0} DH"></div>`).join("")}</div>
+        <div class="chartx">${days.map((d,i) => `<span>${i % Math.ceil(days.length/7) === 0 ? fromIso(d).getDate() : ""}</span>`).join("")}</div></div>` : ""}
+      ${barsHtml("Les services", s.services)}
+      ${barsHtml("Les coiffeurs", s.barbers)}`;
+  } catch(e){ if (e.message !== "auth") $("#statsBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
+/* ---------- start ---------- */
+function start(){
+  $("#login").hidden = true; $("#app").hidden = false;
+  loadConfig().catch(() => {});
+  if (location.hash === "#pending" && tab !== "rdv") setTab("rdv"); else load();
+  if (location.hash === "#pending") setTimeout(() => $("#pendBox").scrollIntoView({ behavior:"smooth" }), 1500);
+  clearInterval(window._poll); window._poll = setInterval(refreshPendingCount, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden){ refreshPendingCount(); if (tab === "rdv") loadPending(); } });
+  try { if (window.Notification && Notification.permission === "default") document.addEventListener("click", () => Notification.requestPermission(), { once:true }); } catch(e){}
+}
+if (PIN) start();
+})();
+</script>
+</body>
+</html>
