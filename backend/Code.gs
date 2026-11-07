@@ -1,5 +1,5 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v7
+ * BACKEND — Oussama Barber (Google Apps Script) · v8
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
  *   Reservations · Blocages · Attente
@@ -121,6 +121,7 @@ function config_() {
   c.coiffeurs = c.coiffeurs || []; c.galerie = c.galerie || [];
   if (!Array.isArray(c.services) || !c.services.length) c.services = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
   c.salon = c.salon || { maps: '', instagram: '', facebook: '' };
+  if (!c.salon.nom) c.salon.nom = SALON;
   return c;
 }
 function saveConfig_(c) { PropertiesService.getScriptProperties().setProperty('config', JSON.stringify(c)); }
@@ -185,7 +186,7 @@ function notify_(subject, lines, link) {
   } catch (e) { console.error(e); }
   try {
     const to = NOTIFY_EMAIL || Session.getEffectiveUser().getEmail();
-    if (to) MailApp.sendEmail(to, '💈 ' + subject + ' — ' + SALON, body + '\n\n👉 ' + url);
+    if (to) MailApp.sendEmail(to, '💈 ' + subject + ' — ' + (config_().salon.nom || SALON), body + '\n\n👉 ' + url);
   } catch (e) { console.error(e); }
 }
 
@@ -399,8 +400,23 @@ function admin_(b) {
     case 'savesalon': {
       const url = v => { v = String(v || '').trim().slice(0, 300); return /^https:\/\//.test(v) ? v : ''; };
       const ig = String(b.instagram || '').trim().replace(/^@/, '').slice(0, 300);
-      const c = config_();
-      c.salon = { maps: url(b.maps), instagram: /^https:\/\//.test(ig) ? ig : ig.replace(/[^A-Za-z0-9._]/g, ''), facebook: url(b.facebook) };
+      const c = config_(), old = c.salon || {};
+      const str = (v, n) => String(v || '').trim().slice(0, n);
+      const hm = s => /^\d{2}:\d{2}$/.test(String(s || ''));
+      let horaires = old.horaires || null;
+      if (b.horaires && typeof b.horaires === 'object') {
+        horaires = {};
+        DAYKEYS.forEach(d => { const v = b.horaires[d]; horaires[d] = Array.isArray(v) && hm(v[0]) && hm(v[1]) && toMin_(v[1]) > toMin_(v[0]) ? [v[0], v[1]] : null; });
+        if (!DAYKEYS.some(d => horaires[d])) return { ok: false, error: 'horaires' };
+      }
+      let wa = String(b.whatsapp || '').replace(/\D/g, ''); if (wa.indexOf('0') === 0) wa = '212' + wa.slice(1);
+      const col = /^#[0-9a-fA-F]{6}$/.test(String(b.couleur || '')) ? b.couleur : (old.couleur || '');
+      c.salon = {
+        nom: str(b.nom, 40) || old.nom || SALON, adresse: str(b.adresse, 80) || old.adresse || '', ville: str(b.ville, 40) || old.ville || '',
+        whatsapp: wa.length >= 11 ? wa.slice(0, 15) : (old.whatsapp || ''), tel: str(b.tel, 20) || old.tel || '',
+        horaires: horaires, couleur: col,
+        maps: url(b.maps), instagram: /^https:\/\//.test(ig) ? ig : ig.replace(/[^A-Za-z0-9._]/g, ''), facebook: url(b.facebook)
+      };
       saveConfig_(c);
       return { ok: true, salon: c.salon };
     }

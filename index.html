@@ -857,6 +857,22 @@ const mapsLink = () => SALON.maps || CONFIG.mapsUrl;
 const igLink = () => { const v = SALON.instagram || CONFIG.instagram || ""; return !v ? "" : v.startsWith("http") ? v : "https://instagram.com/" + v.replace(/^@/, ""); };
 const igName = () => { const v = SALON.instagram || CONFIG.instagram || ""; return v.startsWith("http") ? "Instagram" : "@" + v.replace(/^@/, ""); };
 const fbLink = () => SALON.facebook || CONFIG.facebook || "";
+/* Paramètres men l-admin (smiya, numéro, adresse, horaires, lon) */
+function shade(hex, amt){ const n = parseInt(hex.slice(1), 16); const f = v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt);
+  return "#" + [n >> 16, (n >> 8) & 255, n & 255].map(f).map(x => x.toString(16).padStart(2, "0")).join(""); }
+function applySalon(){
+  const s = SALON || {};
+  if (s.nom) CONFIG.salon = s.nom;
+  if (s.adresse) CONFIG.adresse = s.adresse;
+  if (s.ville) CONFIG.ville = s.ville;
+  if (s.whatsapp){ CONFIG.whatsapp = s.whatsapp; CONFIG.telAffiche = s.tel || CONFIG.telAffiche; }
+  if (s.horaires && Object.values(s.horaires).some(Boolean)) CONFIG.horaires = s.horaires;
+  if (/^#[0-9a-fA-F]{6}$/.test(s.couleur || "")){
+    const st = document.documentElement.style, c = s.couleur;
+    st.setProperty("--or", c); st.setProperty("--or2", shade(c, -0.16)); st.setProperty("--orsoft", shade(c, 0.92)); st.setProperty("--orline", shade(c, 0.65));
+  }
+}
+applySalon();
 let SERVICES = ((store.get("ob_cfg", null) || {}).services || CONFIG.services.map((s, i) => ({ id: "s" + (i + 1), ...s }))).map(s => ({ photo: "", ...s }));
 const member = name => TEAM.find(x => x.nom === name);
 const names = () => TEAM.map(x => x.nom);
@@ -878,7 +894,7 @@ async function loadConfig(){
     if (!j.ok || !Array.isArray(j.coiffeurs) || !j.coiffeurs.length) return;
     TEAM = j.coiffeurs; GALLERY = j.galerie || [];
     if (Array.isArray(j.services) && j.services.length) SERVICES = j.services;
-    if (j.salon) SALON = j.salon;
+    if (j.salon){ SALON = j.salon; applySalon(); renderStatic(); if (st.step === 3) renderDays(); if (st.step === 4) loadSlots(); }
     st.services = st.services.filter(id => SERVICES.some(s => s.id === id));
     store.set("ob_cfg", { coiffeurs: TEAM, galerie: GALLERY, services: SERVICES, salon: SALON });
     renderLinks();

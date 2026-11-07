@@ -208,6 +208,25 @@ nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
 .btn.wa{background:var(--wa);color:#05290F}
 .btn.wa:hover{background:#1FBF5B}
 
+/* paramètres */
+.fsec{font-family:var(--display);font-weight:800;font-size:20px;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)}
+.fsec:first-child{border-top:0;padding-top:0;margin-top:0}
+.hint{font-size:12px;color:var(--mute);margin-top:5px}
+.hrs{display:grid;gap:8px}
+.hr{display:grid;grid-template-columns:62px 92px 1fr 1fr;gap:8px;align-items:center}
+.hr b{font-size:14px}
+.hr .tg{height:40px;border-radius:12px;font-weight:700;font-size:12.5px;background:var(--oksoft);color:var(--ok);border:1.5px solid transparent}
+.hr .tg[aria-pressed=false]{background:var(--redsoft);color:var(--red)}
+.hr input{min-height:40px!important;padding:8px!important}
+.hr.off input{opacity:.35;pointer-events:none}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swatches button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line)}
+.swatches button[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
+.colrow{display:flex;align-items:center;gap:12px}
+.colrow label{margin:0!important}
+.colrow input[type=color]{width:52px!important;height:40px!important;min-height:40px!important;padding:2px!important;border-radius:10px}
+.colrow .prev{margin-inline-start:auto;background:var(--or);color:#fff;font-weight:700;border-radius:999px;padding:9px 16px;font-size:14px}
+
 /* action sheet */
 .opts{display:grid;gap:10px}
 .opt{display:flex;align-items:center;gap:14px;width:100%;text-align:start;padding:14px;border-radius:16px;background:var(--s1);transition:background .12s}
@@ -463,7 +482,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
       <div class="seg" role="tablist">
         <button role="tab" data-seg="svc" aria-selected="true">✂️ Services</button>
         <button role="tab" data-seg="team" aria-selected="false">👤 L-équipe</button>
-        <button role="tab" data-seg="info" aria-selected="false">📍 Infos</button>
+        <button role="tab" data-seg="info" aria-selected="false">⚙️ Paramètres</button>
       </div>
       <div id="segSvc">
         <p class="sub">L-prix, l-wa9t, smiya w tswira dyal kol service. Kaybanou f étape 1 dyal réservation.</p>
@@ -471,13 +490,33 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
         <button class="btn ghost full" type="button" id="addSvc">＋ Zid service</button>
       </div>
       <div id="segInfo" hidden>
-        <p class="sub">Had les liens kaybanou f ticket dyal l-client, f l-accueil, w f message dyal l-confirmation.</p>
+        <p class="sub">Smiya, numéro, adresse, l-wa9t w lon dyal l-site. Ay tbdil kayban f l-site direct.</p>
         <form class="form" id="salonForm">
-          <div><label for="iMaps">Lien Google Maps dyal s-salon</label><input id="iMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…">
-            <div class="s" style="font-size:12px;color:var(--mute);margin-top:5px">F Google Maps: 7el s-salon → Partager → Copier le lien.</div></div>
-          <div><label for="iIg">Instagram</label><input id="iIg" placeholder="@oussama.barber"></div>
-          <div><label for="iFb">Facebook (lien dyal la page)</label><input id="iFb" type="url" inputmode="url" placeholder="https://facebook.com/…"></div>
-          <button class="btn full" type="submit" id="iSave" style="margin-top:0">Sjjel</button>
+          <div class="fsec">🏪 L-ma7al</div>
+          <div><label for="iNom">Smiyt l-ma7al</label><input id="iNom" maxlength="40" placeholder="Oussama Barber"></div>
+          <div class="two">
+            <div><label for="iAdr">Adresse</label><input id="iAdr" maxlength="80" placeholder="Tabriquet, Salé"></div>
+            <div><label for="iVille">L-mdina</label><input id="iVille" maxlength="40" placeholder="Salé"></div>
+          </div>
+          <div><label for="iWa">Numéro (WhatsApp w téléphone)</label><input id="iWa" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99">
+            <div class="hint">Les clients kaysifto l had n-numéro w kay3aytou lih.</div></div>
+
+          <div class="fsec">🕐 L-wa9t dyal l-khdma</div>
+          <div class="hrs" id="hrs"></div>
+          <button type="button" class="btn sm ghost" id="hrsCopy">Nefs l-wa9t dyal Tnin l kol nhar</button>
+
+          <div class="fsec">🎨 Lon dyal l-site</div>
+          <div class="swatches" id="sw"></div>
+          <div class="colrow"><label for="iCol">Lon akhor</label><input id="iCol" type="color" value="#E2560A"><span class="prev" id="colPrev">Réservi</span></div>
+
+          <div class="fsec">🔗 Les liens</div>
+          <div><label for="iMaps">Lien Google Maps</label><input id="iMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…">
+            <div class="hint">F Google Maps: 7el s-salon → Partager → Copier le lien.</div></div>
+          <div class="two">
+            <div><label for="iIg">Instagram</label><input id="iIg" placeholder="@oussama.barber"></div>
+            <div><label for="iFb">Facebook</label><input id="iFb" type="url" inputmode="url" placeholder="https://facebook.com/…"></div>
+          </div>
+          <button class="btn full" type="submit" id="iSave">Sjjel les paramètres</button>
           <div class="err" id="iErr"></div>
         </form>
       </div>
@@ -561,6 +600,7 @@ const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === a
 const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
 let PIN = ""; try { PIN = sessionStorage.getItem("ob_pin") || ""; } catch(e){}
 let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
+const SN = () => (CFG.salon && CFG.salon.nom) || "Oussama Barber";
 const MAPS_DEFAULT = "https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9";
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
@@ -639,9 +679,9 @@ function fmtDate(s, lg){
 function clientMsg(r, ok){
   const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
   if (ok) return {
-    da: `Salam ${r.nom} 👋 réservation dyalek f Oussama Barber tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Kifach twsel: ${maps}\nNtsennawk!`,
-    fr: `Bonjour ${r.nom} 👋 votre réservation chez Oussama Barber est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Itinéraire : ${maps}\nÀ bientôt !`,
-    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في Oussama Barber ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 الموقع: ${maps}\nفي انتظارك!` }[lg];
+    da: `Salam ${r.nom} 👋 réservation dyalek f ${SN()} tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Kifach twsel: ${maps}\nNtsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 votre réservation chez ${SN()} est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Itinéraire : ${maps}\nÀ bientôt !`,
+    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في ${SN()} ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 الموقع: ${maps}\nفي انتظارك!` }[lg];
   return {
     da: `Salam ${r.nom}, smeh lina 🙏 ma qdernach nconfirmiw réservation dyal ${d} m3a ${r.heure}. Tqder tkhtar wa9t akhor hna: ${SITE}`,
     fr: `Bonjour ${r.nom}, désolé 🙏 nous ne pouvons pas confirmer votre réservation du ${d} à ${r.heure}. Choisissez un autre créneau ici : ${SITE}`,
@@ -711,13 +751,13 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#actMo
 function lgOf(r){ return r.langue === "fr" || r.langue === "ar" ? r.langue : "da"; }
 function reschedMsg(r, date, heure){
   const lg = lgOf(r), d = fmtDate(date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
-  return { da:`Salam ${r.nom} 👋 rendez-vous dyalek f Oussama Barber tbeddel l ${d} m3a ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nIla ma ynasbekch had l-wa9t, jaweb 3la had l-message.`,
-    fr:`Bonjour ${r.nom} 👋 votre rendez-vous chez Oussama Barber est déplacé au ${d} à ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nSi l'horaire ne vous convient pas, répondez à ce message.`,
-    ar:`مرحبا ${r.nom} 👋 تم تغيير موعدك في Oussama Barber إلى ${d} على ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nإذا لم يناسبك هذا الوقت، أجب على هذه الرسالة.` }[lg];
+  return { da:`Salam ${r.nom} 👋 rendez-vous dyalek f ${SN()} tbeddel l ${d} m3a ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nIla ma ynasbekch had l-wa9t, jaweb 3la had l-message.`,
+    fr:`Bonjour ${r.nom} 👋 votre rendez-vous chez ${SN()} est déplacé au ${d} à ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nSi l'horaire ne vous convient pas, répondez à ce message.`,
+    ar:`مرحبا ${r.nom} 👋 تم تغيير موعدك في ${SN()} إلى ${d} على ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nإذا لم يناسبك هذا الوقت، أجب على هذه الرسالة.` }[lg];
 }
 function freeMsg(date, heure, name){
   const d = fmtDate(date, "da");
-  return `Salam${name ? " " + name : ""} 👋 t7llat blassa f Oussama Barber ${d} m3a ${heure} 💈\nBghiti tji? Jaweb 3la had l-message wla réservi hna: ${SITE}`;
+  return `Salam${name ? " " + name : ""} 👋 t7llat blassa f ${SN()} ${d} m3a ${heure} 💈\nBghiti tji? Jaweb 3la had l-message wla réservi hna: ${SITE}`;
 }
 function openActions(r, reload){
   actR = r; actReload = reload;
@@ -922,7 +962,7 @@ async function loadWait(){
     $("#waitList").innerHTML = list.map(w => `<div class="item"><div class="tx">
         <b>${esc(w.nom)}</b> <span class="pill ${w.statut.includes("attente") ? "confirmé" : "venu"}">${esc(w.statut)}</span>
         <div class="s">${esc(label(w.date))} · ${esc(w.services)}${w.barber ? " · " + esc(w.barber) : ""}</div></div>
-        <div class="contact"><a href="tel:${esc(w.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent("Salam " + w.nom + " 👋 t7llat blassa f Oussama Barber " + label(w.date).toLowerCase() + ". Mazal bghiti?")}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div>
+        <div class="contact"><a href="tel:${esc(w.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent("Salam " + w.nom + " 👋 t7llat blassa f " + SN() + " " + label(w.date).toLowerCase() + ". Mazal bghiti?")}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div>
         ${w.statut.includes("attente") ? `<button class="btn sm ghost" data-id="${esc(w.id)}">Tsselt</button>` : ""}</div>`).join("");
     $("#waitList").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
       b.disabled = true; try { const j = await call("waitdone", { id: b.dataset.id }); if (j.ok) loadWait(); } catch(e){ b.disabled = false; }
@@ -1019,19 +1059,61 @@ document.querySelectorAll("[data-seg]").forEach(b => b.onclick = () => {
   $("#segSvc").hidden = b.dataset.seg !== "svc"; $("#segTeam").hidden = b.dataset.seg !== "team"; $("#segInfo").hidden = b.dataset.seg !== "info";
 });
 
-/* ---------- infos dyal salon ---------- */
+/* ---------- paramètres dyal salon ---------- */
+const DK = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const DKL = { lundi:"Tnin", mardi:"Tlat", mercredi:"Larb3", jeudi:"Lkhmis", vendredi:"Jjem3a", samedi:"Ssebt", dimanche:"L-7ed" };
+const PALETTE = ["#E2560A","#C8322A","#D97706","#0E7C4A","#0F766E","#1D4ED8","#6D28D9","#BE185D","#17140F"];
+let setCol = "#E2560A";
+function shade(hex, amt){ const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt); return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+function applyColor(hex){
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex || "")) return;
+  const s = document.documentElement.style;
+  s.setProperty("--or", hex); s.setProperty("--or2", shade(hex, -0.16)); s.setProperty("--orsoft", shade(hex, 0.92)); s.setProperty("--orline", shade(hex, 0.65));
+}
+function hrsRows(hz){
+  $("#hrs").innerHTML = DK.map(d => { const v = hz && hz[d]; return `<div class="hr ${v ? "" : "off"}" data-d="${d}"><b>${DKL[d]}</b>
+    <button type="button" class="tg" aria-pressed="${!!v}">${v ? "M7loul" : "Msdod"}</button>
+    <input type="time" step="1800" value="${v ? v[0] : "11:00"}" aria-label="${DKL[d]} men"><input type="time" step="1800" value="${v ? v[1] : "21:00"}" aria-label="${DKL[d]} 7ta"></div>`; }).join("");
+  $("#hrs").querySelectorAll(".tg").forEach(b => b.onclick = () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on); b.textContent = on ? "M7loul" : "Msdod"; b.closest(".hr").classList.toggle("off", !on); });
+}
+$("#hrsCopy").addEventListener("click", () => {
+  const first = $("#hrs .hr"), [a, b] = first.querySelectorAll("input"), on = first.querySelector(".tg").getAttribute("aria-pressed") === "true";
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const [x, y] = r.querySelectorAll("input"); x.value = a.value; y.value = b.value; const tg = r.querySelector(".tg"); tg.setAttribute("aria-pressed", on); tg.textContent = on ? "M7loul" : "Msdod"; r.classList.toggle("off", !on); });
+});
+function swatches(){
+  $("#sw").innerHTML = PALETTE.map(c => `<button type="button" style="background:${c}" data-c="${c}" aria-label="${c}" aria-pressed="${c.toLowerCase() === setCol.toLowerCase()}"></button>`).join("");
+  $("#sw").querySelectorAll("button").forEach(b => b.onclick = () => pickCol(b.dataset.c));
+}
+function pickCol(c){ setCol = c; $("#iCol").value = c; applyColor(c); swatches(); }
+$("#iCol").addEventListener("input", e => pickCol(e.target.value));
+const fmtTel = wa => { const d = String(wa || "").replace(/\D/g, ""); const l = d.startsWith("212") ? "0" + d.slice(3) : d; return l.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); };
 function fillSalon(){
   const s = CFG.salon || {};
   if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
+  $("#iNom").value = s.nom || "Oussama Barber"; $("#iAdr").value = s.adresse || "Tabriquet, Salé"; $("#iVille").value = s.ville || "Salé";
+  $("#iWa").value = fmtTel(s.whatsapp || "212655778899");
+  hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
+  setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
   $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
+  if (s.nom) document.querySelector(".brand span").firstChild.textContent = s.nom.split(/\s+/)[0];
 }
 $("#salonForm").addEventListener("submit", async e => {
   e.preventDefault(); $("#iErr").textContent = "";
-  const maps = $("#iMaps").value.trim(), fb = $("#iFb").value.trim();
+  const maps = $("#iMaps").value.trim(), fb = $("#iFb").value.trim(), wa = $("#iWa").value.replace(/\D/g, "");
   if ((maps && !maps.startsWith("https://")) || (fb && !fb.startsWith("https://"))){ $("#iErr").textContent = "L-liens khasshom ybdaw b https://"; return; }
+  if (!$("#iNom").value.trim()){ $("#iErr").textContent = "Kteb smiyt l-ma7al."; return; }
+  if (!/^(0[5-7]\d{8}|212[5-7]\d{8})$/.test(wa)){ $("#iErr").textContent = "Numéro machi sa7i7 (ex: 06 55 77 88 99)."; return; }
+  const horaires = {}; let bad = false;
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const on = r.querySelector(".tg").getAttribute("aria-pressed") === "true", [a, b] = r.querySelectorAll("input");
+    if (on && !(a.value && b.value && b.value > a.value)) bad = true; horaires[r.dataset.d] = on ? [a.value, b.value] : null; });
+  if (bad){ $("#iErr").textContent = "Tchecki l-wa9t: sa3a dyal l-bdya khass tkoun 9bel l-akhir."; return; }
+  if (!Object.values(horaires).some(Boolean)){ $("#iErr").textContent = "Khass nhar wa7ed 3la l-a9al ykoun m7loul."; return; }
   $("#iSave").disabled = true;
-  try { const j = await call("savesalon", { maps, instagram: $("#iIg").value.trim(), facebook: fb });
-    if (j.ok){ CFG.salon = j.salon; fillSalon(); toast("Tsjjel ✓ · l-site tbeddel"); } else $("#iErr").textContent = "Ma tsjjelch.";
+  try {
+    const j = await call("savesalon", { nom: $("#iNom").value.trim(), adresse: $("#iAdr").value.trim(), ville: $("#iVille").value.trim(),
+      whatsapp: wa, tel: fmtTel(wa), horaires, couleur: setCol, maps, instagram: $("#iIg").value.trim(), facebook: fb });
+    if (j.ok){ CFG.salon = j.salon; fillSalon(); toast("Tsjjel ✓ · l-site tbeddel"); } else $("#iErr").textContent = j.error === "horaires" ? "Tchecki l-wa9t." : "Ma tsjjelch.";
   } catch(err){ if (err.message !== "auth") $("#iErr").textContent = "Ma kaynach connexion."; }
   $("#iSave").disabled = false;
 });
