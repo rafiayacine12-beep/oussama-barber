@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FFFFFF">
-<title>Admin · Oussama Barber</title>
+<title>Admin · Barber Junior</title>
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +16,19 @@
 const ADMIN = {
   apiUrl: "https://script.google.com/macros/s/AKfycbzBna68m3uYB009UEVxlTisv_vr2G3eAaMUGQg0eeThgE43x_TUKor1Frhb1s8a-8NmIQ/exec"
 };
+</script>
+<script>
+/* Lon w smiya dyal l-ma7al men l-cache: kaytbeddlo 9bel ma tban l-page (bla ma ntsennaw Google ~5s) */
+(() => { try {
+  const s = JSON.parse(localStorage.getItem("ob_admin_salon") || "null"); if (!s) return;
+  const c = s.couleur, st = document.documentElement.style;
+  if (/^#[0-9a-fA-F]{6}$/.test(c || "")){
+    const sh = (h, a) => { const n = parseInt(h.slice(1), 16); const f = v => Math.round(a < 0 ? v * (1 + a) : v + (255 - v) * a);
+      return "#" + [n >> 16, (n >> 8) & 255, n & 255].map(f).map(x => x.toString(16).padStart(2, "0")).join(""); };
+    st.setProperty("--or", c); st.setProperty("--or2", sh(c, -0.16)); st.setProperty("--orsoft", sh(c, 0.92)); st.setProperty("--orline", sh(c, 0.65));
+  }
+  if (s.nom) document.title = "Admin · " + s.nom;
+} catch(e){} })();
 </script>
 <style>
 :root{
@@ -442,7 +455,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 <section class="login" id="login">
   <div class="lg-top">
     <div class="lg-pole" aria-hidden="true"></div>
-    <h1>Oussama<small>Barber · Admin</small></h1>
+    <h1><span id="lgName">Barber Junior</span><small>Admin</small></h1>
   </div>
   <form id="loginForm" class="lg-body">
     <p>Dkhel l-code dyalek</p>
@@ -462,7 +475,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 <!-- ============ APP ============ -->
 <div id="app" hidden>
   <header><div class="wrap">
-    <div class="brand"><i aria-hidden="true"></i><span>Oussama<small>Admin</small></span></div>
+    <div class="brand"><i aria-hidden="true"></i><span>Barber<small>Admin</small></span></div>
     <div style="display:flex;gap:8px">
       <a class="iconbtn" href="./" target="_blank" rel="noopener" aria-label="Chouf l-site" title="Chouf l-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg></a>
       <button class="iconbtn" id="refresh" aria-label="Actualiser" title="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
@@ -718,7 +731,14 @@ const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === a
 const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
 let PIN = ""; try { PIN = sessionStorage.getItem("ob_pin") || ""; } catch(e){}
 let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
-const SN = () => (CFG.salon && CFG.salon.nom) || "Oussama Barber";
+try { CFG.salon = JSON.parse(localStorage.getItem("ob_admin_salon") || "null") || {}; } catch(e){}
+const SN = () => (CFG.salon && CFG.salon.nom) || "Barber Junior";
+function paintName(){
+  const n = SN();
+  document.querySelector(".brand span").firstChild.textContent = n.split(/\s+/)[0];
+  const lg = document.getElementById("lgName"); if (lg) lg.textContent = n;
+}
+paintName();
 const MAPS_DEFAULT = "https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9";
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
@@ -998,13 +1018,13 @@ async function loadPending(){
 function paintBadge(n){
   const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
   $("#waitBadge").hidden = !tot; $("#waitBadge").textContent = tot;
-  document.title = (n ? `(${n}) ` : "") + "Admin · Oussama Barber";
+  document.title = (n ? `(${n}) ` : "") + "Admin · " + SN();
 }
 function setPendingBadge(n){
   paintBadge(n);
   if (lastPending >= 0 && n > lastPending){
     toast("🔔 Réservation jdida kaytsenna l-validation");
-    try { if (window.Notification && Notification.permission === "granted") new Notification("Oussama Barber", { body:"Réservation jdida kaytsenna l-validation", icon:"icons/icon-192.png" }); } catch(e){}
+    try { if (window.Notification && Notification.permission === "granted") new Notification(SN(), { body:"Réservation jdida kaytsenna l-validation", icon:"icons/icon-192.png" }); } catch(e){}
     if (tab === "rdv") loadPending();
   }
   lastPending = n;
@@ -1274,7 +1294,8 @@ function fillSalon(){
   hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
   setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
   $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
-  if (s.nom) document.querySelector(".brand span").firstChild.textContent = s.nom.split(/\s+/)[0];
+  paintName();
+  try { localStorage.setItem("ob_admin_salon", JSON.stringify({ nom: s.nom || "", couleur: s.couleur || "" })); } catch(e){}
 }
 $("#salonForm").addEventListener("submit", async e => {
   e.preventDefault(); $("#iErr").textContent = "";
