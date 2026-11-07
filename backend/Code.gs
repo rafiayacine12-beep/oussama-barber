@@ -42,7 +42,7 @@ const DEFAULT_SERVICES = [
   { id: 's5', prix: 60, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Soin visage', da: 'Soin visage', ar: 'عناية بالوجه' }, desc: { fr: 'Masque et nettoyage', da: 'Masque w nettoyage', ar: 'قناع وتنظيف' } },
   { id: 's6', prix: 30, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Coupe enfant', da: 'Coupe enfant', ar: 'حلاقة الأطفال' }, desc: { fr: 'Moins de 12 ans', da: '9el mn 12 3am', ar: 'أقل من 12 سنة' } }
 ];
-const SITE_URL = 'https://oussama-barber.vercel.app';
+const SITE_URL = 'https://barber-junior.vercel.app';
 
 const SHEETS = {
   Reservations: ['date','heure','debut_min','duree_min','coiffeur','services','prix_dh','nom','telephone','statut','cree_le','id','remise_dh','langue'],
