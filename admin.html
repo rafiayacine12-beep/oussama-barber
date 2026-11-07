@@ -385,6 +385,14 @@ nav.tabs button[aria-selected=true]{color:#fff;background:var(--or)}
 body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 .badge{box-shadow:0 0 0 2px var(--ink)}
 .toast{bottom:calc(100px + env(safe-area-inset-bottom))}
+.nstat{font-weight:700;font-size:13.5px;padding:10px 12px;border-radius:12px;margin:10px 0 2px}
+.nstat.on{background:#E8F6EE;color:#0E7C4A}.nstat.off{background:var(--s1);color:#6b655c}
+.steps{background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:10px 14px;margin:8px 0}
+.steps summary{font-weight:700;cursor:pointer;font-size:14px}
+.steps ol{margin:10px 0 2px;padding-inline-start:20px;display:grid;gap:8px;font-size:13.5px;line-height:1.45}
+.steps a{color:var(--or2);font-weight:700}.steps code{background:#fff;border:1px dashed var(--orline);padding:2px 6px;border-radius:6px;font-size:12.5px;display:inline-block;margin-top:4px}
+.nchk{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:4px 0 8px}.nchk label{display:flex;align-items:center;gap:6px;font-weight:600}
+.nchk input{width:18px;height:18px;accent-color:var(--or)}
 </style>
 </head>
 <body>
@@ -518,6 +526,33 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
           </div>
           <button class="btn full" type="submit" id="iSave">Sjjel les paramètres</button>
           <div class="err" id="iErr"></div>
+        </form>
+
+        <form class="form" id="notifForm" style="margin-top:14px">
+          <div class="fsec">🔔 Notifications f WhatsApp</div>
+          <p class="hint" style="margin:0">Kaywslek msg f WhatsApp mli client <b>yréservi</b>, <b>y-annuli</b> wla ytsjjel f liste d'attente. Khddam m3a WhatsApp 3adi w WhatsApp Business.</p>
+          <div class="nstat" id="nStat"></div>
+          <details class="steps" id="nSteps">
+            <summary>Kifach tfa33lha (merra wa7da, 2 dqaye9)</summary>
+            <ol>
+              <li>7el <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener">had l-page dyal CallMeBot</a> w nqel n-numéro dyal l-bot li fiha (kaybda b +34).</li>
+              <li>Zid had n-numéro f les contacts dyalek (smmih "Notif Salon").</li>
+              <li>Sift lih f WhatsApp, men n-numéro li bghiti ywslouk fih les msg, had l-jomla b-dabt:<br><code id="nPhrase">I allow callmebot to send me messages</code> <button type="button" class="btn sm ghost" id="nCopy">Copier</button></li>
+              <li>Ghadi yjawbek b <b>APIKEY</b> (ar9am). Koubih l-te7t w brek "Jrreb".</li>
+            </ol>
+          </details>
+          <div class="two">
+            <div><label for="nPhone">Numéro dyalek</label><input id="nPhone" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99"></div>
+            <div><label for="nKey">APIKEY</label><input id="nKey" inputmode="numeric" maxlength="40" autocomplete="off" placeholder="1234567"></div>
+          </div>
+          <div class="nchk">
+            <label><input type="checkbox" id="nBook" checked> Réservation jdida</label>
+            <label><input type="checkbox" id="nCancel" checked> Annulation</label>
+            <label><input type="checkbox" id="nWait" checked> Liste d'attente</label>
+          </div>
+          <button class="btn full" type="button" id="nTest">📲 Jrreb w sjjel</button>
+          <button class="btn ghost full" type="submit" id="nSave">Sjjel bla test</button>
+          <div class="err" id="nErr"></div>
         </form>
       </div>
       <div id="segTeam" hidden>
@@ -661,7 +696,7 @@ function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loa
 
 async function loadConfig(){
   const j = await call("getconfig");
-  if (j.ok){ CFG = { coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); }
+  if (j.ok){ CFG = { coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; fillBarberSelect(); fillSalon(); loadNotif(); }
   return CFG;
 }
 function fillBarberSelect(){
@@ -1088,6 +1123,38 @@ function swatches(){
 function pickCol(c){ setCol = c; $("#iCol").value = c; applyColor(c); swatches(); }
 $("#iCol").addEventListener("input", e => pickCol(e.target.value));
 const fmtTel = wa => { const d = String(wa || "").replace(/\D/g, ""); const l = d.startsWith("212") ? "0" + d.slice(3) : d; return l.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); };
+/* ---------- notifications WhatsApp ---------- */
+let NOTIF = null;
+function paintNotif(){
+  const n = NOTIF || {}, on = n.phone && n.hasKey;
+  $("#nStat").className = "nstat " + (on ? "on" : "off");
+  $("#nStat").textContent = on ? "✅ Mfa33la · kaywslo l " + fmtTel(n.phone) : "⚪ Mazal ma mfa33lach";
+  $("#nPhone").value = n.phone ? fmtTel(n.phone) : (CFG.salon && CFG.salon.whatsapp ? fmtTel(CFG.salon.whatsapp) : "");
+  $("#nKey").value = ""; $("#nKey").placeholder = n.hasKey ? "•••••• (mkhbiya)" : "1234567";
+  $("#nBook").checked = n.book !== false; $("#nCancel").checked = n.cancel !== false; $("#nWait").checked = n.wait !== false;
+  $("#nSteps").open = !on;
+}
+async function loadNotif(){ try { const j = await call("getnotif"); if (j.ok){ NOTIF = j; paintNotif(); } } catch(e){} }
+async function sendNotif(op){
+  $("#nErr").textContent = "";
+  const phone = $("#nPhone").value.replace(/\D/g, ""), apikey = $("#nKey").value.trim();
+  if (phone.length < 10){ $("#nErr").textContent = "Kteb n-numéro dyalek."; return; }
+  if (!apikey && !(NOTIF && NOTIF.hasKey)){ $("#nErr").textContent = "Kteb l-APIKEY li sift lik l-bot."; return; }
+  const btn = op === "testnotif" ? $("#nTest") : $("#nSave"), lab = btn.textContent;
+  btn.disabled = true; btn.textContent = op === "testnotif" ? "Kansifto test…" : "…";
+  try {
+    const j = await call(op, { phone, apikey, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked });
+    if (j.ok){ NOTIF = { ...(NOTIF || {}), phone: j.phone, hasKey: true, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked }; paintNotif();
+      toast(op === "testnotif" ? "Tsift ✓ · chouf WhatsApp dyalek" : "Tsjjel ✓"); }
+    else $("#nErr").textContent = j.error === "phone" ? "Numéro machi sa7i7." : j.error === "apikey" ? "Kteb l-APIKEY." :
+      j.error === "send" ? "Ma wslch l-msg. Tchecki l-APIKEY w n-numéro (khass ykoun nefs n-numéro li sift mno l-bot)." + (j.detail ? " · " + j.detail : "") : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#nErr").textContent = "Ma kaynach connexion."; }
+  btn.disabled = false; btn.textContent = lab;
+}
+$("#nTest").addEventListener("click", () => sendNotif("testnotif"));
+$("#notifForm").addEventListener("submit", e => { e.preventDefault(); sendNotif("savenotif"); });
+$("#nCopy").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText($("#nPhrase").textContent).then(() => toast("Tcopia ✓")); });
+
 function fillSalon(){
   const s = CFG.salon || {};
   if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;

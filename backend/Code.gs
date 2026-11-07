@@ -158,14 +158,24 @@ function upload_(b) {
 }
 
 /* ---------------- notifications ---------------- */
-function notify_(subject, lines, link) {
+/* Notifications WhatsApp (CallMeBot) — kaytsjjlo men l-admin → Paramètres */
+function notif_() {
+  let n = null; try { n = JSON.parse(PropertiesService.getScriptProperties().getProperty('notif') || 'null'); } catch (e) {}
+  n = n || {};
+  return { phone: n.phone || WHATSAPP_PHONE, apikey: n.apikey || WHATSAPP_APIKEY,
+    book: n.book !== false, cancel: n.cancel !== false, wait: n.wait !== false };
+}
+function sendWa_(n, text) {
+  const r = UrlFetchApp.fetch('https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent('+' + n.phone) +
+    '&apikey=' + encodeURIComponent(n.apikey) + '&text=' + encodeURIComponent(text), { muteHttpExceptions: true });
+  return { code: r.getResponseCode(), text: String(r.getContentText() || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) };
+}
+function notify_(subject, lines, link, kind) {
   const body = lines.join('\n');
   const url = link || (SITE_URL + '/admin.html');
   try {
-    if (WHATSAPP_PHONE && WHATSAPP_APIKEY) {
-      UrlFetchApp.fetch('https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(WHATSAPP_PHONE) +
-        '&apikey=' + encodeURIComponent(WHATSAPP_APIKEY) + '&text=' + encodeURIComponent('💈 ' + subject + '\n\n' + body + '\n\n👉 ' + url), { muteHttpExceptions: true });
-    }
+    const n = notif_();
+    if (n.phone && n.apikey && n[kind || 'book'] !== false) sendWa_(n, '💈 *' + subject + '*\n\n' + body + '\n\n👉 ' + url);
   } catch (e) { console.error(e); }
   try {
     if (NTFY_TOPIC) {
@@ -274,9 +284,9 @@ function cancel_(b) {
   if (r.date < today_()) return { ok: false, error: 'past' };
   sh_('Reservations').getRange(r.row, 10).setValue('annulé');
   const waiting = rows_('Attente').filter(w => day_(w.date) === r.date && String(w.statut || 'en attente').indexOf('attente') >= 0);
-  const lines = ['📅 ' + r.date + ' · ' + r.heure, '💈 ' + r.barber, '🙍 ' + r.nom + ' · ' + r.tel, '🔖 #' + r.id];
+  const lines = ['🙍 ' + r.nom + ' · ' + String(r.tel).replace(/^'/, ''), '📅 ' + r.date + ' · ' + r.heure, '💈 ' + r.barber, '✂️ ' + (r.services || ''), '🔖 #' + r.id, '', '✅ L-blassa wliat khawya f s-site.'];
   if (waiting.length) lines.push('', '⏳ Kaynin ' + waiting.length + ' f liste d\'attente had nhar:', ...waiting.map(w => '• ' + w.nom + ' · ' + String(w.telephone).replace(/^'/, '')));
-  notify_('Réservation tlghat', lines);
+  notify_('❌ Client annula r-rendez-vous', lines, SITE_URL + '/admin.html', 'cancel');
   return { ok: true, date: r.date, heure: r.heure };
 }
 
@@ -285,7 +295,7 @@ function waitlist_(b) {
   const id = id_();
   sh_('Attente').appendRow([txt_(b.date), String(b.name).slice(0, 80), txt_(String(b.phone).slice(0, 30)), String(b.services || '').slice(0, 300),
     String(b.barber || 'Ay wa7ed'), 'en attente', new Date(), id]);
-  notify_('Liste d\'attente', ['📅 ' + b.date, '🙍 ' + b.name + ' · ' + b.phone, '✂️ ' + (b.services || ''), '💈 ' + (b.barber || 'Ay wa7ed')]);
+  notify_('Liste d\'attente', ['📅 ' + b.date, '🙍 ' + b.name + ' · ' + b.phone, '✂️ ' + (b.services || ''), '💈 ' + (b.barber || 'Ay wa7ed')], null, 'wait');
   return { ok: true, id: id };
 }
 
@@ -395,6 +405,22 @@ function admin_(b) {
         absent: live.filter(r => absent_(r.statut)).length, pending: live.filter(r => pending_(r.statut)).length, revenue: done.reduce((a, r) => a + r.prix, 0),
         clients: Object.keys(done.reduce((m, r) => (m[phone_(r.tel)] = 1, m), {})).length,
         services: svc, barbers: brb, days: days } };
+    }
+    case 'getnotif': { const n = notif_(); return { ok: true, phone: n.phone || '', hasKey: !!n.apikey, book: n.book, cancel: n.cancel, wait: n.wait }; }
+    case 'savenotif': case 'testnotif': {
+      const old = notif_();
+      let ph = String(b.phone || '').replace(/\D/g, ''); if (ph.indexOf('0') === 0) ph = '212' + ph.slice(1);
+      if (ph.length < 11 || ph.length > 15) return { ok: false, error: 'phone' };
+      const key = String(b.apikey || '').trim().replace(/[^A-Za-z0-9]/g, '').slice(0, 40) || (ph === old.phone ? old.apikey : '');
+      if (!key) return { ok: false, error: 'apikey' };
+      const n = { phone: ph, apikey: key, book: b.book !== false, cancel: b.cancel !== false, wait: b.wait !== false };
+      if (b.op === 'testnotif') {
+        const r = sendWa_(n, '💈 *' + (config_().salon.nom || SALON) + '*\n\n✅ Test: les notifications WhatsApp khddamin! Ghadi twslek msg f kol réservation jdida w f kol annulation.');
+        const okSend = r.code === 200 && !/error|invalid|not (yet )?activ|apikey/i.test(r.text);
+        if (!okSend) return { ok: false, error: 'send', detail: r.text };
+      }
+      PropertiesService.getScriptProperties().setProperty('notif', JSON.stringify(n));
+      return { ok: true, phone: ph, hasKey: true };
     }
     case 'getconfig': { const c = config_(); return { ok: true, coiffeurs: c.coiffeurs, galerie: c.galerie, services: c.services, salon: c.salon }; }
     case 'savesalon': {
