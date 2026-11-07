@@ -61,7 +61,7 @@ h2{font-family:var(--display);font-weight:800;font-size:34px;margin:20px 0 6px;l
 
 /* tabs */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
-nav.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:0}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:0}
 nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:12px;font-size:11.5px;font-weight:600;color:var(--mute);position:relative}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
@@ -321,6 +321,36 @@ h2{font-size:32px;margin:14px 0 4px}
 .kp span{font-size:12px;color:var(--mute);font-weight:600}
 .kp.main{background:var(--ink);color:#fff}
 .kp.main span{color:#B9B3A9}
+/* ===== Boutique (admin) ===== */
+.ord{background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04);border-inline-start:4px solid var(--line)}
+.ord.nouvelle{border-inline-start-color:var(--or)}.ord.confirmée{border-inline-start-color:#2563EB}.ord.prête{border-inline-start-color:#9333EA}.ord.livrée{border-inline-start-color:var(--ok)}.ord.annulée{opacity:.6}
+.ord .oh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ord .oh b{font-weight:800;font-size:16px}
+.ord .oh small{color:var(--mute);font-size:12px;font-weight:600}
+.ord .oi{font-size:14px;line-height:1.45}
+.ord .om{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--mute)}
+.ord .ot{font-family:var(--display);font-weight:800;font-size:24px;color:var(--ink)}
+.ord .oa{font-size:13px;background:var(--s1);padding:8px 10px;border-radius:10px}
+.ord .ob{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ord .ob .btn{min-height:40px;padding:8px 14px;font-size:13.5px}
+.ord .ob .contact{margin-inline-start:auto}
+.mpill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--ink2)}
+.mpill.livraison{background:#E0EAFF;color:#1D4ED8}.mpill.salon{background:#F3E8FF;color:#7E22CE}.mpill.whatsapp{background:#DCFCE7;color:#15803D}
+.spill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--mute)}
+.spill.nouvelle{background:var(--or);color:#fff}.spill.confirmée{background:#DBEAFE;color:#1D4ED8}.spill.prête{background:#F3E8FF;color:#7E22CE}.spill.livrée{background:var(--oksoft);color:var(--ok)}
+.ofilter{display:flex;gap:8px;overflow-x:auto;margin:0 0 12px;scrollbar-width:none}
+.ofilter button{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:13px;color:var(--ink2)}
+.ofilter button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pthumb{width:64px;height:64px;border-radius:14px;flex:0 0 64px;background:var(--orsoft);overflow:hidden;display:grid;place-items:center;color:var(--or2);font-size:24px}
+.pthumb img{width:100%;height:100%;object-fit:cover}
+.member .edit textarea{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:90px;font:inherit;font-size:14.5px;resize:vertical}
+.member .edit textarea:focus{outline:none;border-color:var(--or)}
+.stock0{color:var(--red);font-weight:700}
+.member .edit input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;flex:0 0 20px;accent-color:var(--or)}
+.shopkpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.shopkpis div{background:#fff;border-radius:16px;padding:12px;box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.shopkpis b{display:block;font-family:var(--display);font-weight:800;font-size:24px}
+.shopkpis span{font-size:12px;color:var(--mute);font-weight:600}
 .rem{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px}
 .rem summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:15px;cursor:pointer}
 .rem summary::-webkit-details-marker{display:none}
@@ -587,6 +617,46 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
       <div class="grid" id="galGrid"></div>
     </section>
 
+    <!-- BOUTIQUE -->
+    <section id="t-shop" hidden>
+      <h2>Boutique</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-sseg="ord" aria-selected="true">🧾 Commandes</button>
+        <button role="tab" data-sseg="prod" aria-selected="false">🛍️ Produits</button>
+        <button role="tab" data-sseg="set" aria-selected="false">⚙️ Livraison</button>
+      </div>
+      <div id="sOrd">
+        <div class="shopkpis" id="shopKpis"></div>
+        <div class="ofilter" id="ordFilter"></div>
+        <div class="list" id="ordList"></div>
+      </div>
+      <div id="sProd" hidden>
+        <p class="sub">Tswira, smiya, prix w stock dyal kol produit. Kaybanou f l-Boutique dyal l-site direct mlli tsjjel.</p>
+        <div class="list" id="prodList"></div>
+        <button class="btn ghost full" type="button" id="addProd">＋ Zid produit</button>
+      </div>
+      <div id="sSet" hidden>
+        <form class="form" id="shopForm">
+          <div class="fsec">🛍️ L-boutique</div>
+          <div class="nchk"><label><input type="checkbox" id="shActif"> L-boutique m7loula f l-site</label></div>
+          <div class="fsec">🧾 Kifach ychriw les clients</div>
+          <div class="nchk">
+            <label><input type="checkbox" id="shWa"> Commande f WhatsApp</label>
+            <label><input type="checkbox" id="shSalon"> Ykhdouha mn s-salon</label>
+            <label><input type="checkbox" id="shLiv"> Livraison (COD)</label>
+          </div>
+          <div class="fsec">🚚 Livraison</div>
+          <div class="two">
+            <div><label for="shFrais">Prix dyal livraison (DH)</label><input id="shFrais" type="number" inputmode="numeric" min="0" placeholder="30"></div>
+            <div><label for="shFree">Gratuite mn (DH)</label><input id="shFree" type="number" inputmode="numeric" min="0" placeholder="300"><div class="hint">0 = 3mmerha ma tkoun gratuite</div></div>
+          </div>
+          <div><label for="shDelai">Wa9t dyal livraison</label><input id="shDelai" maxlength="30" placeholder="24–48h"></div>
+          <button class="btn full" type="submit">Sjjel</button>
+          <div class="err" id="shErr"></div>
+        </form>
+      </div>
+    </section>
+
     <!-- STATS -->
     <section id="t-stats" hidden>
       <h2>Statistiques</h2>
@@ -600,6 +670,7 @@ body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
     <button role="tab" data-tab="block" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>Sedd</button>
     <button role="tab" data-tab="team" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5c2.3.2 4 1.8 4.5 4.5"/></svg>Salon</button>
     <button role="tab" data-tab="photos" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>Photos</button>
+    <button role="tab" data-tab="shop" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>Boutique<i class="badge" id="shopBadge" hidden></i></button>
     <button role="tab" data-tab="stats" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
   </div></nav>
 </div>
@@ -699,12 +770,12 @@ let tab = "rdv";
 function setTab(t){
   tab = t;
   document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === t));
-  ["rdv","block","team","photos","stats"].forEach(k => $("#t-"+k).hidden = k !== t);
+  ["rdv","block","team","photos","shop","stats"].forEach(k => $("#t-"+k).hidden = k !== t);
   load(); window.scrollTo(0,0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
 $("#refresh").addEventListener("click", () => load());
-function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loadPhotos, stats: loadStats })[tab](); }
+function load(){ ({ rdv: loadRdv, block: loadBlocks, team: loadTeam, photos: loadPhotos, shop: loadShop, stats: loadStats })[tab](); }
 
 async function loadConfig(){
   const j = await call("getconfig");
@@ -1500,13 +1571,209 @@ async function loadStats(){
   } catch(e){ if (e.message !== "auth") $("#statsBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
 }
 
+/* ---------- BOUTIQUE ---------- */
+let SHOPC = null, PRODS = [], ORDERS = [], openProd = null, sseg = "ord", ordF = "open";
+const MODE_L = { whatsapp: "WhatsApp", salon: "F s-salon", livraison: "Livraison" };
+const ST_L = { nouvelle: "Jdida", confirmée: "Tconfirmat", prête: "Wajda", livrée: "Tsellmat", annulée: "Tlghat" };
+document.querySelectorAll("[data-sseg]").forEach(b => b.onclick = () => {
+  sseg = b.dataset.sseg;
+  document.querySelectorAll("[data-sseg]").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#sOrd").hidden = sseg !== "ord"; $("#sProd").hidden = sseg !== "prod"; $("#sSet").hidden = sseg !== "set";
+  loadShop();
+});
+function paintShopBadge(){
+  const n = ORDERS.filter(o => o.statut === "nouvelle").length, b = $("#shopBadge");
+  b.hidden = !n; b.textContent = n;
+}
+async function refreshShopBadge(){ try { const j = await call("orders"); if (j.ok){ ORDERS = j.list || []; paintShopBadge(); } } catch(e){} }
+async function loadShop(){
+  if (sseg === "ord") return loadOrders();
+  if (!SHOPC || sseg === "prod"){
+    if (sseg === "prod") $("#prodList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+    try {
+      const j = await call("getshop");
+      if (!j.ok){ const m = j.error === "op" ? "Backend 9dim: khass déploiement jdid f Apps Script (v10)." : "Ma kaynach connexion."; $("#prodList").innerHTML = `<div class="empty">${m}</div>`; $("#shErr").textContent = m; return; }
+      SHOPC = j.shop; PRODS = JSON.parse(JSON.stringify(j.produits || []));
+    } catch(e){ if (e.message !== "auth") $("#prodList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; return; }
+  }
+  if (sseg === "prod") renderProds(); else fillShopForm();
+}
+/* commandes */
+function ordMsg(o, kind){
+  const it = o.produits, tot = o.total + " DH";
+  return ({
+    confirmée: o.mode === "livraison" ? `Salam ${o.nom} 👋 commande dyalek #${o.id} tconfirmat ✅\\n📦 ${it}\\n💰 ${tot} (tkhelles mlli twslek)\\n📍 ${o.ville} — ${o.adresse}\\nGhadi twslek f a9rab wa9t. Choukran!` :
+      `Salam ${o.nom} 👋 commande dyalek #${o.id} tconfirmat ✅\\n📦 ${it}\\n💰 ${tot}\\nGhadi n3lmouk mlli twjed. Choukran!`,
+    prête: `Salam ${o.nom} 👋 commande dyalek #${o.id} wajda f s-salon 🛍️\\n📦 ${it}\\n💰 ${tot} (tkhelles f s-salon)\\nNtsennawk!`,
+    annulée: `Salam ${o.nom}, smeh lina 🙏 ma qdernach nwjjdou commande #${o.id}. Ila bghiti chi produit akhor golha lina.`,
+    hello: `Salam ${o.nom} 👋 b khsous commande dyalek #${o.id} (${it})…`
+  })[kind].replace(/\\n/g, "\n");
+}
+async function loadOrders(){
+  $("#ordList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    const j = await call("orders");
+    if (!j.ok){ $("#ordList").innerHTML = `<div class="empty">${j.error === "op" ? "Backend 9dim: khass déploiement jdid f Apps Script (v10)." : "Ma kaynach connexion."}</div>`; return; }
+    ORDERS = j.list || []; paintShopBadge(); renderOrders();
+  } catch(e){ if (e.message !== "auth") $("#ordList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+function renderOrders(){
+  const live = ORDERS.filter(o => o.statut !== "annulée"), t0 = today();
+  const open = ORDERS.filter(o => o.statut === "nouvelle" || o.statut === "confirmée" || o.statut === "prête");
+  const month = t0.slice(0, 7), ca = live.filter(o => o.statut === "livrée" && o.date.slice(0, 7) === month).reduce((a, o) => a + o.total, 0);
+  $("#shopKpis").innerHTML = `<div><b>${ORDERS.filter(o => o.statut === "nouvelle").length}</b><span>Jdad</span></div><div><b>${open.length}</b><span>F l-khdma</span></div><div><b>${ca}<small style="font-size:14px"> DH</small></b><span>Tsellmo had chher</span></div>`;
+  const F = [["open", "F l-khdma (" + open.length + ")"], ["nouvelle", "Jdad"], ["livrée", "Tsellmo"], ["annulée", "Tlghaw"], ["all", "Kolchi"]];
+  $("#ordFilter").innerHTML = F.map(([k, l]) => `<button type="button" data-of="${k}" aria-pressed="${ordF === k}">${l}</button>`).join("");
+  $("#ordFilter").querySelectorAll("[data-of]").forEach(b => b.onclick = () => { ordF = b.dataset.of; renderOrders(); });
+  const list = ordF === "all" ? ORDERS : ordF === "open" ? open : ORDERS.filter(o => o.statut === ordF);
+  if (!list.length){ $("#ordList").innerHTML = `<div class="empty big"><span>🛍️</span><b>Ma kayn 7ta commande</b>${ordF === "open" ? "Les commandes jdad ghadi ybanou hna." : ""}</div>`; return; }
+  $("#ordList").innerHTML = list.map(o => {
+    const next = o.statut === "nouvelle" ? [["confirmée", "✓ Confirmer"], ["annulée", "✗ Lghi"]]
+      : o.statut === "confirmée" ? (o.mode === "livraison" ? [["livrée", "🚚 Tsellmat"]] : [["prête", "📦 Wajda"], ["livrée", "✓ Tsellmat"]]).concat([["annulée", "Lghi"]])
+      : o.statut === "prête" ? [["livrée", "✓ Tsellmat"], ["annulée", "Lghi"]] : o.statut === "annulée" ? [["nouvelle", "↺ Rjje3ha"]] : [];
+    return `<article class="ord ${esc(o.statut)}">
+      <div class="oh"><div><b>${esc(o.nom)}</b> <small>#${esc(o.id)} · ${esc(o.date.slice(5).replace(" ", " · "))}</small></div><span class="spill ${esc(o.statut)}">${ST_L[o.statut] || esc(o.statut)}</span></div>
+      <div class="om"><span class="mpill ${esc(o.mode)}">${MODE_L[o.mode] || esc(o.mode)}</span><span>${esc(o.tel)}</span></div>
+      <div class="oi">${(o.items.length ? o.items.map(i => `${i.q} × ${esc(i.n)} <span style="color:var(--mute)">· ${i.p * i.q} DH</span>`) : [esc(o.produits)]).join("<br>")}</div>
+      ${o.mode === "livraison" ? `<div class="oa">📍 ${esc(o.ville)} — ${esc(o.adresse)}</div>` : ""}
+      ${o.note ? `<div class="oa">📝 ${esc(o.note)}</div>` : ""}
+      <div class="om"><span class="ot">${o.total} DH</span>${o.livraison ? `<span>(livraison ${o.livraison} DH)</span>` : ""}</div>
+      <div class="ob">${next.map(([s2, l]) => `<button class="btn ${s2 === "annulée" ? "ghost" : ""}" type="button" data-os="${esc(s2)}" data-oid="${esc(o.id)}">${l}</button>`).join("")}
+        <div class="contact"><a href="tel:${esc(o.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(o.tel)}?text=${encodeURIComponent(ordMsg(o, "hello"))}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div></div>
+    </article>`;
+  }).join("");
+  $("#ordList").querySelectorAll("[data-os]").forEach(b => b.onclick = async () => {
+    const o = ORDERS.find(x => x.id === b.dataset.oid); if (!o) return;
+    b.disabled = true;
+    try {
+      const j = await call("orderstatus", { id: o.id, statut: b.dataset.os });
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
+      o.statut = b.dataset.os; toast("Tsjjel ✓"); paintShopBadge(); renderOrders(); SHOPC = null;
+      if (["confirmée", "prête", "annulée"].includes(o.statut)) openOrdMsg(o);
+    } catch(e){ b.disabled = false; }
+  });
+}
+function openOrdMsg(o){
+  $("#mIcon").textContent = o.statut === "annulée" ? "✕" : "✓";
+  $("#mTitle").textContent = "Sift l-khbar l " + o.nom; $("#mSub").textContent = "Commande #" + o.id + " · " + (ST_L[o.statut] || o.statut);
+  $("#mText").value = ordMsg(o, o.statut);
+  const upd = () => $("#mSend").href = `https://wa.me/${waNum(o.tel)}?text=${encodeURIComponent($("#mText").value)}`;
+  upd(); $("#mText").oninput = upd;
+  $("#msgModal").hidden = false;
+}
+/* produits */
+const newProd = () => ({ id: "p" + Date.now().toString(36), nom: "", cat: "", prix: 0, ancien: 0, desc: "", photo: "", stock: null, actif: true });
+function renderProds(){
+  if (!PRODS.length){ $("#prodList").innerHTML = `<div class="empty big"><span>🛍️</span><b>Ma kayn 7ta produit</b>Brek 3la "Zid produit" bach tbda.</div>`; return; }
+  const cats = [...new Set(PRODS.map(p => p.cat).filter(Boolean))];
+  $("#prodList").innerHTML = `<datalist id="catList">${cats.map(c => `<option value="${esc(c)}">`).join("")}</datalist>` + PRODS.map((p, i) => `
+    <article class="member ${p.actif ? "" : "off"}">
+      <div class="top">
+        <div class="order"><button type="button" data-pup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Tla3">▲</button><button type="button" data-pdown="${i}" ${i === PRODS.length - 1 ? "disabled" : ""} aria-label="Hbet">▼</button></div>
+        <div class="pthumb">${p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "🛍️"}</div>
+        <div class="tx"><div class="n" style="font-size:15.5px">${esc(p.nom || "Produit jdid")} ${p.actif ? "" : '<span class="pill">Mkhbbi</span>'}</div>
+          <div class="s">${esc(p.cat || "—")} · ${p.stock === null ? "Stock: bla 7did" : p.stock <= 0 ? '<span class="stock0">Ma b9ach</span>' : "Stock: " + p.stock}</div></div>
+        <div class="price">${p.prix} DH</div>
+      </div>
+      <div style="padding:0 14px 14px"><button class="btn sm ghost" style="width:100%" type="button" data-pedit="${esc(p.id)}">${openProd === p.id ? "Sedd" : "Bddel"}</button></div>
+      ${openProd === p.id ? prodForm(p) : ""}
+    </article>`).join("");
+  $("#prodList").querySelectorAll("[data-pedit]").forEach(b => b.onclick = () => { openProd = openProd === b.dataset.pedit ? null : b.dataset.pedit; renderProds(); });
+  $("#prodList").querySelectorAll("[data-pup],[data-pdown]").forEach(b => b.onclick = async () => {
+    const i = +(b.dataset.pup ?? b.dataset.pdown), j = b.dataset.pup != null ? i - 1 : i + 1;
+    [PRODS[i], PRODS[j]] = [PRODS[j], PRODS[i]]; renderProds(); await saveProds("Tbeddel t-tartib ✓");
+  });
+  if (openProd){ const p = PRODS.find(x => x.id === openProd); if (p) bindProd(p); }
+}
+function prodForm(p){
+  return `<div class="edit">
+    <div class="photo-pick"><div class="pthumb" id="pThumb">${p.photo ? `<img src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer">` : "🛍️"}</div>
+      <label class="btn sm ghost" for="pFile">📷 ${p.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="pFile" accept="image/*">
+      ${p.photo ? `<button type="button" class="btn sm ghost" id="pNoPhoto">Msse7</button>` : ""}</div>
+    <div><label class="lbl" for="pNom">Smiya dyal l-produit</label><input id="pNom" maxlength="70" value="${esc(p.nom)}" placeholder="Ex: Cire coiffante mat"></div>
+    <div class="two">
+      <div><label class="lbl" for="pPrix">Prix (DH)</label><input id="pPrix" type="number" inputmode="numeric" min="0" value="${p.prix || ""}" placeholder="89"></div>
+      <div><label class="lbl" for="pOld">Prix 9dim (promo)</label><input id="pOld" type="number" inputmode="numeric" min="0" value="${p.ancien || ""}" placeholder="Ikhtiyari"></div>
+    </div>
+    <div class="two">
+      <div><label class="lbl" for="pCat">Catégorie</label><input id="pCat" maxlength="30" list="catList" value="${esc(p.cat)}" placeholder="Cheveux, Barbe…"></div>
+      <div><label class="lbl" for="pStock">Stock</label><input id="pStock" type="number" inputmode="numeric" min="0" value="${p.stock === null ? "" : p.stock}" placeholder="Khawi = bla 7did"></div>
+    </div>
+    <div><label class="lbl" for="pDesc">Description</label><textarea id="pDesc" maxlength="400" placeholder="Chno kaydir, l-7ajm, kifach yste3mlo…">${esc(p.desc)}</textarea></div>
+    <div class="nchk"><label><input type="checkbox" id="pActif" ${p.actif ? "checked" : ""}> Kayban f l-site</label></div>
+    <button class="btn full" type="button" id="pSave">Sjjel</button>
+    <button class="btn ghost full" type="button" id="pDel" style="color:var(--red)">Msse7 had l-produit</button>
+    <div class="err" id="pErr"></div>
+  </div>`;
+}
+function bindProd(p){
+  $("#pFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#pThumb").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 1000);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "produit-" + (p.nom || p.id) });
+      if (!j.ok) throw new Error("up");
+      p.photo = j.url; renderProds(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#pThumb").innerHTML = "🛍️"; $("#pErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#pNoPhoto")) $("#pNoPhoto").onclick = () => { p.photo = ""; renderProds(); };
+  const bind = (id, fn) => { $(id).oninput = $(id).onchange = e => fn(e.target.value); };
+  bind("#pNom", v => p.nom = v); bind("#pPrix", v => p.prix = Number(v) || 0); bind("#pOld", v => p.ancien = Number(v) || 0);
+  bind("#pCat", v => p.cat = v); bind("#pStock", v => p.stock = v === "" ? null : Math.max(0, Math.round(Number(v) || 0))); bind("#pDesc", v => p.desc = v);
+  $("#pActif").onchange = e => p.actif = e.target.checked;
+  $("#pSave").onclick = async () => {
+    if (!p.nom.trim()){ $("#pErr").textContent = "Kteb smiya dyal l-produit."; return; }
+    if (!(p.prix > 0)){ $("#pErr").textContent = "Kteb l-prix."; return; }
+    if (p.ancien && p.ancien <= p.prix){ $("#pErr").textContent = "Prix 9dim khasso ykoun kbar mn l-prix."; return; }
+    $("#pSave").disabled = true;
+    if (await saveProds("Tsjjel ✓ · l-boutique tbeddlat")){ openProd = null; renderProds(); } else $("#pSave").disabled = false;
+  };
+  $("#pDel").onclick = async () => {
+    const b = $("#pDel");
+    if (!b.dataset.arm){ b.dataset.arm = 1; b.textContent = "Brek merra okhra bach tmse7"; setTimeout(() => { if (b.isConnected){ delete b.dataset.arm; b.textContent = "Msse7 had l-produit"; } }, 3500); return; }
+    PRODS = PRODS.filter(x => x.id !== p.id); openProd = null; renderProds(); await saveProds("Tmse7 ✓");
+  };
+}
+async function saveProds(okMsg){
+  try {
+    const j = await call("saveproducts", { produits: PRODS });
+    if (j.ok){ PRODS = JSON.parse(JSON.stringify(j.produits || [])); toast(okMsg || "Tsjjel ✓"); return true; }
+    toast(j.error === "op" ? "Backend 9dim: dir déploiement jdid" : "Ma tsjjelch"); return false;
+  } catch(e){ return false; }
+}
+$("#addProd").addEventListener("click", () => {
+  if (PRODS.some(p => !p.nom.trim())){ openProd = PRODS.find(p => !p.nom.trim()).id; renderProds(); return; }
+  const p = newProd(); PRODS.push(p); openProd = p.id; renderProds();
+  setTimeout(() => { const el = $("#pNom"); if (el){ el.scrollIntoView({ behavior:"smooth", block:"center" }); el.focus(); } }, 50);
+});
+/* réglages */
+function fillShopForm(){
+  const s = SHOPC || {};
+  $("#shActif").checked = s.actif !== false; $("#shWa").checked = s.whatsapp !== false; $("#shSalon").checked = s.salon !== false; $("#shLiv").checked = s.livraison !== false;
+  $("#shFrais").value = s.frais ?? 30; $("#shFree").value = s.gratuitDes ?? 300; $("#shDelai").value = s.delai || ""; $("#shErr").textContent = "";
+}
+$("#shopForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const shop = { actif: $("#shActif").checked, whatsapp: $("#shWa").checked, salon: $("#shSalon").checked, livraison: $("#shLiv").checked,
+    frais: Number($("#shFrais").value) || 0, gratuitDes: Number($("#shFree").value) || 0, delai: $("#shDelai").value.trim(), villes: "" };
+  if (!shop.whatsapp && !shop.salon && !shop.livraison){ $("#shErr").textContent = "Khtar 3la l-a9al tari9a wa7da."; return; }
+  try {
+    const j = await call("saveshop", { shop });
+    if (j.ok){ SHOPC = j.shop; toast("Tsjjel ✓ · l-site tbeddel"); $("#shErr").textContent = ""; }
+    else $("#shErr").textContent = j.error === "op" ? "Backend 9dim: dir déploiement jdid f Apps Script (v10)." : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#shErr").textContent = "Ma kaynach connexion."; }
+});
+
 /* ---------- start ---------- */
 function start(){
   $("#login").hidden = true; $("#app").hidden = false;
   loadConfig().catch(() => {});
-  if (location.hash === "#pending" && tab !== "rdv") setTab("rdv"); else load();
+  if (location.hash === "#boutique") setTab("shop");
+  else if (location.hash === "#pending" && tab !== "rdv") setTab("rdv"); else load();
+  refreshShopBadge();
   if (location.hash === "#pending") setTimeout(() => $("#pendBox").scrollIntoView({ behavior:"smooth" }), 1500);
-  clearInterval(window._poll); window._poll = setInterval(refreshPendingCount, 60000);
+  clearInterval(window._poll); window._poll = setInterval(() => { refreshPendingCount(); refreshShopBadge(); }, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden){ refreshPendingCount(); if (tab === "rdv") loadPending(); } });
   try { if (window.Notification && Notification.permission === "default") document.addEventListener("click", () => Notification.requestPermission(), { once:true }); } catch(e){}
 }

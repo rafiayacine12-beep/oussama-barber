@@ -1,8 +1,8 @@
 /**
- * BACKEND — Oussama Barber (Google Apps Script) · v9
+ * BACKEND — Oussama Barber (Google Apps Script) · v10 (Boutique)
  * ---------------------------------------------------
  * Feuilles (kaytwjdo b wa7dhom):
- *   Reservations · Blocages · Attente
+ *   Reservations · Blocages · Attente · Produits · Commandes
  *
  * Statut d'une réservation (colonne "statut"): en attente · confirmé · venu · absent · annulé
  *   - "en attente" => l-client sifet, Oussama khasso yvalidi men l-admin (l-crénau msdod).
@@ -48,7 +48,9 @@ const SHEETS = {
   Reservations: ['date','heure','debut_min','duree_min','coiffeur','services','prix_dh','nom','telephone','statut','cree_le','id','remise_dh','langue'],
   Blocages:     ['date','de','a','coiffeur','raison','id','cree_le'],
   Attente:      ['date','nom','telephone','services','coiffeur','statut','cree_le','id'],
-  Bloques:      ['telephone','raison','cree_le']
+  Bloques:      ['telephone','raison','cree_le'],
+  Produits:     ['id','nom','categorie','prix_dh','ancien_prix_dh','description','photo','stock','actif','ordre'],
+  Commandes:    ['id','cree_le','nom','telephone','mode','ville','adresse','produits','sous_total_dh','livraison_dh','total_dh','statut','note','items_json']
 };
 
 /* ---------------- helpers ---------------- */
@@ -130,7 +132,8 @@ function publicConfig_() {
   return { ok: true, coiffeurs: c.coiffeurs.filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, photo: x.photo || '', de: x.de, a: x.a, repos: x.repos || [] })),
     galerie: c.galerie.map(g => g.url),
     salon: c.salon,
-    services: c.services.filter(s => s.actif).map(s => ({ id: s.id, nom: s.nom, desc: s.desc, prix: s.prix, duree: s.duree, top: !!s.top, photo: s.photo || '' })) };
+    services: c.services.filter(s => s.actif).map(s => ({ id: s.id, nom: s.nom, desc: s.desc, prix: s.prix, duree: s.duree, top: !!s.top, photo: s.photo || '' })),
+    boutique: (() => { try { return publicShop_(); } catch (e) { return null; } })() };
 }
 function worksAt_(name, date, start, dur) {
   const c = config_().coiffeurs.find(x => x.nom === name);
@@ -155,6 +158,77 @@ function upload_(b) {
   const file = photosFolder_().createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return { id: file.getId(), url: imgUrl_(file.getId()) };
+}
+
+/* ---------------- boutique ---------------- */
+// Statut dyal commande: nouvelle · confirmée · prête · livrée · annulée
+const SHOP_DEFAULT = { actif: true, whatsapp: true, salon: true, livraison: true, frais: 30, gratuitDes: 300, delai: '24–48h', villes: '' };
+function shop_() {
+  let s = null; try { s = JSON.parse(PropertiesService.getScriptProperties().getProperty('shop') || 'null'); } catch (e) {}
+  return Object.assign({}, SHOP_DEFAULT, s || {});
+}
+function products_() {
+  return rows_('Produits').map(r => ({
+    id: String(r.id || ''), nom: String(r.nom || ''), cat: String(r.categorie || ''), prix: Number(r.prix_dh) || 0,
+    ancien: Number(r.ancien_prix_dh) || 0, desc: String(r.description || ''), photo: String(r.photo || ''),
+    stock: r.stock === '' || r.stock === null ? null : Number(r.stock), actif: !(r.actif === false || String(r.actif).toLowerCase() === 'false'), ordre: Number(r.ordre) || 0
+  })).filter(x => x.id && x.nom).sort((a, b) => a.ordre - b.ordre);
+}
+function saveProducts_(list) {
+  const sh = sh_('Produits'), n = sh.getLastRow();
+  if (n > 1) sh.getRange(2, 1, n - 1, SHEETS.Produits.length).clearContent();
+  if (!list.length) return;
+  sh.getRange(2, 1, list.length, SHEETS.Produits.length).setValues(list.map((x, i) =>
+    [x.id, x.nom, x.cat, x.prix, x.ancien || '', x.desc, x.photo, x.stock === null ? '' : x.stock, x.actif, i + 1]));
+}
+function publicShop_() {
+  const sh = shop_();
+  return { shop: { actif: sh.actif, whatsapp: sh.whatsapp, salon: sh.salon, livraison: sh.livraison, frais: sh.frais, gratuitDes: sh.gratuitDes, delai: sh.delai, villes: sh.villes },
+    produits: sh.actif ? products_().filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, cat: x.cat, prix: x.prix, ancien: x.ancien, desc: x.desc, photo: x.photo, stock: x.stock })) : [] };
+}
+function orders_() {
+  return rows_('Commandes').map(r => ({
+    row: r._row, id: String(r.id || ''), date: r.cree_le instanceof Date ? Utilities.formatDate(r.cree_le, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm') : String(r.cree_le || ''),
+    nom: String(r.nom || ''), tel: String(r.telephone || '').replace(/^'/, ''), mode: String(r.mode || ''), ville: String(r.ville || ''), adresse: String(r.adresse || ''),
+    produits: String(r.produits || ''), sousTotal: Number(r.sous_total_dh) || 0, livraison: Number(r.livraison_dh) || 0, total: Number(r.total_dh) || 0,
+    statut: String(r.statut || 'nouvelle'), note: String(r.note || ''), items: (() => { try { return JSON.parse(String(r.items_json || '[]')); } catch (e) { return []; } })()
+  })).filter(o => o.id);
+}
+function restock_(items, sign) {
+  const list = products_(); let ch = false;
+  items.forEach(it => { const p = list.find(x => x.id === it.id); if (p && p.stock !== null) { p.stock = Math.max(0, p.stock + sign * it.q); ch = true; } });
+  if (ch) saveProducts_(list);
+}
+function order_(b) {
+  if (b.hp) return { ok: false, error: 'invalid' };
+  const sh = shop_(), mode = String(b.mode || '');
+  if (!sh.actif || ['whatsapp', 'salon', 'livraison'].indexOf(mode) < 0 || !sh[mode]) return { ok: false, error: 'mode' };
+  const name = String(b.name || '').trim().slice(0, 80), ph = phone_(b.phone);
+  if (name.length < 2 || ph.length < 9) return { ok: false, error: 'invalid' };
+  if (isBlocked_(ph)) return { ok: false, error: 'blocked' };
+  const ville = String(b.ville || '').trim().slice(0, 60), adresse = String(b.adresse || '').trim().slice(0, 200);
+  if (mode === 'livraison' && (ville.length < 2 || adresse.length < 4)) return { ok: false, error: 'address' };
+  const cache = CacheService.getScriptCache(), k = 'ord_' + ph, n = Number(cache.get(k) || 0);
+  if (n >= 5) return { ok: false, error: 'limit' };
+  const prods = products_().filter(x => x.actif), items = [];
+  (Array.isArray(b.items) ? b.items : []).slice(0, 30).forEach(it => {
+    const p = prods.find(x => x.id === String(it.id)), q = Math.max(1, Math.min(20, Math.round(Number(it.q) || 1)));
+    if (p) items.push({ id: p.id, n: p.nom, p: p.prix, q: q, stock: p.stock });
+  });
+  if (!items.length) return { ok: false, error: 'empty' };
+  const out = items.filter(it => it.stock !== null && it.q > it.stock);
+  if (out.length) return { ok: false, error: 'stock', items: out.map(it => ({ id: it.id, stock: it.stock })) };
+  const sub = items.reduce((a, it) => a + it.p * it.q, 0);
+  const liv = mode === 'livraison' ? (sh.gratuitDes > 0 && sub >= sh.gratuitDes ? 0 : Number(sh.frais) || 0) : 0;
+  const id = 'C' + id_().slice(0, 6), txtItems = items.map(it => it.q + '× ' + it.n).join(' + ');
+  sh_('Commandes').appendRow([id, new Date(), name, txt_(String(b.phone).slice(0, 30)), mode, ville, adresse, txtItems, sub, liv, sub + liv, 'nouvelle',
+    String(b.note || '').slice(0, 200), JSON.stringify(items.map(it => ({ id: it.id, n: it.n, p: it.p, q: it.q })))]);
+  restock_(items, -1);
+  cache.put(k, String(n + 1), 3600);
+  const mlabel = { whatsapp: 'WhatsApp', salon: 'F s-salon', livraison: 'Livraison' }[mode];
+  notify_('Commande jdida 🛍️', ['🧾 #' + id + ' · ' + mlabel, '🙍 ' + name + ' · ' + b.phone, '📦 ' + txtItems, '💰 ' + (sub + liv) + ' DH' + (liv ? ' (livraison ' + liv + ')' : '')]
+    .concat(mode === 'livraison' ? ['📍 ' + ville + ' — ' + adresse] : []), SITE_URL + '/admin.html#boutique', 'book');
+  return { ok: true, id: id, sousTotal: sub, livraison: liv, total: sub + liv };
 }
 
 /* ---------------- notifications ---------------- */
@@ -233,6 +307,7 @@ function doPost(e) {
       case 'book':     return json_(book_(b));
       case 'cancel':   return json_(cancel_(b));
       case 'waitlist': return json_(waitlist_(b));
+      case 'order':    return json_(order_(b));
       case 'admin':    return json_(admin_(b));
       default:         return json_({ ok: false, error: 'action' });
     }
@@ -511,6 +586,39 @@ function admin_(b) {
       if (i < 0 || j < 0 || j >= c.galerie.length) return { ok: true, galerie: c.galerie };
       const t = c.galerie[i]; c.galerie[i] = c.galerie[j]; c.galerie[j] = t; saveConfig_(c);
       return { ok: true, galerie: c.galerie };
+    }
+    case 'getshop': return { ok: true, shop: shop_(), produits: products_() };
+    case 'saveproducts': {
+      if (!Array.isArray(b.produits)) return { ok: false, error: 'produits' };
+      const str = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+      const num = (v, max) => Math.max(0, Math.min(max, Math.round(Number(v) || 0)));
+      const list = b.produits.slice(0, 200).map((x, i) => ({
+        id: str(x.id, 40) || ('p' + Date.now().toString(36) + i), nom: str(x.nom, 70), cat: str(x.cat, 30), prix: num(x.prix, 100000), ancien: num(x.ancien, 100000),
+        desc: str(x.desc, 400), photo: str(x.photo, 300), stock: x.stock === '' || x.stock === null || x.stock === undefined ? null : num(x.stock, 99999), actif: x.actif !== false
+      })).filter(x => x.nom);
+      saveProducts_(list);
+      return { ok: true, produits: products_() };
+    }
+    case 'saveshop': {
+      const o = b.shop || {}, num = (v, d) => { const n = Math.round(Number(v)); return isFinite(n) && n >= 0 ? Math.min(n, 100000) : d; };
+      const s = { actif: o.actif !== false, whatsapp: o.whatsapp !== false, salon: o.salon !== false, livraison: o.livraison !== false,
+        frais: num(o.frais, SHOP_DEFAULT.frais), gratuitDes: num(o.gratuitDes, 0), delai: String(o.delai || '').slice(0, 30), villes: String(o.villes || '').slice(0, 300) };
+      if (!s.whatsapp && !s.salon && !s.livraison) return { ok: false, error: 'modes' };
+      PropertiesService.getScriptProperties().setProperty('shop', JSON.stringify(s));
+      return { ok: true, shop: s };
+    }
+    case 'orders': {
+      const list = orders_().reverse().slice(0, 300).map(o => { const x = Object.assign({}, o); delete x.row; return x; });
+      return { ok: true, list: list };
+    }
+    case 'orderstatus': {
+      const ok = ['nouvelle', 'confirmée', 'prête', 'livrée', 'annulée'];
+      if (ok.indexOf(String(b.statut)) < 0) return { ok: false, error: 'statut' };
+      const o = orders_().find(x => x.id === String(b.id)); if (!o) return { ok: false, error: 'notfound' };
+      const was = o.statut === 'annulée', now = b.statut === 'annulée';
+      sh_('Commandes').getRange(o.row, SHEETS.Commandes.indexOf('statut') + 1).setValue(b.statut);
+      if (was !== now && o.items.length) restock_(o.items, now ? 1 : -1);
+      return { ok: true };
     }
     default: return { ok: false, error: 'op' };
   }
