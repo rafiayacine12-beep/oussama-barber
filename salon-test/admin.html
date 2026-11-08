@@ -1,0 +1,2516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>Admin · Salon Test</title>
+<link rel="icon" href="../icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+/* Nefs l-URL li f index.html */
+const ADMIN = {
+  apiUrl: "https://script.google.com/macros/s/AKfycbyEahs5YFi_3goxo1lkBM7VEmAI8KGbCXxmUtHFe9MDM53qAxnXg0kKwiwfNiHAbAkF/exec"
+};
+</script>
+<script>
+/* Lon w smiya dyal l-ma7al men l-cache: kaytbeddlo 9bel ma tban l-page (bla ma ntsennaw Google ~5s) */
+(() => { try {
+  const s = JSON.parse(localStorage.getItem("ob_admin_salon") || "null"); if (!s) return;
+  const c = s.couleur, st = document.documentElement.style;
+  if (/^#[0-9a-fA-F]{6}$/.test(c || "")){
+    const sh = (h, a) => { const n = parseInt(h.slice(1), 16); const f = v => Math.round(a < 0 ? v * (1 + a) : v + (255 - v) * a);
+      return "#" + [n >> 16, (n >> 8) & 255, n & 255].map(f).map(x => x.toString(16).padStart(2, "0")).join(""); };
+    st.setProperty("--or", c); st.setProperty("--or2", sh(c, -0.16)); st.setProperty("--orsoft", sh(c, 0.92)); st.setProperty("--orline", sh(c, 0.65));
+  }
+  if (s.nom) document.title = "Admin · " + s.nom;
+} catch(e){} })();
+</script>
+<style>
+:root{
+  --bg:#FFFFFF; --s1:#F6F5F3; --s2:#EEECE8; --line:#E4E1DB; --ink:#17140F; --ink2:#3B362E; --mute:#716B62;
+  --or:#E2560A; --or2:#C34807; --orsoft:#FFF1E7; --orline:#F6C9AA;
+  --ok:#14874C; --oksoft:#E6F5EC; --red:#C8322A; --redsoft:#FCEBEA; --wa:#25D366;
+  --display:"Big Shoulders Display",Impact,sans-serif; --body:"Instrument Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{background:var(--s1);color:var(--ink);font:15px/1.45 var(--body);-webkit-font-smoothing:antialiased;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
+.wrap{max-width:680px;margin:0 auto;padding:0 18px}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top)) 0 12px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand i{width:8px;height:26px;border-radius:5px;background:repeating-linear-gradient(-45deg,var(--or) 0 5px,#fff 5px 10px,var(--ink) 10px 15px,#fff 15px 20px);box-shadow:0 0 0 1.5px var(--ink)}
+.brand small{color:var(--or);font-size:14px;letter-spacing:.14em}
+.iconbtn{width:40px;height:40px;border-radius:50%;background:var(--s1);border:1px solid var(--line);display:grid;place-items:center;font-size:17px}
+h2{font-family:var(--display);font-weight:800;font-size:34px;margin:20px 0 6px;line-height:1}
+.sub{color:var(--mute);font-size:14px;margin:0 0 14px}
+.section-t{font-size:13px;color:var(--mute);margin:18px 0 8px;font-weight:600}
+
+/* login */
+.login{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px;max-width:380px;margin:0 auto;text-align:center;background:var(--bg)}
+.login h1{font-family:var(--display);font-weight:900;font-size:60px;line-height:.9;text-transform:uppercase}
+.login h1 small{display:block;color:var(--or);font-size:22px;letter-spacing:.22em;margin-top:8px}
+.login p{color:var(--mute);margin:18px 0}
+.pin{width:100%;text-align:center;letter-spacing:.5em;font-size:28px;padding:16px;border-radius:16px;background:var(--s1);border:1.5px solid var(--line)}
+.pin:focus{outline:none;border-color:var(--or);background:#fff}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:11px 18px;border-radius:999px;font-weight:700;background:var(--or);color:#fff;transition:background .15s}
+.btn:hover{background:var(--or2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.full{width:100%;margin-top:12px;min-height:54px;font-size:16px}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink2)}
+.btn.sm{min-height:36px;padding:7px 13px;font-size:13px}
+.err{color:var(--red);font-size:14px;min-height:20px;margin-top:10px}
+
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:0}
+nav.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:12px;font-size:11.5px;font-weight:600;color:var(--mute);position:relative}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--or);background:var(--orsoft)}
+.badge{position:absolute;top:3px;inset-inline-end:calc(50% - 20px);min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:10.5px;line-height:17px;font-style:normal}
+
+/* date strip */
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip button{flex:0 0 auto;padding:9px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:14px;white-space:nowrap}
+.strip button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.strip input{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 14px}
+.summary div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+.summary b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1.05}
+.summary div:last-child b{color:var(--or)}
+.summary span{font-size:12px;color:var(--mute)}
+
+/* attente banner */
+.waitbar{display:flex;align-items:center;gap:12px;background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:12px 14px;margin-bottom:12px;width:100%;text-align:start}
+.waitbar b{color:var(--or2)}
+.waitbar span{flex:1;font-size:14px}
+
+/* rdv cards */
+.list{display:grid;gap:10px}
+.rdv{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;display:grid;grid-template-columns:66px 1fr;gap:3px 12px;border-inline-start:4px solid var(--or)}
+.rdv.venu{border-inline-start-color:var(--ok)}
+.rdv.absent{border-inline-start-color:var(--red)}
+.rdv.annulé{opacity:.55;border-inline-start-color:var(--line)}
+.rdv .h{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;grid-row:span 2}
+.rdv .h small{display:block;font-family:var(--body);font-size:12px;color:var(--mute);font-weight:500;margin-top:4px}
+.rdv .who{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rdv .what{color:var(--mute);font-size:14px}
+.rdv .row{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;align-items:center}
+.pill{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--mute)}
+.pill.confirmé{background:var(--orsoft);color:var(--or2)}
+.pill.venu{background:var(--oksoft);color:var(--ok)}
+.pill.absent{background:var(--redsoft);color:var(--red)}
+.pill.annulé{text-decoration:line-through}
+.st{min-height:36px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--s1);border:1px solid var(--line)}
+.st.venu.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.absent.on{background:var(--red);border-color:var(--red);color:#fff}
+.st.annulé.on{background:var(--ink2);border-color:var(--ink2);color:#fff}
+.contact{margin-inline-start:auto;display:flex;gap:6px}
+.contact a{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--s1);border:1px solid var(--line);font-size:16px}
+.contact a.wa{background:#E8F9EE;border-color:#BFE9CF}
+.empty{background:#fff;border:1px dashed var(--line);border-radius:16px;padding:28px;text-align:center;color:var(--mute)}
+
+/* forms */
+.form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;margin-bottom:14px}
+.form label,.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.form input,.form select{width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.form input:focus,.form select:focus{outline:none;border-color:var(--or);background:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle{display:flex;gap:6px}
+.toggle button{flex:1;padding:11px;border-radius:12px;background:var(--s1);border:1.5px solid var(--line);font-weight:600;font-size:14px}
+.toggle button[aria-pressed=true]{border-color:var(--or);background:var(--orsoft);color:var(--or2)}
+.days7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.days7 button{padding:10px 0;border-radius:10px;background:var(--s1);border:1.5px solid var(--line);font-weight:700;font-size:12.5px}
+.days7 button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.item .tx{flex:1;min-width:0}
+.item b{font-weight:700}
+.item .s{font-size:13px;color:var(--mute)}
+.del{color:var(--red);font-weight:700;font-size:13px;padding:8px 12px;border-radius:999px;background:var(--redsoft)}
+
+/* team */
+.member{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.member .top{display:flex;align-items:center;gap:14px;padding:14px}
+.av{width:58px;height:58px;border-radius:50%;flex:0 0 58px;background:var(--orsoft);color:var(--or2);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:26px;overflow:hidden;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--orline)}
+.av img{width:100%;height:100%;object-fit:cover}
+.member .tx{flex:1;min-width:0}
+.member .n{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.member .s{font-size:13px;color:var(--mute)}
+.member.off .av{filter:grayscale(1);opacity:.6}
+.member .edit{border-top:1px solid var(--line);padding:14px;display:grid;gap:12px;background:var(--s1)}
+.member .edit input{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.member .edit input:focus{outline:none;border-color:var(--or)}
+.member .edit input[readonly]{background:var(--s2);color:var(--mute)}
+.photo-pick{display:flex;align-items:center;gap:12px}
+.photo-pick label{cursor:pointer}
+.file{position:absolute;width:1px;height:1px;opacity:0}
+
+/* segmented */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px;margin:4px 0 16px}
+.seg button{padding:11px 4px;border-radius:10px;font-weight:700;font-size:13px;color:var(--mute)}
+.seg button[aria-selected=true]{background:var(--ink);color:#fff}
+/* services admin */
+.svcthumb{width:64px;height:64px;border-radius:14px;flex:0 0 64px;background:var(--orsoft);overflow:hidden;display:grid;place-items:center;color:var(--or2);font-family:var(--display);font-weight:900;font-size:24px}
+.svcthumb img{width:100%;height:100%;object-fit:cover}
+.member .price{font-family:var(--display);font-weight:800;font-size:24px;color:var(--or2);white-space:nowrap}
+.order{display:flex;flex-direction:column;gap:4px}
+.order button{width:30px;height:26px;border-radius:8px;background:var(--s1);border:1px solid var(--line);font-size:11px}
+.order button:disabled{opacity:.3}
+.three{display:grid;grid-template-columns:1fr;gap:8px}
+.lang-tag{font-size:11px;font-weight:800;background:var(--s2);color:var(--mute);border-radius:6px;padding:1px 6px;margin-inline-start:6px}
+.member .edit select{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:48px}
+.member .edit input[dir=rtl]{font-family:"Noto Kufi Arabic",var(--body)}
+
+/* gallery admin */
+.upl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;border:2px dashed var(--orline);border-radius:18px;padding:26px;text-align:center;cursor:pointer;color:var(--or2);font-weight:700;margin-bottom:12px}
+.upl:hover{background:var(--orsoft)}
+.upl small{color:var(--mute);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:520px){.grid{grid-template-columns:repeat(3,1fr)}}
+.ph{position:relative;border-radius:14px;overflow:hidden;background:var(--s2);aspect-ratio:4/5}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .ctl{position:absolute;left:6px;right:6px;bottom:6px;display:flex;gap:5px;justify-content:flex-end}
+.ph .ctl button{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ph .ctl .x{color:var(--red);margin-inline-end:auto}
+.ph.loading::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.6) url() center no-repeat}
+.progress{height:6px;border-radius:6px;background:var(--s2);overflow:hidden;margin:6px 0 12px}
+.progress i{display:block;height:100%;background:var(--or);width:0;transition:width .3s}
+
+/* pending */
+.pend{background:#fff;border:1.5px solid var(--orline);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(226,86,10,.10)}
+.pend h3{font-family:var(--display);font-weight:800;font-size:24px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pend h3 i{font-style:normal;font-family:var(--body);font-size:13px;background:var(--or);color:#fff;border-radius:99px;padding:2px 9px}
+.pend .list{gap:8px}
+.rdv.en.attente,.rdv[data-pending="1"]{border-inline-start-color:var(--or);background:#FFFBF8}
+.pill.attente{background:var(--or);color:#fff}
+.st.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.st.no{background:#fff;border-color:#F0C3BF;color:var(--red)}
+.after{grid-column:1/-1;margin-top:8px}
+.after a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:999px;background:#E8F9EE;border:1px solid #BFE9CF;color:#0B5A2C;font-weight:700;font-size:14px}
+.contact .blk{background:var(--redsoft);border-color:#F0C3BF;font-size:15px}
+.contact .blk.armed{background:var(--red);color:#fff}
+.dayof{font-size:12px;color:var(--or2);font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(23,20,15,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .25s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.mhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.mhead>div{flex:1;min-width:0}
+.mhead h3{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.mhead p{font-size:13px;color:var(--mute)}
+.mic{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px;background:var(--oksoft);color:var(--ok)}
+.mic.no{background:var(--redsoft);color:var(--red)}
+.sheet textarea{width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14.5px;line-height:1.5;resize:vertical;margin-bottom:12px}
+.sheet textarea:focus{outline:none;border-color:var(--or);background:#fff}
+.btn.wa{background:var(--wa);color:#05290F}
+.btn.wa:hover{background:#1FBF5B}
+
+/* paramètres */
+.fsec{font-family:var(--display);font-weight:800;font-size:20px;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)}
+.fsec:first-child{border-top:0;padding-top:0;margin-top:0}
+.hint{font-size:12px;color:var(--mute);margin-top:5px}
+.hrs{display:grid;gap:8px}
+.hr{display:grid;grid-template-columns:62px 92px 1fr 1fr;gap:8px;align-items:center}
+.hr b{font-size:14px}
+.hr .tg{height:40px;border-radius:12px;font-weight:700;font-size:12.5px;background:var(--oksoft);color:var(--ok);border:1.5px solid transparent}
+.hr .tg[aria-pressed=false]{background:var(--redsoft);color:var(--red)}
+.hr input{min-height:40px!important;padding:8px!important}
+.hr.off input{opacity:.35;pointer-events:none}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swatches button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line)}
+.swatches button[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
+.colrow{display:flex;align-items:center;gap:12px}
+.colrow label{margin:0!important}
+.colrow input[type=color]{width:52px!important;height:40px!important;min-height:40px!important;padding:2px!important;border-radius:10px}
+.colrow .prev{margin-inline-start:auto;background:var(--or);color:#fff;font-weight:700;border-radius:999px;padding:9px 16px;font-size:14px}
+
+/* action sheet */
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:start;padding:14px;border-radius:16px;background:var(--s1);transition:background .12s}
+.opt:hover{background:var(--s2)}
+.opt i{width:42px;height:42px;flex:0 0 42px;border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:19px;background:#fff}
+.opt b{display:block;font-size:15px}
+.opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:1px}
+.opt.danger i{color:var(--red)}
+.sheet .back{display:inline-flex;align-items:center;gap:6px;color:var(--mute);font-weight:700;font-size:13px;margin-bottom:10px}
+.dgrid{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none}
+.dgrid::-webkit-scrollbar{display:none}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:230px;overflow-y:auto;margin-bottom:12px}
+.tgrid button{padding:11px 0;border-radius:12px;background:var(--s1);font-weight:700;font-size:14px;border:1.5px solid transparent}
+.tgrid button[aria-pressed=true]{background:var(--or);color:#fff}
+.tgrid button:disabled{opacity:.3;text-decoration:line-through}
+.freebox{background:var(--oksoft);color:var(--ok);border-radius:14px;padding:12px 14px;font-weight:700;font-size:14px;margin-bottom:12px}
+.wl{display:grid;gap:8px;margin-bottom:12px}
+.wl a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:#E8F9EE;color:#0B5A2C;font-weight:700;font-size:14px}
+.wl a span{flex:1}
+.wl small{font-weight:600;color:#3E7A55}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi b{display:block;font-family:var(--display);font-weight:800;font-size:34px;line-height:1.05}
+.kpi span{font-size:13px;color:var(--mute)}
+.kpi.main{grid-column:1/-1;background:var(--or);border-color:var(--or);color:#fff}
+.kpi.main b{font-size:46px}
+.kpi.main span{color:#FFE3D1}
+.bars{display:grid;gap:9px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.bars h3{font-size:14px;margin-bottom:2px}
+.bar{display:grid;grid-template-columns:110px 1fr 34px;align-items:center;gap:10px;font-size:13px}
+.bar .t{height:10px;border-radius:6px;background:var(--s2);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--or);border-radius:6px}
+.bar .n{text-align:end;font-weight:700}
+.bar .l{color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart{display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:8px}
+.chart div{flex:1;background:var(--or);border-radius:5px 5px 0 0;min-height:2px;position:relative}
+.chart div:hover::after{content:attr(data-v);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:11px;background:var(--ink);color:#fff;padding:2px 6px;border-radius:6px;white-space:nowrap}
+.chartx{display:flex;gap:4px;font-size:10px;color:var(--mute);margin-top:4px}
+.chartx span{flex:1;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--or);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-inline-end:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ================= PRO ================= */
+body{background:#F4F3F0}
+.wrap{padding:0 16px}
+header{background:rgba(244,243,240,.9);border-bottom:0;padding:calc(10px + env(safe-area-inset-top)) 0 10px}
+.brand{font-size:22px;gap:11px}
+.brand i{width:9px;height:30px}
+.brand span{display:flex;flex-direction:column;line-height:.9}
+.brand small{font-size:11px;letter-spacing:.24em;margin-top:3px}
+.iconbtn{background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.iconbtn svg{width:19px;height:19px}
+h2{font-size:32px;margin:14px 0 4px}
+
+/* login */
+.login{max-width:none;padding:0;justify-content:flex-start;background:#fff;text-align:center}
+.lg-top{background:var(--or);color:#fff;padding:calc(54px + env(safe-area-inset-top)) 24px 46px;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.lg-top::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08);top:-70px;right:-60px}
+.lg-pole{width:14px;height:58px;margin:0 auto 18px;border-radius:8px;background:repeating-linear-gradient(-45deg,#fff 0 7px,var(--ink) 7px 14px,#fff 14px 21px,#FFB98A 21px 28px);background-size:100% 40px;animation:lgp 2.4s linear infinite;box-shadow:0 0 0 2.5px var(--ink)}
+@keyframes lgp{to{background-position:0 40px}}
+.login h1{color:#fff;font-size:58px}
+.login h1 small{color:var(--ink);font-size:15px;letter-spacing:.3em;margin-top:10px}
+.lg-body{max-width:340px;margin:0 auto;width:100%;padding:28px 24px calc(24px + env(safe-area-inset-bottom))}
+.lg-body p{margin:0 0 16px;font-weight:600;color:var(--ink2)}
+.dots{display:flex;justify-content:center;gap:14px;height:18px;margin-bottom:6px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid #CFCAC1;transition:.15s}
+.dots i.on{background:var(--or);border-color:var(--or);transform:scale(1.08)}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pin-hidden{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.pad button{height:64px;border-radius:20px;background:var(--s1);font-size:26px;font-weight:600;transition:background .1s,transform .08s}
+.pad button:active{transform:scale(.94);background:var(--s2)}
+.pad .go{background:var(--ink);color:#fff;font-size:26px}
+.pad .go:disabled{opacity:.5}
+
+/* dashboard */
+.hello{margin-top:6px}
+.hello small{font-size:13px;font-weight:600;color:var(--mute);text-transform:capitalize}
+.hello h2{margin:2px 0 14px}
+.kpis3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kp{background:#fff;border-radius:18px;padding:13px 12px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04)}
+.kp i{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;margin-bottom:8px}
+.kp i svg{width:18px;height:18px}
+.kp .k1{background:#EEF2FF;color:#4338CA}.kp .k2{background:var(--oksoft);color:var(--ok)}.kp .k3{background:rgba(255,255,255,.18);color:#fff}
+.kp b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.kp b small{font-size:14px}
+.kp span{font-size:12px;color:var(--mute);font-weight:600}
+.kp.main{background:var(--ink);color:#fff}
+.kp.main span{color:#B9B3A9}
+/* ===== Boutique (admin) ===== */
+.ord{background:#fff;border-radius:18px;padding:14px;display:grid;gap:10px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04);border-inline-start:4px solid var(--line)}
+.ord.nouvelle{border-inline-start-color:var(--or)}.ord.confirmée{border-inline-start-color:#2563EB}.ord.prête{border-inline-start-color:#9333EA}.ord.livrée{border-inline-start-color:var(--ok)}.ord.annulée{opacity:.6}
+.ord .oh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ord .oh b{font-weight:800;font-size:16px}
+.ord .oh small{color:var(--mute);font-size:12px;font-weight:600}
+.ord .oi{font-size:14px;line-height:1.45}
+.ord .om{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--mute)}
+.ord .ot{font-family:var(--display);font-weight:800;font-size:24px;color:var(--ink)}
+.ord .oa{font-size:13px;background:var(--s1);padding:8px 10px;border-radius:10px}
+.ord .ob{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ord .ob .btn{min-height:40px;padding:8px 14px;font-size:13.5px}
+.ord .ob .contact{margin-inline-start:auto}
+.mpill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--ink2)}
+.mpill.livraison{background:#E0EAFF;color:#1D4ED8}.mpill.salon{background:#F3E8FF;color:#7E22CE}.mpill.whatsapp{background:#DCFCE7;color:#15803D}
+.spill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--s2);color:var(--mute)}
+.spill.nouvelle{background:var(--or);color:#fff}.spill.confirmée{background:#DBEAFE;color:#1D4ED8}.spill.prête{background:#F3E8FF;color:#7E22CE}.spill.livrée{background:var(--oksoft);color:var(--ok)}
+.ofilter{display:flex;gap:8px;overflow-x:auto;margin:0 0 12px;scrollbar-width:none}
+.ofilter button{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:13px;color:var(--ink2)}
+.ofilter button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pthumb{width:64px;height:64px;border-radius:14px;flex:0 0 64px;background:var(--orsoft);overflow:hidden;display:grid;place-items:center;color:var(--or2);font-size:24px}
+.pthumb img{width:100%;height:100%;object-fit:cover}
+.member .edit textarea{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:90px;font:inherit;font-size:14.5px;resize:vertical}
+.member .edit textarea:focus{outline:none;border-color:var(--or)}
+.stock0{color:var(--red);font-weight:700}
+.member .edit input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;flex:0 0 20px;accent-color:var(--or)}
+.shopkpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.shopkpis div{background:#fff;border-radius:16px;padding:12px;box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.shopkpis b{display:block;font-family:var(--display);font-weight:800;font-size:24px}
+.shopkpis span{font-size:12px;color:var(--mute);font-weight:600}
+.rem{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.rem summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:15px;cursor:pointer}
+.rem summary::-webkit-details-marker{display:none}
+.rem summary small{font-weight:700;color:var(--or);font-size:13px}
+.rem .rl{display:grid;gap:8px;margin-top:12px}
+.rem .ri{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#FAF8F5}
+.rem .ri .tm{font-weight:900;font-size:16px;min-width:48px}
+.rem .ri .nm{flex:1;min-width:0;font-weight:700;font-size:14px;line-height:1.25}
+.rem .ri .nm small{display:block;font-weight:600;color:#7A736A;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rem .ri a{flex:0 0 auto;padding:9px 12px;border-radius:999px;background:#25D366;color:#fff;font-weight:800;font-size:13px;text-decoration:none}
+.rem .ri.sent a{background:#E8E4DE;color:#5B554C}
+.nextc{display:flex;flex-wrap:wrap;gap:14px;background:linear-gradient(135deg,var(--or),#F07A2E);color:#fff;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 12px 28px rgba(226,86,10,.25)}
+.nl{flex:0 0 auto;border-inline-end:1px solid rgba(255,255,255,.3);padding-inline-end:14px;display:flex;flex-direction:column;justify-content:center}
+.nl small{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#FFE3D1;white-space:nowrap}
+.nl small svg{width:13px;height:13px}
+.nl b{font-family:var(--display);font-weight:900;font-size:42px;line-height:1}
+.nr{flex:1;min-width:0}
+.nn{font-weight:800;font-size:17px}
+.ns{font-size:13px;color:#FFE3D1;margin-top:1px}
+.ns span{filter:brightness(1.6)}
+.na{display:flex;gap:8px;flex:1 0 100%;margin-top:-2px}
+.na button{flex:1;text-align:center;background:#fff;color:var(--or2);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:800;white-space:nowrap}
+.na a{flex:1;text-align:center;background:rgba(255,255,255,.18);border-radius:999px;padding:8px 6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.na a:hover{background:rgba(255,255,255,.28)}
+
+/* date chips */
+.strip{gap:8px;padding:2px 0 14px;margin:0 -16px;padding-inline:16px;scroll-padding-inline:16px}
+.dchip{flex:0 0 58px;height:72px;border-radius:16px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0}
+.dchip small{font-size:11px;font-weight:700;color:var(--mute)}
+.dchip b{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.05}
+.dchip i{font-style:normal;font-size:10.5px;color:var(--mute)}
+.dchip.is-today small{color:var(--or2)}
+.strip .dchip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.strip .dchip[aria-pressed=true] small,.strip .dchip[aria-pressed=true] i{color:#B9B3A9}
+.dchip.pick{position:relative;color:var(--mute)}
+.dchip.pick svg{width:22px;height:22px}
+.dchip.pick input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.strip input{padding:0;border:0}
+
+/* timeline */
+.dayhead2{display:flex;align-items:baseline;justify-content:space-between;margin:6px 0 10px}
+.dayhead2 h3{font-family:var(--display);font-weight:800;font-size:24px}
+.dayhead2 span{font-size:13px;color:var(--mute);font-weight:600}
+.timeline{display:grid;gap:10px;position:relative}
+.timeline .rdv{border:0;border-radius:18px;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.05);border-inline-start:0;position:relative;padding-inline-start:18px;grid-template-columns:62px 1fr}
+.timeline .rdv::before{content:"";position:absolute;inset-block:14px;inset-inline-start:0;width:4px;border-radius:0 4px 4px 0;background:var(--bc,var(--or))}
+.rdv .h{font-size:27px}
+.rdv .who{font-size:15.5px;gap:8px}
+.ava{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-size:12px;font-weight:800;flex:0 0 26px}
+.rdv .what{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:3px}
+.rdv .what b{color:var(--ink);font-weight:700}
+.bar-tag{font-size:12px;font-weight:700;border-radius:99px;padding:2px 8px}
+.rdv.venu{background:#FBFEFC}
+.rdv.annulé{opacity:.5}
+.st{border-radius:12px;min-height:38px}
+.contact a,.contact .blk{border-radius:12px!important}
+.empty.big{display:flex;flex-direction:column;align-items:center;gap:6px;padding:34px 20px;border:0;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(23,20,15,.04)}
+.empty.big span{width:54px;height:54px;border-radius:16px;background:var(--orsoft);color:var(--or);display:grid;place-items:center;margin-bottom:4px}
+.empty.big span svg{width:26px;height:26px}
+.empty.big b{color:var(--ink);font-size:16px}
+.pend{border:0;box-shadow:0 0 0 1.5px var(--orline),0 10px 26px rgba(226,86,10,.10)}
+.pend .rdv{box-shadow:none;border:1px solid var(--line)}
+
+/* forms/cards general */
+.form,.member,.item,.bars,.kpi,.summary div{border:0;box-shadow:0 1px 2px rgba(23,20,15,.04),0 6px 16px rgba(23,20,15,.04)}
+.kpi.main{box-shadow:0 12px 28px rgba(226,86,10,.22)}
+.seg{border:0;box-shadow:0 1px 2px rgba(23,20,15,.05)}
+
+/* bottom nav flottante */
+nav.tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;border:0;border-radius:24px;background:rgba(23,20,15,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 14px 34px rgba(23,20,15,.28);max-width:560px;margin:0 auto}
+nav.tabs button{color:#A9A398;border-radius:18px;white-space:nowrap;font-size:11px;letter-spacing:-.1px}
+nav.tabs button[aria-selected=true]{color:#fff;background:var(--or)}
+body{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.badge{box-shadow:0 0 0 2px var(--ink)}
+.toast{bottom:calc(100px + env(safe-area-inset-bottom))}
+.nstat{font-weight:700;font-size:13.5px;padding:10px 12px;border-radius:12px;margin:10px 0 2px}
+.nstat.on{background:#E8F6EE;color:#0E7C4A}.nstat.off{background:var(--s1);color:#6b655c}
+.steps{background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:10px 14px;margin:8px 0}
+.steps summary{font-weight:700;cursor:pointer;font-size:14px}
+.steps ol{margin:10px 0 2px;padding-inline-start:20px;display:grid;gap:8px;font-size:13.5px;line-height:1.45}
+.steps a{color:var(--or2);font-weight:700}.steps code{background:#fff;border:1px dashed var(--orline);padding:2px 6px;border-radius:6px;font-size:12.5px;display:inline-block;margin-top:4px}
+.nchk{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:4px 0 8px}.nchk label{display:flex;align-items:center;gap:6px;font-weight:600}
+.nchk input{width:18px;height:18px;accent-color:var(--or)}
+
+/* ================= PRO v2 — design jdid ================= */
+:root{--bg2:#F5F5F3;--card:#fff;--bd:#EAE8E3;--sh:0 1px 2px rgba(17,17,17,.04),0 4px 14px rgba(17,17,17,.05)}
+body{background:var(--bg2)}
+.wrap{max-width:760px}
+header{background:rgba(245,245,243,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);position:sticky;top:0;z-index:20;border-bottom:1px solid transparent}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hdr-r{display:flex;gap:8px;align-items:center}
+.rolechip{font-size:12px;font-weight:800;padding:7px 11px;border-radius:999px;background:#fff;border:1px solid var(--bd);white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.is-barber .rolechip{background:var(--orsoft);border-color:var(--orline);color:var(--or2)}
+.iconbtn{border-color:var(--bd)}
+h2{font-size:30px;letter-spacing:.01em}
+.section-t{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:22px 2px 10px}
+.section-t.warn{color:var(--red)}
+.back{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--mute);font-size:14px;margin:8px 0 -4px;padding:6px 0}
+.lg-hint{font-size:12.5px;color:var(--mute);margin:-8px 0 14px}
+
+/* kpis */
+.kpis4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:620px){.kpis4{grid-template-columns:repeat(4,1fr)}}
+.kp{border:1px solid var(--bd);box-shadow:none;border-radius:18px;padding:14px}
+.kp .k4{background:#FEF3C7;color:#B45309}
+.kp.main{border-color:var(--ink)}
+.kp b{font-size:30px}
+
+/* quick actions */
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 16px}
+.quick button{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:12px;color:var(--ink2);transition:transform .08s}
+.quick button:active{transform:scale(.96)}
+.quick i{font-style:normal;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--orsoft);color:var(--or2);font-weight:900;font-size:17px}
+.quick button:first-child i{background:var(--or);color:#fff;font-size:22px}
+.closebar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;border-radius:16px;padding:13px 14px;font-weight:700;font-size:14px;margin-bottom:14px;text-align:start}
+.closebar i{font-style:normal;font-weight:800;white-space:nowrap}
+.nextc{background:linear-gradient(135deg,var(--or),var(--or2));box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.nl small,.ns{color:rgba(255,255,255,.82)}
+.na button{color:var(--or2)}
+
+/* équipe lyoum */
+.tt{display:grid;gap:8px}
+@media(min-width:620px){.tt{grid-template-columns:1fr 1fr}}
+.ttc{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--bd);border-radius:16px;padding:12px 14px}
+.ttx{flex:1;min-width:0}.ttx b{display:block;font-size:15px}.ttx small{display:block;color:var(--mute);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttn{text-align:end}.ttn b{display:block;font-family:var(--display);font-size:24px;line-height:1}.ttn small{color:var(--ok);font-weight:700;font-size:12px}
+.ava{overflow:hidden}.ava img{width:100%;height:100%;object-fit:cover}
+
+/* planning */
+.ptitle{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.vseg{display:flex;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:3px;margin-top:10px}
+.vseg button{padding:7px 12px;border-radius:9px;font-weight:700;font-size:13px;color:var(--mute)}
+.vseg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.bfilter{display:flex;gap:8px;overflow-x:auto;margin:-4px -16px 10px;padding:2px 16px;scrollbar-width:none}
+.bfilter:empty{display:none}
+.bfilter button{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1px solid var(--bd);font-weight:700;font-size:13px}
+.bfilter button i{width:9px;height:9px;border-radius:50%}
+.bfilter button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pg{background:#fff;border:1px solid var(--bd);border-radius:18px;overflow:clip;position:relative}
+.pg.wide{overflow:auto hidden}
+.pg-head,.pg-body{display:grid;grid-template-columns:46px repeat(var(--cols),minmax(0,1fr))}
+.pg.wide .pg-head,.pg.wide .pg-body{grid-template-columns:46px repeat(var(--cols),minmax(104px,1fr));min-width:calc(46px + var(--cols) * 104px)}
+.pg-head{position:sticky;top:66px;z-index:4;border-radius:18px 18px 0 0;background:#fff;border-bottom:1px solid var(--bd)}
+.pg-ch{display:flex;align-items:center;gap:8px;padding:10px 8px;border-inline-start:1px solid var(--bd);min-width:0}
+.pg-ch div{min-width:0}.pg-ch b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pg-ch small{display:block;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:480px){.pg-ch{flex-direction:column;align-items:flex-start;gap:4px;padding:8px 6px}}
+.pg-body{position:relative}
+.pg-times{position:relative}
+.pg-times span{position:absolute;inset-inline:0;transform:translateY(-50%);text-align:center;font-size:10.5px;font-weight:700;color:var(--mute)}
+.pg-times span:first-child{transform:none}
+.pg-col{position:relative;border-inline-start:1px solid var(--bd);background-image:linear-gradient(to bottom,var(--bd) 1px,transparent 1px),linear-gradient(to bottom,#F4F3F0 1px,transparent 1px);background-size:100% calc(var(--slot) * 2),100% var(--slot);cursor:copy}
+.pg-col.off{background-color:#FAFAF8;cursor:not-allowed}
+.pg-offl{position:sticky;top:60px;text-align:center;font-size:12px;font-weight:700;color:var(--mute);padding-top:12px}
+.pg-out{position:absolute;inset-inline:0;background:repeating-linear-gradient(-45deg,rgba(0,0,0,.025) 0 6px,transparent 6px 12px);pointer-events:none}
+.pg-blk{position:absolute;inset-inline:3px;border-radius:8px;background:repeating-linear-gradient(-45deg,#EFEDE9 0 6px,#F7F6F3 6px 12px);border:1px dashed #D6D2CB;color:var(--mute);font-size:11px;font-weight:700;padding:4px 6px;overflow:hidden;pointer-events:none}
+.ev{position:absolute;inset-inline:3px;border-radius:9px;padding:5px 7px 5px 9px;text-align:start;overflow:hidden;background:color-mix(in srgb,var(--bc) 13%,#fff);border:1px solid color-mix(in srgb,var(--bc) 30%,#fff);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.05);z-index:2;display:flex;flex-direction:column;gap:1px;transition:transform .08s}
+.ev::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--bc)}
+.ev:active{transform:scale(.98)}
+.ev b{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
+.ev small{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8}
+.ev.tiny{flex-direction:row;align-items:center;padding-block:2px}.ev.tiny small{display:none}
+.ev.venu{background:#ECFDF3;border-color:#BBF0D0}.ev.venu::before{background:var(--ok)}
+.ev.pend{background:#FFF7ED;border:1.5px dashed #F59E0B}.ev.pend::before{background:#F59E0B}
+.ev.absent{background:#F5F5F4;border-color:#E7E5E4;opacity:.7}.ev.absent b{text-decoration:line-through}.ev.absent::before{background:#A8A29E}
+.evk{position:absolute;top:4px;inset-inline-end:5px;width:16px;height:16px;border-radius:50%;background:var(--ok);color:#fff;font-size:10px;font-style:normal;font-weight:900;display:grid;place-items:center}
+.evk.q{background:#F59E0B}.evk.x{background:#A8A29E}
+.pg-now{position:absolute;inset-inline:46px 0;height:0;border-top:2px solid var(--red);z-index:3;pointer-events:none}
+.pg-now::before{content:"";position:absolute;inset-inline-start:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:var(--red)}
+.pg-now i{position:absolute;inset-inline-start:-46px;top:-9px;width:42px;text-align:center;font-style:normal;font-size:10px;font-weight:800;color:#fff;background:var(--red);border-radius:6px;padding:1px 0}
+.fab{position:fixed;inset-inline-end:18px;bottom:calc(96px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;background:var(--or);color:#fff;font-size:30px;font-weight:400;box-shadow:0 10px 26px rgba(0,0,0,.22);z-index:15;display:grid;place-items:center}
+.fab:active{transform:scale(.94)}
+
+/* fiche */
+.dt{display:grid;gap:0;background:var(--s1);border-radius:14px;padding:4px 14px;margin-bottom:12px}
+.dt div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dt div:last-child{border-bottom:0}
+.dt span{color:var(--mute);font-weight:600}.dt b{text-align:end;display:flex;align-items:center;gap:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 9px;margin-inline-end:4px;vertical-align:1px}
+.dt-contact{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dt-contact a{text-align:center;padding:11px;border-radius:12px;background:var(--s1);font-weight:700;font-size:14px}
+.dt-contact a.wa{background:#E8F9EF;color:#128C4A}
+.dt-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.dt-acts .btn{margin:0}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.payamt{display:flex;align-items:center;gap:8px;background:var(--s1);border-radius:16px;padding:6px 16px}
+.payamt input{flex:1;border:0;background:none;font-family:var(--display);font-weight:900;font-size:44px;padding:4px 0;min-width:0;width:100%}
+.payamt input:focus{outline:none}
+.payamt span{font-weight:800;color:var(--mute)}
+.paychips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.paychips button{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:700;font-size:13px}
+
+/* zid rdv */
+.addf{display:grid;gap:12px}
+.addf input,.addf select{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;min-height:46px}
+.addf input:focus,.addf select:focus{outline:none;border-color:var(--or)}
+.addf .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.addf .btn{margin:0}
+.bpick,.spick{display:flex;flex-wrap:wrap;gap:6px}
+.bpick button{display:flex;align-items:center;gap:7px;padding:6px 12px 6px 6px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:14px}
+.bpick button[aria-pressed=true],.spick button[aria-pressed=true]{border-color:var(--or);background:var(--orsoft);color:var(--or2)}
+.spick button{padding:8px 12px;border-radius:12px;background:#fff;border:1.5px solid var(--line);font-weight:700;font-size:13.5px;text-align:start;line-height:1.2}
+.spick small{display:block;font-weight:600;font-size:11px;color:var(--mute)}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.chk input{width:20px;height:20px;min-height:0;accent-color:var(--or)}
+
+/* caisse */
+.cday{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cday .iconbtn{font-size:22px;font-weight:700}
+.cday .iconbtn:disabled{opacity:.35}
+.cdlab{flex:1;position:relative;text-align:center;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px;font-size:15px}
+.cdlab input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.cash-hero{background:var(--ink);color:#fff;border-radius:22px;padding:18px 18px 16px;margin-bottom:6px}
+.cash-hero small{color:#B9B3A9;font-weight:700;font-size:13px}
+.cash-hero b{display:block;font-family:var(--display);font-weight:900;font-size:52px;line-height:1.05}
+.cash-hero b span{font-size:20px}
+.cbar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin:10px 0 10px}
+.cbar i{display:block;height:100%;background:#34D399;border-radius:99px}
+.cmeta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:#D6D1C8;font-weight:600}
+.ctab{background:#fff;border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+.ctab>div{display:grid;grid-template-columns:30px 1fr auto;grid-template-areas:"a n s" "a m s";column-gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--bd)}
+.ctab>div:last-child{border-bottom:0}
+.ctab .ava{grid-area:a}.ctab>div>.ava,.ttab>div>.ava{color:#fff;font-size:12px;font-weight:800;text-align:center}.ctab b{grid-area:n;font-size:14.5px}.ctab span{grid-area:m;font-size:12px;color:var(--mute)}.ctab strong{grid-area:s;font-family:var(--display);font-size:20px}
+.ctab .tot{background:var(--s1);grid-template-areas:"n n s"}
+.clist{display:grid;gap:6px}
+.crow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px 12px;cursor:pointer}
+.crow.late{border-color:#FECACA;background:#FFFBFA}
+.crow .ch{font-family:var(--display);font-weight:800;font-size:18px;min-width:48px}
+.crow .cn{flex:1;min-width:0}.crow .cn b{display:block;font-size:14.5px}
+.crow .cn small{display:block;font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camt{font-family:var(--display);font-weight:800;font-size:18px;white-space:nowrap;padding:6px 10px;border-radius:10px;background:#ECFDF3;color:var(--ok)}
+.camt i{font-style:normal;font-size:12px;opacity:.6}
+.camt.muted{background:none;color:var(--mute)}
+.cq{display:flex;gap:6px}
+.cq button{padding:8px 10px;border-radius:10px;background:var(--ok);color:#fff;font-weight:800;font-size:13px;white-space:nowrap}
+.cq button.x{background:var(--s2);color:var(--ink2)}
+
+/* stats */
+.kpi span em{font-style:normal;font-weight:800;font-size:12px;padding:1px 6px;border-radius:6px;margin-inline-start:4px}
+.kpi span em.up{background:rgba(52,211,153,.2);color:#059669}.kpi.main span em.up{color:#A7F3D0}
+.kpi span em.down{background:rgba(239,68,68,.15);color:#DC2626}.kpi.main span em.down{color:#FECACA}
+.kpi span small{opacity:.75}
+.ttab>div{display:grid;grid-template-columns:26px 1fr 54px 70px 40px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ttab>div:last-child{border-bottom:0}
+.ttab .th{grid-template-columns:1fr 54px 70px 40px;font-size:11px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;padding-top:0}
+.ttab .th span:first-child{padding-inline-start:0}
+.ttab span,.ttab strong{text-align:end}.ttab strong{font-weight:800}.ttab .warn{color:var(--red);font-weight:700}
+
+/* plus */
+.menu{display:grid;gap:10px;margin-top:10px}
+.menu>*{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--bd);border-radius:18px;padding:16px;text-align:start;color:inherit;text-decoration:none}
+.menu i{font-style:normal;width:44px;height:44px;border-radius:14px;background:var(--orsoft);color:var(--or2);display:grid;place-items:center;font-size:20px;flex:0 0 44px}
+.menu b{display:block;font-size:16px}.menu small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.pinbox{background:var(--orsoft);border:1px solid var(--orline);border-radius:14px;padding:12px;display:grid;gap:6px}
+.pinbox input{letter-spacing:.3em;font-weight:800}
+.pinbox .btn{justify-self:start;margin:0}
+
+/* bottom nav (telephone) */
+nav.tabs{background:rgba(255,255,255,.96);border:1px solid var(--bd);box-shadow:0 10px 30px rgba(17,17,17,.12)}
+nav.tabs button{color:#8A857C}
+nav.tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+nav.tabs .wrap>button[hidden]{display:none}
+@media(max-width:959px){
+nav.tabs .wrap{display:flex;gap:4px;max-width:none}
+nav.tabs .wrap>button:not([hidden]){flex:1 1 0;min-width:0;padding:10px 0 9px;font-size:12.5px;font-weight:700;gap:4px;border-radius:18px}
+nav.tabs button svg{width:25px;height:25px}
+nav.tabs{padding:7px;border-radius:26px}
+}
+.badge{box-shadow:0 0 0 2px #fff}
+.side-brand{display:none}
+.is-barber [data-owner]{display:none!important}
+body[data-tab=rdv] .toast{bottom:calc(166px + env(safe-area-inset-bottom))}
+
+/* desktop: sidebar */
+@media(min-width:960px){
+  body{padding-bottom:30px;padding-inline-start:236px}
+  nav.tabs{inset:0 auto 0 0;width:236px;max-width:none;border-radius:0;border:0;border-inline-end:1px solid #1f1d1a;background:#141311;box-shadow:none;padding:18px 12px;transform:none}
+  nav.tabs .wrap{flex-direction:column;align-items:stretch;gap:4px;height:100%;max-width:none;padding:0;display:flex}
+  nav.tabs button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:14.5px;padding:12px 14px;color:#A8A29A;border-radius:12px;position:relative}
+  nav.tabs button svg{width:20px;height:20px}
+  nav.tabs button[aria-selected=true]{background:var(--or);color:#fff}
+  nav.tabs button:hover:not([aria-selected=true]){background:#1f1d1a;color:#fff}
+  nav.tabs .badge{position:static;margin-inline-start:auto;box-shadow:none}
+  .side-brand{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--display);font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px 22px}
+  .side-brand i{width:8px;height:28px;border-radius:5px;background:repeating-linear-gradient(-45deg,var(--or) 0 5px,#fff 5px 10px,#555 10px 15px,#fff 15px 20px)}
+  header .brand{visibility:hidden}
+  .wrap{max-width:1100px;padding:0 28px}
+  .fab{bottom:28px;inset-inline-end:28px}
+  .toast,body[data-tab=rdv] .toast{bottom:30px}
+  .pg-head,.pg-body{grid-template-columns:56px repeat(var(--cols),minmax(150px,1fr))}
+  .pg-now{inset-inline-start:56px}.pg-now i{inset-inline-start:-54px}
+  #t-home{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;align-items:start}
+  #t-home[hidden]{display:none}
+  #t-home>.hello,#t-home>.kpis4,#t-home>.quick{grid-column:1/-1}
+  #t-home>#pendBox,#t-home>#closeBox,#t-home>#nextBox{grid-column:1}
+  #t-home>#teamToday,#t-home>#remBox{grid-column:2}
+  .modal .sheet{max-width:520px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section class="login" id="login">
+  <div class="lg-top">
+    <div class="lg-pole" aria-hidden="true"></div>
+    <h1><span id="lgName">Salon Test</span><small>Admin</small></h1>
+  </div>
+  <form id="loginForm" class="lg-body">
+    <p>Dkhel l-code dyalek</p>
+    <div class="lg-hint">Mol s-salon wla coiffeur — kol wa7ed b code dyalo</div>
+    <div class="dots" id="pinDots" aria-hidden="true"></div>
+    <input class="pin-hidden" id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" aria-label="Code">
+    <div class="err" id="loginErr" role="alert"></div>
+    <div class="pad" id="pad">
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+      <button type="button" data-k="del" aria-label="Ms7">⌫</button><button type="button" data-k="0">0</button>
+      <button type="submit" class="go" id="loginBtn" aria-label="Dkhel">→</button>
+    </div>
+  </form>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header><div class="wrap">
+    <div class="brand"><i aria-hidden="true"></i><span>Barber<small>Admin</small></span></div>
+    <div class="hdr-r">
+      <span class="rolechip" id="roleChip" hidden></span>
+      <a class="iconbtn" href="./" target="_blank" rel="noopener" aria-label="Chouf l-site" title="Chouf l-site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg></a>
+      <button class="iconbtn" id="refresh" aria-label="Actualiser" title="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
+      <button class="iconbtn" id="logout" aria-label="Khrej" title="Khrej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg></button>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <!-- LYOUM (dashboard) -->
+    <section id="t-home">
+      <div class="hello"><small id="todayLbl"></small><h2 id="helloT"></h2></div>
+      <div class="kpis4" id="daySum"></div>
+      <div class="quick" id="quick">
+        <button type="button" data-q="add"><i>＋</i>Rendez-vous</button>
+        <button type="button" data-q="plan"><i>▦</i>Planning</button>
+        <button type="button" data-q="cash"><i>DH</i>Caisse</button>
+        <button type="button" data-q="block"><i>⦸</i>Sedd wa9t</button>
+      </div>
+      <div id="nextBox"></div>
+      <div class="pend" id="pendBox" hidden>
+        <h3>Khasshom validation <i id="pendN"></i></h3>
+        <div class="list" id="pendList"></div>
+      </div>
+      <div id="closeBox"></div>
+      <div id="remBox"></div>
+      <button class="waitbar" id="waitBar" hidden type="button"><span>⏳ <b id="waitN"></b> f liste d'attente</span>Chouf</button>
+      <div id="teamToday"></div>
+      <div id="waitSec" hidden>
+        <div class="section-t">Liste d'attente</div>
+        <div class="list" id="waitList"></div>
+      </div>
+    </section>
+
+    <!-- PLANNING -->
+    <section id="t-rdv" hidden>
+      <div class="ptitle"><h2>Planning</h2>
+        <div class="vseg" role="group" aria-label="Affichage">
+          <button type="button" data-view="plan" aria-pressed="true">▦ Planning</button>
+          <button type="button" data-view="list" aria-pressed="false">☰ Liste</button>
+        </div></div>
+      <div class="strip" id="dayStrip"></div>
+      <div class="bfilter" id="bFilter"></div>
+      <div class="dayhead2"><h3 id="dayTitle">Lyoum</h3><span id="dayCount"></span></div>
+      <div class="plan" id="plan"></div>
+      <div class="timeline" id="rdvList" hidden></div>
+      <button class="fab" type="button" id="fabAdd" aria-label="Zid rendez-vous">＋</button>
+    </section>
+
+    <!-- FLOUS: caisse + stats -->
+    <section id="t-money" hidden>
+      <h2>Flous</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-mseg="cash" aria-selected="true">💵 Caisse</button>
+        <button role="tab" data-mseg="stats" aria-selected="false">📈 Statistiques</button>
+      </div>
+      <div id="mCash">
+        <div class="cday"><button type="button" class="iconbtn" id="cPrev" aria-label="Nhar li fat">‹</button>
+          <label class="cdlab"><b id="cDayL">Lyoum</b><input type="date" id="cDay" aria-label="Khtar nhar"></label>
+          <button type="button" class="iconbtn" id="cNext" aria-label="Nhar li jay">›</button></div>
+        <div id="cashBox"></div>
+      </div>
+      <div id="mStats" hidden>
+        <div class="strip" id="periodStrip"></div>
+        <div id="statsBox"></div>
+      </div>
+    </section>
+
+    <!-- PLUS -->
+    <section id="t-more" hidden>
+      <h2>Plus</h2>
+      <div class="menu" id="moreMenu">
+        <button type="button" data-go="team"><i>✂️</i><span><b>Salon</b><small>Services, l-équipe, codes dyal coiffeurs, paramètres</small></span></button>
+        <button type="button" data-go="block"><i>⦸</i><span><b>Sedd l-wa9t</b><small>Pause, 3otla, numéros bloqués</small></span></button>
+        <button type="button" data-go="photos"><i>🖼️</i><span><b>Photos</b><small>Tsawer dyal l-khdma f l-site</small></span></button>
+        <a href="./" target="_blank" rel="noopener"><i>↗</i><span><b>Chouf l-site</b><small>Kifach kayban l les clients</small></span></a>
+      </div>
+    </section>
+
+    <!-- BLOCAGES -->
+    <section id="t-block" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
+      <h2>Sedd l-wa9t</h2>
+      <p class="sub">Pause, nhar 3otla, l-3id, coiffeur ghayb… L-site kaysedd had l-wa9t direct.</p>
+      <form class="form" id="blockForm">
+        <div><label for="bDate">Nhar</label><input type="date" id="bDate" required></div>
+        <div class="toggle" role="group" aria-label="Mudda">
+          <button type="button" data-full="1" aria-pressed="true">Nhar kamel</button>
+          <button type="button" data-full="0" aria-pressed="false">Men sa3a l sa3a</button>
+        </div>
+        <div class="two" id="bTimes" hidden>
+          <div><label for="bDe">Men</label><input type="time" id="bDe" step="1800"></div>
+          <div><label for="bA">7ta</label><input type="time" id="bA" step="1800"></div>
+        </div>
+        <div><label for="bWho">Chkoun</label><select id="bWho"></select></div>
+        <div><label for="bWhy">Sabab (optionnel)</label><input id="bWhy" maxlength="80" placeholder="Ex: Pause dyal l-ghda"></div>
+        <button class="btn full" type="submit" id="bBtn">Sedd had l-wa9t</button>
+        <div class="err" id="bErr"></div>
+      </form>
+      <div class="section-t">Les blocages jayin</div>
+      <div class="list" id="blockList"></div>
+
+      <div id="phonesSec">
+      <h2 style="margin-top:30px">Numéros bloqués</h2>
+      <p class="sub">Had les numéros ma y9derouch yréserviw. Numéro li ma ja 2 merrat kaytbloka b wa7du.</p>
+      <form class="form" id="phoneForm">
+        <div class="two">
+          <div><label for="pTel">Numéro</label><input id="pTel" type="tel" inputmode="tel" placeholder="06 12 34 56 78" maxlength="17"></div>
+          <div><label for="pWhy">Sabab</label><input id="pWhy" maxlength="80" placeholder="Ex: fake"></div>
+        </div>
+        <button class="btn full" type="submit" id="pBtn" style="margin-top:0">🚫 Bloqui had n-numéro</button>
+        <div class="err" id="pErr"></div>
+      </form>
+      <div class="list" id="phoneList"></div>
+      </div>
+    </section>
+
+    <!-- SALON: SERVICES + ÉQUIPE -->
+    <section id="t-team" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
+      <h2>Salon</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-seg="svc" aria-selected="true">✂️ Services</button>
+        <button role="tab" data-seg="team" aria-selected="false">👤 L-équipe</button>
+        <button role="tab" data-seg="info" aria-selected="false">⚙️ Paramètres</button>
+      </div>
+      <div id="segSvc">
+        <p class="sub">L-prix, l-wa9t, smiya w tswira dyal kol service. Kaybanou f étape 1 dyal réservation.</p>
+        <div class="list" id="svcList"></div>
+        <button class="btn ghost full" type="button" id="addSvc">＋ Zid service</button>
+      </div>
+      <div id="segInfo" hidden>
+        <p class="sub">Smiya, numéro, adresse, l-wa9t w lon dyal l-site. Ay tbdil kayban f l-site direct.</p>
+        <form class="form" id="salonForm">
+          <div class="fsec">🏪 L-ma7al</div>
+          <div><label for="iNom">Smiyt l-ma7al</label><input id="iNom" maxlength="40" placeholder="Salon Test"></div>
+          <div class="two">
+            <div><label for="iAdr">Adresse</label><input id="iAdr" maxlength="80" placeholder="Adresse test"></div>
+            <div><label for="iVille">L-mdina</label><input id="iVille" maxlength="40" placeholder="Salé"></div>
+          </div>
+          <div><label for="iWa">Numéro (WhatsApp w téléphone)</label><input id="iWa" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99">
+            <div class="hint">Les clients kaysifto l had n-numéro w kay3aytou lih.</div></div>
+
+          <div class="fsec">🕐 L-wa9t dyal l-khdma</div>
+          <div class="hrs" id="hrs"></div>
+          <button type="button" class="btn sm ghost" id="hrsCopy">Nefs l-wa9t dyal Tnin l kol nhar</button>
+
+          <div class="fsec">🎨 Lon dyal l-site</div>
+          <div class="swatches" id="sw"></div>
+          <div class="colrow"><label for="iCol">Lon akhor</label><input id="iCol" type="color" value="#E2560A"><span class="prev" id="colPrev">Réservi</span></div>
+
+          <div class="fsec">🔗 Les liens</div>
+          <div><label for="iMaps">Lien Google Maps</label><input id="iMaps" type="url" inputmode="url" placeholder="https://maps.app.goo.gl/…">
+            <div class="hint">F Google Maps: 7el s-salon → Partager → Copier le lien.</div></div>
+          <div class="two">
+            <div><label for="iIg">Instagram</label><input id="iIg" placeholder="@oussama.barber"></div>
+            <div><label for="iFb">Facebook</label><input id="iFb" type="url" inputmode="url" placeholder="https://facebook.com/…"></div>
+          </div>
+          <button class="btn full" type="submit" id="iSave">Sjjel les paramètres</button>
+          <div class="err" id="iErr"></div>
+        </form>
+
+        <form class="form" id="notifForm" style="margin-top:14px">
+          <div class="fsec">🔔 Notifications f WhatsApp</div>
+          <p class="hint" style="margin:0">Kaywslek msg f WhatsApp mli client <b>yréservi</b>, <b>y-annuli</b> wla ytsjjel f liste d'attente. Khddam m3a WhatsApp 3adi w WhatsApp Business.</p>
+          <div class="nstat" id="nStat"></div>
+          <details class="steps" id="nSteps">
+            <summary>Kifach tfa33lha (merra wa7da, 2 dqaye9)</summary>
+            <ol>
+              <li>7el <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener">had l-page dyal CallMeBot</a> w nqel n-numéro dyal l-bot li fiha (kaybda b +34).</li>
+              <li>Zid had n-numéro f les contacts dyalek (smmih "Notif Salon").</li>
+              <li>Sift lih f WhatsApp, men n-numéro li bghiti ywslouk fih les msg, had l-jomla b-dabt:<br><code id="nPhrase">I allow callmebot to send me messages</code> <button type="button" class="btn sm ghost" id="nCopy">Copier</button></li>
+              <li>Ghadi yjawbek b <b>APIKEY</b> (ar9am). Koubih l-te7t w brek "Jrreb".</li>
+            </ol>
+          </details>
+          <div class="two">
+            <div><label for="nPhone">Numéro dyalek</label><input id="nPhone" type="tel" inputmode="tel" maxlength="17" placeholder="06 55 77 88 99"></div>
+            <div><label for="nKey">APIKEY</label><input id="nKey" inputmode="numeric" maxlength="40" autocomplete="off" placeholder="1234567"></div>
+          </div>
+          <div class="nchk">
+            <label><input type="checkbox" id="nBook" checked> Réservation jdida</label>
+            <label><input type="checkbox" id="nCancel" checked> Annulation</label>
+            <label><input type="checkbox" id="nWait" checked> Liste d'attente</label>
+          </div>
+          <button class="btn full" type="button" id="nTest">📲 Jrreb w sjjel</button>
+          <button class="btn ghost full" type="submit" id="nSave">Sjjel bla test</button>
+          <div class="err" id="nErr"></div>
+        </form>
+      </div>
+      <div id="segTeam" hidden>
+        <p class="sub">Les coiffeurs li kaybanou f l-site, l-wa9t dyal l-khdma w nhar l-ra7a dyal kol wa7ed.</p>
+        <div class="list" id="teamList"></div>
+        <button class="btn ghost full" type="button" id="addMember">＋ Zid coiffeur</button>
+      </div>
+    </section>
+
+    <!-- PHOTOS -->
+    <section id="t-photos" hidden>
+      <button class="back" type="button" data-back>‹ Rje3</button>
+      <h2>Tsawer dyal l-khdma</h2>
+      <p class="sub">Katban f l-accueil dyal l-site. Tsawer w9ofin (portrait) kaybanou a7ssan.</p>
+      <label class="upl" for="galFile">
+        <span style="font-size:28px">＋</span>Zid tsawer
+        <small>Tqder tkhtar bzaf mra wa7da</small>
+      </label>
+      <input class="file" type="file" id="galFile" accept="image/*" multiple>
+      <div id="uplState" hidden><div class="progress"><i id="uplBar"></i></div></div>
+      <div class="grid" id="galGrid"></div>
+    </section>
+
+    <!-- BOUTIQUE -->
+    <section id="t-shop" hidden>
+      <h2>Boutique</h2>
+      <div class="seg" role="tablist">
+        <button role="tab" data-sseg="ord" aria-selected="true">🧾 Commandes</button>
+        <button role="tab" data-sseg="prod" aria-selected="false">🛍️ Produits</button>
+        <button role="tab" data-sseg="set" aria-selected="false">⚙️ Livraison</button>
+      </div>
+      <div id="sOrd">
+        <div class="shopkpis" id="shopKpis"></div>
+        <div class="ofilter" id="ordFilter"></div>
+        <div class="list" id="ordList"></div>
+      </div>
+      <div id="sProd" hidden>
+        <p class="sub">Tswira, smiya, prix w stock dyal kol produit. Kaybanou f l-Boutique dyal l-site direct mlli tsjjel.</p>
+        <div class="list" id="prodList"></div>
+        <button class="btn ghost full" type="button" id="addProd">＋ Zid produit</button>
+      </div>
+      <div id="sSet" hidden>
+        <form class="form" id="shopForm">
+          <div class="fsec">🛍️ L-boutique</div>
+          <div class="nchk"><label><input type="checkbox" id="shActif"> L-boutique m7loula f l-site</label></div>
+          <div class="fsec">🧾 Kifach ychriw les clients</div>
+          <div class="nchk">
+            <label><input type="checkbox" id="shWa"> Commande f WhatsApp</label>
+            <label><input type="checkbox" id="shSalon"> Ykhdouha mn s-salon</label>
+            <label><input type="checkbox" id="shLiv"> Livraison (COD)</label>
+          </div>
+          <div class="fsec">🚚 Livraison</div>
+          <div class="two">
+            <div><label for="shFrais">Prix dyal livraison (DH)</label><input id="shFrais" type="number" inputmode="numeric" min="0" placeholder="30"></div>
+            <div><label for="shFree">Gratuite mn (DH)</label><input id="shFree" type="number" inputmode="numeric" min="0" placeholder="300"><div class="hint">0 = 3mmerha ma tkoun gratuite</div></div>
+          </div>
+          <div><label for="shDelai">Wa9t dyal livraison</label><input id="shDelai" maxlength="30" placeholder="24–48h"></div>
+          <button class="btn full" type="submit">Sjjel</button>
+          <div class="err" id="shErr"></div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabs" role="tablist"><div class="wrap">
+    <div class="side-brand" aria-hidden="true"><i></i><span id="sideName">Barber</span></div>
+    <button role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Lyoum<i class="badge" id="waitBadge" hidden></i></button>
+    <button role="tab" data-tab="rdv" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 14h2M13 14h2M9 17h2"/></svg>Planning</button>
+    <button role="tab" data-tab="money" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>Flous</button>
+    <button role="tab" data-tab="shop" aria-selected="false" data-owner><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>Boutique<i class="badge" id="shopBadge" hidden></i></button>
+    <button role="tab" data-tab="more" aria-selected="false" data-owner><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Plus</button>
+  </div></nav>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<!-- popup dyal l-khiyarat (reporter / lgha / blassa khawya) -->
+<div class="modal" id="actModal" hidden role="dialog" aria-modal="true" aria-labelledby="aTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="aIcon">⋯</span><div><h3 id="aTitle"></h3><p id="aSub"></p></div>
+      <button class="iconbtn" type="button" id="aClose" aria-label="Sedd">✕</button></div>
+    <div id="aBody"></div>
+  </div>
+</div>
+
+<!-- popup dyal message WhatsApp -->
+<div class="modal" id="msgModal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <div class="mhead"><span class="mic" id="mIcon">✓</span><div><h3 id="mTitle"></h3><p id="mSub"></p></div>
+      <button class="iconbtn" type="button" id="mClose" aria-label="Sedd">✕</button></div>
+    <label class="lbl" for="mText">Message (tqder tbeddlo)</label>
+    <textarea id="mText" rows="7"></textarea>
+    <a class="btn full wa" id="mSend" href="#" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1c-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1s0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5s0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.5 1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.8.6-.1 1.8-.7 2-1.4s.2-1.3.2-1.4c-.1-.2-.3-.2-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.3 8.3 0 1 1 12 20.3z"/></svg>
+      Sift f WhatsApp</a>
+    <button class="btn ghost full" type="button" id="mLater" style="margin-top:8px">Mn b3d</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const DAYKEYS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const DAYS = ["L-7ed","Tnin","Tlat","Larb3","Lkhmis","Jjem3a","Ssebt"];
+const D2 = ["7ed","Tni","Tla","Arb","Khm","Jem","Seb"];
+const ORDER = [1,2,3,4,5,6,0];
+const MONTHS = ["jan","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
+const pad = n => String(n).padStart(2,"0");
+const iso = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const fromIso = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const addDays = (s, n) => { const d = fromIso(s); d.setDate(d.getDate()+n); return iso(d); };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today = () => iso(new Date());
+const label = s => { const t = today(); if (s === t) return "Lyoum"; if (s === addDays(t,1)) return "Ghedda"; if (s === addDays(t,-1)) return "L-bare7"; const d = fromIso(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
+const waNum = tel => { let d = String(tel).replace(/\D/g, ""); if (d[0] === "0") d = "212" + d.slice(1); else if (d.length === 9) d = "212" + d; return d; };
+let PIN = ""; try { PIN = sessionStorage.getItem("ob_pin") || ""; } catch(e){}
+/* chkoun dkhel: "owner" (mol s-salon) wla "barber" (coiffeur, ghir l-khdma dyalo) */
+let ROLE = "", ME = "";
+try { const w = JSON.parse(sessionStorage.getItem("ob_who") || "null"); if (w){ ROLE = w.role; ME = w.barber || ""; } } catch(e){}
+const isOwner = () => ROLE !== "barber";
+function setWho(j){
+  ROLE = j.role === "barber" ? "barber" : "owner"; ME = j.role === "barber" ? (j.barber || "") : "";
+  try { sessionStorage.setItem("ob_who", JSON.stringify({ role: ROLE, barber: ME })); } catch(e){}
+  applyRole();
+}
+function applyRole(){
+  document.body.classList.toggle("is-barber", !isOwner());
+  const rc = $("#roleChip"); rc.hidden = false;
+  rc.textContent = isOwner() ? "👑 Mol s-salon" : "💈 " + ME;
+  document.querySelectorAll("[data-owner]").forEach(el => el.hidden = !isOwner());
+  if ($("#phonesSec")) $("#phonesSec").hidden = !isOwner();
+}
+let CFG = { coiffeurs: [], galerie: [], services: [], salon: {} };
+try { CFG.salon = JSON.parse(localStorage.getItem("ob_admin_salon") || "null") || {}; } catch(e){}
+/* cache: kanbiyno l-données li fatou dghya, w kanjibou l-jdad men lor */
+const cKey = k => "ob_c_" + k + "_" + ROLE + "_" + ME;
+function cGet(k){ try { return JSON.parse(localStorage.getItem(cKey(k)) || "null"); } catch(e){ return null; } }
+function cSet(k, v){ try { localStorage.setItem(cKey(k), JSON.stringify(v)); } catch(e){} }
+function cClear(){ try { Object.keys(localStorage).filter(k => k.indexOf("ob_c_") === 0).forEach(k => localStorage.removeItem(k)); } catch(e){} }
+{ const c = cGet("cfg"); if (c && c.coiffeurs) CFG = c; }
+const SN = () => (CFG.salon && CFG.salon.nom) || "Salon Test";
+function paintName(){
+  const n = SN();
+  document.querySelector(".brand span").firstChild.textContent = n.split(/\s+/)[0];
+  const lg = document.getElementById("lgName"); if (lg) lg.textContent = n;
+  const sn = document.getElementById("sideName"); if (sn) sn.textContent = n;
+}
+paintName();
+const MAPS_DEFAULT = "https://maps.google.com/?q=Salon%20Test%20Adresse%20test%20Sal%C3%A9";
+
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
+async function call(op, extra){
+  const r = await fetch(ADMIN.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify({ action:"admin", pin: PIN, op, ...(extra||{}) }) });
+  const j = await r.json();
+  if (!j.ok && (j.error === "pin" || j.error === "locked")){ logout(j.error === "locked" ? "Bzaf dyal l-mo7awalat. Tsenna 15 dqi9a." : "Code ghalat."); throw new Error("auth"); }
+  return j;
+}
+
+/* ---------- login (clavier) ---------- */
+function paintDots(){ const n = $("#pin").value.length; $("#pinDots").innerHTML = Array.from({ length: Math.max(4, n) }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join(""); }
+$("#pad").addEventListener("click", e => {
+  const b = e.target.closest("button[data-k]"); if (!b) return;
+  const p = $("#pin"); $("#loginErr").textContent = "";
+  if (b.dataset.k === "del") p.value = p.value.slice(0, -1); else if (p.value.length < 12) p.value += b.dataset.k;
+  paintDots();
+});
+$("#pin").addEventListener("input", paintDots);
+document.addEventListener("keydown", e => {
+  if ($("#login").hidden || document.activeElement === $("#pin")) return;
+  if (/^\d$/.test(e.key)){ $("#pin").value += e.key; paintDots(); }
+  else if (e.key === "Backspace"){ $("#pin").value = $("#pin").value.slice(0, -1); paintDots(); }
+  else if (e.key === "Enter"){ $("#loginForm").requestSubmit(); }
+});
+paintDots();
+
+/* ---------- login ---------- */
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  PIN = $("#pin").value.trim(); if (!PIN) return;
+  $("#loginBtn").disabled = true; $("#loginErr").textContent = "";
+  try {
+    const j = await call("login");
+    if (j.ok){ try { sessionStorage.setItem("ob_pin", PIN); } catch(e){} setWho(j); start(); }
+    else $("#loginErr").textContent = "Backend 9dim: khass déploiement jdid f Apps Script.";
+  } catch(err){ if (err.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; }
+  $("#loginBtn").disabled = false;
+});
+function logout(msg){
+  cClear(); PIN = ""; ROLE = ""; ME = ""; try { sessionStorage.removeItem("ob_pin"); sessionStorage.removeItem("ob_who"); } catch(e){}
+  $("#app").hidden = true; $("#login").hidden = false; $("#pin").value = ""; paintDots(); $("#loginErr").textContent = msg || "";
+  if (msg){ $("#pinDots").classList.remove("shake"); void $("#pinDots").offsetWidth; $("#pinDots").classList.add("shake"); }
+}
+$("#logout").addEventListener("click", () => logout());
+
+/* ---------- tabs ---------- */
+let tab = "home", backTo = "more";
+const SECTIONS = ["home","rdv","money","shop","more","block","team","photos"];
+const NAV_OF = { block: null, team: "more", photos: "more" };
+function setTab(t, from){
+  if (!isOwner() && ["shop","more","team","photos"].includes(t)) t = "home";
+  if (["block","team","photos"].includes(t)) backTo = from || (isOwner() ? "more" : "home");
+  tab = t;
+  const nav = t in NAV_OF ? (NAV_OF[t] || backTo) : t;
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === nav));
+  SECTIONS.forEach(k => $("#t-"+k).hidden = k !== t);
+  document.body.dataset.tab = t;
+  load(); window.scrollTo(0,0);
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+document.querySelectorAll("[data-back]").forEach(b => b.addEventListener("click", () => setTab(backTo)));
+$("#moreMenu").querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => setTab(b.dataset.go, "more")));
+$("#refresh").addEventListener("click", () => load());
+function load(){ ({ home: loadHome, rdv: loadRdv, money: loadMoney, more: () => {}, block: loadBlocks, team: loadTeam, photos: loadPhotos, shop: loadShop })[tab](); }
+
+let _cfgP = null;
+function loadConfig(){
+  if (_cfgP) return _cfgP;              // ila kayna wa7da f t-tri9, ma nsifto jouj
+  const p = _cfgP = (async () => {
+    const j = await call("getconfig");
+    if (j.ok){ CFG = { v: j.v || 0, coiffeurs: j.coiffeurs || [], galerie: j.galerie || [], services: j.services || [], salon: j.salon || {} }; cSet("cfg", CFG); fillBarberSelect(); fillSalon(); }
+    return CFG;
+  })();
+  p.finally(() => { if (_cfgP === p) _cfgP = null; }).catch(() => {});
+  return p;
+}
+function fillBarberSelect(){
+  if (!isOwner()){ $("#bWho").innerHTML = `<option>${esc(ME)}</option>`; return; }
+  $("#bWho").innerHTML = `<option value="tous">Salon kamel</option>` + CFG.coiffeurs.filter(c => c.actif).map(c => `<option>${esc(c.nom)}</option>`).join("");
+}
+
+/* ---------- messages l l-client ---------- */
+const SITE = location.origin + location.pathname.replace(/admin\.html$/, "");
+function fmtDate(s, lg){
+  const d = fromIso(s);
+  if (lg === "fr") return d.toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
+  if (lg === "ar") return d.toLocaleDateString("ar-MA", { weekday:"long", day:"numeric", month:"long" });
+  return label(s).toLowerCase() === "lyoum" ? "lyoum" : label(s);
+}
+function clientMsg(r, ok){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  if (ok) return {
+    da: `Salam ${r.nom} 👋 réservation dyalek f ${SN()} tconfirmat ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Kifach twsel: ${maps}\nNtsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 votre réservation chez ${SN()} est confirmée ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 Itinéraire : ${maps}\nÀ bientôt !`,
+    ar: `مرحبا ${r.nom} 👋 تم تأكيد حجزك في ${SN()} ✅\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 الموقع: ${maps}\nفي انتظارك!` }[lg];
+  return {
+    da: `Salam ${r.nom}, smeh lina 🙏 ma qdernach nconfirmiw réservation dyal ${d} m3a ${r.heure}. Tqder tkhtar wa9t akhor hna: ${SITE}`,
+    fr: `Bonjour ${r.nom}, désolé 🙏 nous ne pouvons pas confirmer votre réservation du ${d} à ${r.heure}. Choisissez un autre créneau ici : ${SITE}`,
+    ar: `مرحبا ${r.nom}، نعتذر 🙏 لم نتمكن من تأكيد حجزك ليوم ${d} على ${r.heure}. يمكنك اختيار موعد آخر هنا: ${SITE}` }[lg];
+}
+const isPend = s => String(s).includes("attente");
+function rdvCard(r, showDay){
+  const pend = isPend(r.statut);
+  const col = barberColor(r.barber);
+  return `<article class="rdv ${esc(r.statut)}" data-pending="${pend ? 1 : 0}" data-id="${esc(r.id)}" style="--bc:${col}">
+    <div class="h">${esc(r.heure)}<small>${r.dur} min</small></div>
+    <div class="who"><span class="ava" style="background:${col}">${esc((r.nom||"?")[0].toUpperCase())}</span>${esc(r.nom)} <span class="pill ${pend ? "attente" : esc(r.statut)}">${esc(r.statut)}</span></div>
+    <div class="what">${showDay ? `<span class="dayof">${esc(label(r.date))}</span> · ` : ""}${esc(r.services)} · <b>${r.prix} DH</b><span class="bar-tag" style="color:${col};background:${col}14">● ${esc(r.barber)}</span></div>
+    <div class="row">
+      ${pend
+        ? `<button class="st ok" data-id="${esc(r.id)}" data-s="confirmé">✓ Valider</button><button class="st no" data-id="${esc(r.id)}" data-s="annulé" data-refuse="1">✗ Refuser</button>`
+        : ["venu","absent","annulé"].map(s => `<button class="st ${s} ${r.statut===s?"on":""}" data-id="${esc(r.id)}" data-s="${s}">${{venu:"✓ Ja",absent:"✗ Ma jach",annulé:"Lgha"}[s]}</button>`).join("")}
+      <div class="contact">
+        <a href="tel:${esc(r.tel.length === 9 ? "0" + r.tel : r.tel)}" aria-label="3ayet l ${esc(r.nom)}">📞</a>
+        <a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.nom)}">💬</a>
+        ${isOwner() ? `<button class="blk iconbtn" style="width:38px;height:38px" data-tel="${esc(r.tel)}" aria-label="Bloqui ${esc(r.nom)}" title="Bloqui had n-numéro">🚫</button>` : ""}
+        ${!pend && !String(r.statut).startsWith("annul") ? `<button class="more iconbtn" style="width:38px;height:38px" data-id="${esc(r.id)}" aria-label="Khiyarat okhrin" title="Reporter / Lgha">⋯</button>` : ""}
+      </div>
+    </div>
+    <div class="after" hidden></div>
+  </article>`;
+}
+let LISTS = {};
+function bindCards(container, list, reload){
+  container.querySelectorAll(".st").forEach(b => b.onclick = async () => {
+    const r = list.find(x => x.id === b.dataset.id); if (!r) return;
+    const s = b.classList.contains("on") ? "confirmé" : b.dataset.s;
+    const decide = isPend(r.statut) && (s === "confirmé" || b.dataset.refuse);
+    b.disabled = true;
+    try {
+      const j = await call("status", { id: r.id, statut: s });
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
+      if (decide){
+        const card = b.closest(".rdv"), ok = s === "confirmé";
+        const wa = `https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(clientMsg(r, ok))}`;
+        openMsgModal(r, ok);
+        card.querySelector(".row").innerHTML = `<span class="pill ${ok ? "venu" : "annulé"}">${ok ? "✓ Tvalidat" : "Trefdat"}</span>`;
+        const af = card.querySelector(".after"); af.hidden = false;
+        af.innerHTML = `<a href="#" data-remsg="1">💬 Sift l-message l ${esc(r.nom)} f WhatsApp</a>`;
+        af.querySelector("[data-remsg]").onclick = e => { e.preventDefault(); openMsgModal(r, ok); };
+        toast(ok ? "Tvalidat ✓" : "Trefdat"); refreshPendingCount();
+        setTimeout(() => { if (tab === "rdv" || tab === "home") reload(); }, 15000);
+      } else { toast("Tsjjel ✓"); reload(); }
+    } catch(e){ b.disabled = false; }
+  });
+  container.querySelectorAll(".more").forEach(b => b.onclick = () => { const r = list.find(x => x.id === b.dataset.id); if (r) openActions(r, reload); });
+  container.querySelectorAll(".blk").forEach(b => b.onclick = async () => {
+    if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "?"; toast("3awed brek bach tbloqui had n-numéro"); setTimeout(() => { if (b.isConnected){ b.classList.remove("armed"); b.textContent = "🚫"; } }, 3500); return; }
+    b.disabled = true;
+    try { const j = await call("blockphone", { tel: b.dataset.tel, raison: "men l-admin" }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); reload(); refreshPendingCount(); } }
+    catch(e){ b.disabled = false; }
+  });
+}
+
+/* ---------- khiyarat: reporter / lgha / blassa khawya ---------- */
+let actR = null, actReload = null;
+function openAct(){ $("#actModal").hidden = false; document.body.style.overflow = "hidden"; }
+function closeAct(){ $("#actModal").hidden = true; document.body.style.overflow = ""; }
+$("#aClose").addEventListener("click", closeAct);
+$("#actModal").addEventListener("click", e => { if (e.target.id === "actModal") closeAct(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#actModal").hidden) closeAct(); });
+function lgOf(r){ return r.langue === "fr" || r.langue === "ar" ? r.langue : "da"; }
+function reschedMsg(r, date, heure){
+  const lg = lgOf(r), d = fmtDate(date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return { da:`Salam ${r.nom} 👋 rendez-vous dyalek f ${SN()} tbeddel l ${d} m3a ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nIla ma ynasbekch had l-wa9t, jaweb 3la had l-message.`,
+    fr:`Bonjour ${r.nom} 👋 votre rendez-vous chez ${SN()} est déplacé au ${d} à ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nSi l'horaire ne vous convient pas, répondez à ce message.`,
+    ar:`مرحبا ${r.nom} 👋 تم تغيير موعدك في ${SN()} إلى ${d} على ${heure} ✅\n💈 ${r.barber}\n📍 ${maps}\nإذا لم يناسبك هذا الوقت، أجب على هذه الرسالة.` }[lg];
+}
+function freeMsg(date, heure, name){
+  const d = fmtDate(date, "da");
+  return `Salam${name ? " " + name : ""} 👋 t7llat blassa f ${SN()} ${d} m3a ${heure} 💈\nBghiti tji? Jaweb 3la had l-message wla réservi hna: ${SITE}`;
+}
+function openActions(r, reload){
+  actR = r; actReload = reload;
+  $("#aIcon").textContent = "⋯"; $("#aIcon").className = "mic";
+  $("#aTitle").textContent = r.nom + " · " + r.heure;
+  $("#aSub").textContent = `${label(r.date)} · ${r.services} · ${r.barber}`;
+  $("#aBody").innerHTML = `<div class="opts">
+    <button class="opt" type="button" data-a="resched"><i>⏱</i><span><b>Reporter</b><small>Bddel l nhar wla sa3a okhra w sift lih l-wa9t jdid</small></span></button>
+    <button class="opt danger" type="button" data-a="absent"><i>✗</i><span><b>Ma jach / ma jawebch</b><small>Kat7sab absent w l-blassa katwelli khawya</small></span></button>
+    <button class="opt danger" type="button" data-a="cancel"><i>🗑</i><span><b>Lgha l-rendez-vous</b><small>Chi 7aja urgente — l-blassa katwelli khawya</small></span></button>
+  </div>`;
+  $("#aBody").querySelectorAll("[data-a]").forEach(b => b.onclick = () => {
+    if (b.dataset.a === "resched") reschedView(r.date);
+    else freeSlot(b.dataset.a === "absent" ? "absent" : "annulé");
+  });
+  openAct();
+}
+async function freeSlot(statut){
+  const r = actR;
+  $("#aBody").innerHTML = `<div class="empty"><span class="spin"></span>Kansjjlo…</div>`;
+  try {
+    const j = await call("status", { id: r.id, statut });
+    if (!j.ok){ $("#aBody").innerHTML = `<div class="err">Ma tsjjelch. 3awed.</div>`; return; }
+    actReload && actReload();
+    let wl = [];
+    try { const w = await call("waitlist"); wl = (w.list || []).filter(x => x.date === r.date && x.statut.includes("attente")); } catch(e){}
+    $("#aIcon").textContent = "✓"; $("#aIcon").className = "mic";
+    $("#aTitle").textContent = "L-blassa wllat khawya";
+    $("#aSub").textContent = `${label(r.date)} · ${r.heure} · ${r.barber}`;
+    $("#aBody").innerHTML = `
+      <div class="freebox">${statut === "absent" ? r.nom + " tsjjel absent." : "Rendez-vous dyal " + esc(r.nom) + " tlgha."} 3ti had l-blassa l chi wa7ed akhor 👇</div>
+      ${wl.length ? `<div class="lbl">F liste d'attente dyal had nhar</div><div class="wl">${wl.map(w => `<a href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent(freeMsg(r.date, r.heure, w.nom))}" target="_blank" rel="noopener"><span>${esc(w.nom)}<br><small>${esc(w.services)}</small></span>💬 Sift</a>`).join("")}</div>` : ""}
+      <label class="lbl" for="fText">Message</label>
+      <textarea id="fText" rows="4" style="width:100%;background:var(--s1);border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:14px;margin-bottom:12px">${esc(freeMsg(r.date, r.heure))}</textarea>
+      <a class="btn full wa" id="fShare" href="#" target="_blank" rel="noopener">📣 Sift l chi wa7ed f WhatsApp</a>
+      <button class="btn ghost full" type="button" id="fDone" style="margin-top:8px">Safi</button>`;
+    const upd = () => $("#fShare").href = "https://wa.me/?text=" + encodeURIComponent($("#fText").value);
+    upd(); $("#fText").oninput = upd; $("#fDone").onclick = closeAct;
+  } catch(e){ if (e.message !== "auth") $("#aBody").innerHTML = `<div class="err">Ma kaynach connexion.</div>`; }
+}
+let rsDate = null, rsStart = null;
+async function reschedView(date){
+  const r = actR; rsDate = date; rsStart = null;
+  const t = today(), days = Array.from({ length: 14 }, (_, i) => addDays(t, i));
+  $("#aIcon").textContent = "⏱";
+  $("#aTitle").textContent = "Reporter " + r.nom;
+  $("#aSub").textContent = `Daba: ${label(r.date)} · ${r.heure} · ${r.barber}`;
+  $("#aBody").innerHTML = `<button class="back" type="button" id="rsBack">‹ Rje3</button>
+    <div class="dgrid">${days.map(d => { const x = fromIso(d); return `<button type="button" class="dchip" data-d="${d}" aria-pressed="${d === date}"><small>${d === t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("")}</div>
+    <div class="tgrid" id="rsTimes"><div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanchoufou les blayes…</div></div>
+    <button class="btn full" type="button" id="rsGo" disabled>Reporter</button><div class="err" id="rsErr"></div>`;
+  $("#rsBack").onclick = () => openDetail(r, actReload);
+  $("#aBody").querySelectorAll(".dgrid .dchip").forEach(b => b.onclick = () => reschedView(b.dataset.d));
+  const on = $("#aBody .dgrid [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
+  try {
+    const res = await fetch(ADMIN.apiUrl + "?date=" + date, { cache:"no-store" }).then(x => x.json());
+    let busy = res.bookings || [];
+    if (date === r.date){ const i = busy.findIndex(x => x.barber === r.barber && x.start === hm2m(r.heure) && x.dur === r.dur); if (i >= 0) busy.splice(i, 1); }
+    const c = (CFG.coiffeurs || []).find(x => x.nom === r.barber) || { de:"11:00", a:"21:00", repos:[] };
+    const dk = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"][fromIso(date).getDay()];
+    if ((c.repos || []).includes(dk)){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(r.barber)} kayrta7 had nhar.</div>`; return; }
+    const min = date === today() ? nowM() + 15 : 0, out = [];
+    for (let m = hm2m(c.de); m + r.dur <= hm2m(c.a); m += 30){
+      const free = m >= min && !busy.some(x => (x.barber === "*" || x.barber === r.barber) && m < x.start + x.dur && x.start < m + r.dur);
+      out.push(`<button type="button" data-m="${m}" ${free ? "" : "disabled"}>${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}</button>`);
+    }
+    $("#rsTimes").innerHTML = out.join("") || `<div class="empty" style="grid-column:1/-1">Ma kayn 7ta blassa.</div>`;
+    $("#rsTimes").querySelectorAll("button[data-m]").forEach(b => b.onclick = () => {
+      rsStart = +b.dataset.m; $("#rsTimes").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+      $("#rsGo").disabled = false; $("#rsGo").textContent = `Reporter l ${label(date)} · ${b.textContent}`;
+    });
+  } catch(e){ $("#rsTimes").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+  $("#rsGo").onclick = async () => {
+    if (rsStart === null) return;
+    $("#rsGo").disabled = true; $("#rsErr").textContent = "";
+    try {
+      const j = await call("reschedule", { id: r.id, date: rsDate, start: rsStart });
+      if (!j.ok){ $("#rsErr").textContent = j.error === "taken" ? "Had sa3a t7jzat daba. Khtar wa7da okhra." : j.error === "hours" ? "Had sa3a barra l-wa9t dyal l-coiffeur." : "Ma tsjjelch."; $("#rsGo").disabled = false; return; }
+      closeAct(); actReload && actReload(); toast("Treporta ✓");
+      const nr = { ...r, date: j.date, heure: j.heure };
+      openMsgModal(nr, true, reschedMsg(r, j.date, j.heure), "Rendez-vous treporta");
+    } catch(e){ if (e.message !== "auth"){ $("#rsErr").textContent = "Ma kaynach connexion."; $("#rsGo").disabled = false; } }
+  };
+}
+
+/* ---------- popup message ---------- */
+let modalR = null;
+function waHref(){ return `https://wa.me/${waNum(modalR.tel)}?text=${encodeURIComponent($("#mText").value)}`; }
+function openMsgModal(r, ok, text, title){
+  modalR = r;
+  $("#mIcon").textContent = ok ? "✓" : "✕"; $("#mIcon").classList.toggle("no", !ok);
+  $("#mTitle").textContent = title || (ok ? "Réservation tvalidat" : "Réservation trefdat");
+  $("#mSub").textContent = `${r.nom} · ${label(r.date)} · ${r.heure} — sift lih l-message`;
+  $("#mText").value = text || clientMsg(r, ok);
+  $("#mSend").href = waHref();
+  $("#msgModal").hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(() => $("#mSend").focus(), 50);
+}
+function closeMsgModal(){ $("#msgModal").hidden = true; document.body.style.overflow = ""; }
+$("#mText").addEventListener("input", () => { $("#mSend").href = waHref(); });
+$("#mSend").addEventListener("click", () => { $("#mSend").href = waHref(); setTimeout(closeMsgModal, 300); toast("WhatsApp t7el ✓"); });
+$("#mClose").addEventListener("click", closeMsgModal);
+$("#mLater").addEventListener("click", closeMsgModal);
+$("#msgModal").addEventListener("click", e => { if (e.target.id === "msgModal") closeMsgModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#msgModal").hidden) closeMsgModal(); });
+
+/* ---------- en attente ---------- */
+let lastPending = -1;
+function paintPending(list, cached){
+    LISTS.pending = list;
+    $("#pendBox").hidden = !list.length; $("#pendN").textContent = list.length;
+    $("#pendList").innerHTML = list.map(r => rdvCard(r, true)).join("");
+    bindCards($("#pendList"), list, () => { loadPending(); if (tab === "home") loadHomeDay(); });
+    if (cached) paintBadge(list.length); else setPendingBadge(list.length);
+}
+async function loadPending(){
+  try { const j = await call("pending"), list = j.list || []; cSet("pend", list); paintPending(list); } catch(e){}
+}
+function paintBadge(n){
+  const w = Number($("#waitBadge").dataset.wait || 0), tot = n + w;
+  $("#waitBadge").hidden = !tot; $("#waitBadge").textContent = tot;
+  document.title = (n ? `(${n}) ` : "") + "Admin · " + SN();
+}
+function setPendingBadge(n){
+  paintBadge(n);
+  if (lastPending >= 0 && n > lastPending){
+    toast("🔔 Réservation jdida kaytsenna l-validation");
+    try { if (window.Notification && Notification.permission === "granted") new Notification(SN(), { body:"Réservation jdida kaytsenna l-validation", icon:"../icons/icon-192.png" }); } catch(e){}
+    if (tab === "home") loadPending();
+  }
+  lastPending = n;
+}
+async function refreshPendingCount(){ try { const j = await call("pending"); setPendingBadge((j.list || []).length); } catch(e){} }
+
+/* ---------- rendez-vous ---------- */
+let day = today();
+function renderStrip(){
+  const t = today(), days = [-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13].map(n => addDays(t, n));
+  $("#dayStrip").innerHTML = days.map(d => { const x = fromIso(d);
+    return `<button type="button" class="dchip${d===t?" is-today":""}" data-d="${d}" aria-pressed="${d===day}" aria-label="${esc(label(d))}"><small>${d===t ? "Lyoum" : D2[x.getDay()]}</small><b>${x.getDate()}</b><i>${MONTHS[x.getMonth()]}</i></button>`; }).join("") +
+    `<label class="dchip pick" title="Khtar nhar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><input type="date" id="pickDay" value="${day}" aria-label="Khtar nhar"></label>`;
+  const on = $("#dayStrip [aria-pressed=true]"); if (on) on.scrollIntoView({ inline:"center", block:"nearest" });
+  $("#dayStrip").querySelectorAll("button").forEach(b => b.onclick = () => { day = b.dataset.d; loadRdv(); });
+  $("#pickDay").onchange = e => { if (e.target.value){ day = e.target.value; loadRdv(); } };
+}
+const ICO = {
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+const BCOL = ["#E2560A","#2563EB","#0E9F6E","#9333EA","#DB2777","#CA8A04","#0891B2"];
+const barberColor = n => { const i = (CFG.coiffeurs || []).findIndex(c => c.nom === n); let x = i; if (x < 0){ x = 0; for (const ch of String(n)) x = (x + ch.charCodeAt(0)) % 97; } return BCOL[x % BCOL.length]; };
+const nowM = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+const hm2m = s => { const [a,b] = String(s).split(":").map(Number); return a*60 + b; };
+function renderNext(live){
+  const box = $("#nextBox"); if (!box) return;
+  const n = nowM(), nx = live.filter(r => !isPend(r.statut) && r.statut !== "venu" && !r.statut.startsWith("absent") && hm2m(r.heure) + r.dur > n).sort((a,b) => a.heure.localeCompare(b.heure))[0];
+  if (!nx){ box.innerHTML = ""; return; }
+  const diff = hm2m(nx.heure) - n;
+  const when = diff <= 0 ? "Daba" : diff < 60 ? `F ${diff} dqi9a` : `F ${Math.floor(diff/60)}h${String(diff%60).padStart(2,"0")}`;
+  box.innerHTML = `<div class="nextc"><div class="nl"><small>${ICO.clock} L-client jay · ${when}</small><b>${esc(nx.heure)}</b></div>
+    <div class="nr"><div class="nn">${esc(nx.nom)}</div><div class="ns">${esc(nx.services)} · <span style="color:${barberColor(nx.barber)}">●</span> ${esc(nx.barber)}</div>
+    </div><div class="na"><a href="tel:${esc(nx.tel.length === 9 ? "0" + nx.tel : nx.tel)}">📞 3ayet</a><a href="https://wa.me/${waNum(nx.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a><button type="button" id="nxMore">Ma jawebch?</button></div></div>`;
+  $("#nxMore").onclick = () => openDetail(nx, () => loadHome());
+}
+function setHello(){
+  const d = new Date(), H = d.getHours();
+  $("#helloT").textContent = (H < 12 ? "Sba7 l-khir" : H < 18 ? "Mbrouk l-3chiya" : "Msa l-khir") + " 👋";
+  $("#todayLbl").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
+}
+/* ---------- rappels dyal ghedda ---------- */
+function remMsg(r){
+  const lg = r.langue === "fr" || r.langue === "ar" ? r.langue : "da", d = fmtDate(r.date, lg), maps = (CFG.salon && CFG.salon.maps) || MAPS_DEFAULT;
+  return {
+    da: `Salam ${r.nom} 👋 kanfekrouk b rendez-vous dyalek f ${SN()} ghedda:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nIla ma t9derch tji, golha lina 🙏 Ntsennawk!`,
+    fr: `Bonjour ${r.nom} 👋 petit rappel de votre rendez-vous chez ${SN()} demain :\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nSi vous ne pouvez pas venir, prévenez-nous 🙏 À demain !`,
+    ar: `مرحبا ${r.nom} 👋 كنفكروك بالموعد ديالك في ${SN()} غدا:\n📅 ${d} · ${r.heure}\n💈 ${r.barber}\n📍 ${maps}\nإلا ما تقدرش تجي، علمنا 🙏 في انتظارك!` }[lg];
+}
+async function loadReminders(p){
+  try { const h = await (p || homeList()); paintReminders(h.all.filter(r => r.date === h.tmr)); } catch(e){}
+}
+function paintReminders(raw){
+  const box = $("#remBox"); if (!box) return;
+  {
+    const list = raw.filter(r => !String(r.statut).startsWith("annul") && !String(r.statut).startsWith("absent")).sort((a,b) => a.heure.localeCompare(b.heure));
+    if (!list.length){ box.innerHTML = ""; return; }
+    const sent = id => { try { return localStorage.getItem("rem_" + id) === "1"; } catch(e){ return false; } };
+    const left = list.filter(r => !sent(r.id)).length;
+    box.innerHTML = `<details class="rem" ${left ? "open" : ""}><summary>🔔 Rappels dyal ghedda (${list.length})<small>${left ? left + " mazal" : "Kolchi tsifet ✓"}</small></summary>
+      <div class="rl">${list.map(r => `<div class="ri ${sent(r.id) ? "sent" : ""}" data-id="${esc(r.id)}"><span class="tm">${esc(r.heure)}</span>
+        <span class="nm">${esc(r.nom)}<small>${esc(r.services)} · ${esc(r.barber)}</small></span>
+        <a href="https://wa.me/${waNum(r.tel)}?text=${encodeURIComponent(remMsg(r))}" target="_blank" rel="noopener">${sent(r.id) ? "✓ Tsifet" : "💬 Sift rappel"}</a></div>`).join("")}</div></details>`;
+    box.querySelectorAll(".ri a").forEach(a => a.addEventListener("click", () => {
+      const row = a.closest(".ri"); try { localStorage.setItem("rem_" + row.dataset.id, "1"); } catch(e){}
+      setTimeout(() => { row.classList.add("sent"); a.textContent = "✓ Tsifet"; const n = box.querySelectorAll(".ri:not(.sent)").length; box.querySelector("summary small").textContent = n ? n + " mazal" : "Kolchi tsifet ✓"; }, 400);
+    }));
+  }
+}
+/* ---------- attente (f rendez-vous) ---------- */
+$("#waitBar").addEventListener("click", () => { $("#waitSec").hidden = false; $("#waitSec").scrollIntoView({ behavior:"smooth" }); });
+async function loadWait(){
+  try { const j = await call("waitlist"), list = j.list || []; cSet("wait", list); paintWait(list); } catch(e){}
+}
+function paintWait(list){
+  {
+    const pending = list.filter(w => w.statut.includes("attente"));
+    $("#waitBadge").dataset.wait = pending.length; paintBadge(Math.max(0, lastPending));
+    $("#waitBar").hidden = !pending.length; $("#waitN").textContent = pending.length;
+    $("#waitSec").hidden = !list.length || $("#waitSec").hidden;
+    $("#waitList").innerHTML = list.map(w => `<div class="item"><div class="tx">
+        <b>${esc(w.nom)}</b> <span class="pill ${w.statut.includes("attente") ? "confirmé" : "venu"}">${esc(w.statut)}</span>
+        <div class="s">${esc(label(w.date))} · ${esc(w.services)}${w.barber ? " · " + esc(w.barber) : ""}</div></div>
+        <div class="contact"><a href="tel:${esc(w.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(w.tel)}?text=${encodeURIComponent("Salam " + w.nom + " 👋 t7llat blassa f " + SN() + " " + label(w.date).toLowerCase() + ". Mazal bghiti?")}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div>
+        ${w.statut.includes("attente") ? `<button class="btn sm ghost" data-id="${esc(w.id)}">Tsselt</button>` : ""}</div>`).join("");
+    $("#waitList").querySelectorAll("button[data-id]").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const j = await call("waitdone", { id: b.dataset.id }); if (j.ok) loadWait(); } catch(e){ b.disabled = false; }
+    });
+  }
+}
+
+/* ---------- blocages ---------- */
+let fullDay = true;
+$("#bDate").value = today(); $("#bDate").min = today();
+document.querySelectorAll("[data-full]").forEach(b => b.onclick = () => {
+  fullDay = b.dataset.full === "1";
+  document.querySelectorAll("[data-full]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $("#bTimes").hidden = fullDay;
+});
+$("#blockForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#bErr").textContent = "";
+  const de = fullDay ? "" : $("#bDe").value, a = fullDay ? "" : $("#bA").value;
+  if (!fullDay && (!de || !a || a <= de)){ $("#bErr").textContent = "Sa3a dyal l-bdya khass tkoun 9bel sa3a dyal l-akhir."; return; }
+  $("#bBtn").disabled = true;
+  try {
+    const j = await call("block", { date: $("#bDate").value, de, a, coiffeur: $("#bWho").value, raison: $("#bWhy").value.trim() });
+    if (j.ok){ toast("Tsedd ✓"); $("#bWhy").value = ""; loadBlocks(); } else $("#bErr").textContent = "Ma tsjjelch. Tchecki l-nhar w s-sa3a.";
+  } catch(err){ if (err.message !== "auth") $("#bErr").textContent = "Ma kaynach connexion."; }
+  $("#bBtn").disabled = false;
+});
+async function loadBlocks(){
+  loadPhones();
+  $("#blockList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    if (!CFG.coiffeurs.length) await loadConfig();
+    const j = await call("blocks"), list = j.list || [];
+    if (!list.length){ $("#blockList").innerHTML = `<div class="empty">Ma kayn 7ta blocage jay.</div>`; return; }
+    $("#blockList").innerHTML = list.map(b => `<div class="item"><div class="tx">
+        <b>${esc(label(b.date))} · ${b.de ? esc(b.de) + "–" + esc(b.a) : "nhar kamel"}</b>
+        <div class="s">${b.coiffeur === "tous" ? "Salon kamel" : esc(b.coiffeur)}${b.raison ? " · " + esc(b.raison) : ""}</div></div>
+        <button class="del" data-id="${esc(b.id)}">7ayed</button></div>`).join("");
+    $("#blockList").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Akked?"; return; }
+      b.disabled = true;
+      try { const j = await call("unblock", { id: b.dataset.id }); if (j.ok){ toast("Tm7a ✓"); loadBlocks(); } } catch(e){ b.disabled = false; }
+    });
+  } catch(e){ if (e.message !== "auth") $("#blockList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
+/* ---------- numéros bloqués ---------- */
+async function loadPhones(){
+  try {
+    const j = await call("blocked"), list = j.list || [];
+    $("#phoneList").innerHTML = list.length ? list.map(p => `<div class="item"><div class="tx"><b>${esc(p.tel)}</b><div class="s">${esc(p.raison || "—")}</div></div>
+      <button class="del" data-tel="${esc(p.tel)}">Debloqui</button></div>`).join("") : `<div class="empty">Ma kayn 7ta numéro bloqué.</div>`;
+    $("#phoneList").querySelectorAll(".del").forEach(b => b.onclick = async () => {
+      b.disabled = true; try { const j = await call("unblockphone", { tel: b.dataset.tel }); if (j.ok){ toast("Tdebloqua ✓"); loadPhones(); } } catch(e){ b.disabled = false; }
+    });
+  } catch(e){}
+}
+$("#phoneForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#pErr").textContent = "";
+  const tel = $("#pTel").value.replace(/\D/g, "");
+  if (tel.length < 9){ $("#pErr").textContent = "Numéro na9es."; return; }
+  $("#pBtn").disabled = true;
+  try { const j = await call("blockphone", { tel, raison: $("#pWhy").value.trim() }); if (j.ok){ toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); $("#pTel").value = ""; $("#pWhy").value = ""; loadPhones(); } else $("#pErr").textContent = "Ma tsjjelch."; }
+  catch(err){ if (err.message !== "auth") $("#pErr").textContent = "Ma kaynach connexion."; }
+  $("#pBtn").disabled = false;
+});
+
+/* ---------- images ---------- */
+function resizeImage(file, max){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL("image/jpeg", 0.84).split(",")[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.src = url;
+  });
+}
+
+/* ---------- équipe ---------- */
+let team = [], openId = null;
+async function loadTeam(){
+  $("#teamList").innerHTML = $("#svcList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    if (isOwner()) loadNotif();
+    await loadConfig();
+    team = JSON.parse(JSON.stringify(CFG.coiffeurs)); renderTeam();
+    svcs = JSON.parse(JSON.stringify(CFG.services)); renderSvcs();
+  } catch(e){ if (e.message !== "auth") $("#teamList").innerHTML = $("#svcList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+document.querySelectorAll("[data-seg]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-seg]").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#segSvc").hidden = b.dataset.seg !== "svc"; $("#segTeam").hidden = b.dataset.seg !== "team"; $("#segInfo").hidden = b.dataset.seg !== "info";
+});
+
+/* ---------- paramètres dyal salon ---------- */
+const DK = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const DKL = { lundi:"Tnin", mardi:"Tlat", mercredi:"Larb3", jeudi:"Lkhmis", vendredi:"Jjem3a", samedi:"Ssebt", dimanche:"L-7ed" };
+const PALETTE = ["#E2560A","#C8322A","#D97706","#0E7C4A","#0F766E","#1D4ED8","#6D28D9","#BE185D","#17140F"];
+let setCol = "#E2560A";
+function shade(hex, amt){ const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const f = v => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt); return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+function applyColor(hex){
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex || "")) return;
+  const s = document.documentElement.style;
+  s.setProperty("--or", hex); s.setProperty("--or2", shade(hex, -0.16)); s.setProperty("--orsoft", shade(hex, 0.92)); s.setProperty("--orline", shade(hex, 0.65));
+}
+function hrsRows(hz){
+  $("#hrs").innerHTML = DK.map(d => { const v = hz && hz[d]; return `<div class="hr ${v ? "" : "off"}" data-d="${d}"><b>${DKL[d]}</b>
+    <button type="button" class="tg" aria-pressed="${!!v}">${v ? "M7loul" : "Msdod"}</button>
+    <input type="time" step="1800" value="${v ? v[0] : "11:00"}" aria-label="${DKL[d]} men"><input type="time" step="1800" value="${v ? v[1] : "21:00"}" aria-label="${DKL[d]} 7ta"></div>`; }).join("");
+  $("#hrs").querySelectorAll(".tg").forEach(b => b.onclick = () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on); b.textContent = on ? "M7loul" : "Msdod"; b.closest(".hr").classList.toggle("off", !on); });
+}
+$("#hrsCopy").addEventListener("click", () => {
+  const first = $("#hrs .hr"), [a, b] = first.querySelectorAll("input"), on = first.querySelector(".tg").getAttribute("aria-pressed") === "true";
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const [x, y] = r.querySelectorAll("input"); x.value = a.value; y.value = b.value; const tg = r.querySelector(".tg"); tg.setAttribute("aria-pressed", on); tg.textContent = on ? "M7loul" : "Msdod"; r.classList.toggle("off", !on); });
+});
+function swatches(){
+  $("#sw").innerHTML = PALETTE.map(c => `<button type="button" style="background:${c}" data-c="${c}" aria-label="${c}" aria-pressed="${c.toLowerCase() === setCol.toLowerCase()}"></button>`).join("");
+  $("#sw").querySelectorAll("button").forEach(b => b.onclick = () => pickCol(b.dataset.c));
+}
+function pickCol(c){ setCol = c; $("#iCol").value = c; applyColor(c); swatches(); }
+$("#iCol").addEventListener("input", e => pickCol(e.target.value));
+const fmtTel = wa => { const d = String(wa || "").replace(/\D/g, ""); const l = d.startsWith("212") ? "0" + d.slice(3) : d; return l.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); };
+/* ---------- notifications WhatsApp ---------- */
+let NOTIF = null;
+function paintNotif(){
+  const n = NOTIF || {}, on = n.phone && n.hasKey;
+  $("#nStat").className = "nstat " + (on ? "on" : "off");
+  $("#nStat").textContent = on ? "✅ Mfa33la · kaywslo l " + fmtTel(n.phone) : "⚪ Mazal ma mfa33lach";
+  $("#nPhone").value = n.phone ? fmtTel(n.phone) : (CFG.salon && CFG.salon.whatsapp ? fmtTel(CFG.salon.whatsapp) : "");
+  $("#nKey").value = ""; $("#nKey").placeholder = n.hasKey ? "•••••• (mkhbiya)" : "1234567";
+  $("#nBook").checked = n.book !== false; $("#nCancel").checked = n.cancel !== false; $("#nWait").checked = n.wait !== false;
+  $("#nSteps").open = !on;
+}
+async function loadNotif(){ try { const j = await call("getnotif"); if (j.ok){ NOTIF = j; paintNotif(); } } catch(e){} }
+async function sendNotif(op){
+  $("#nErr").textContent = "";
+  const phone = $("#nPhone").value.replace(/\D/g, ""), apikey = $("#nKey").value.trim();
+  if (phone.length < 10){ $("#nErr").textContent = "Kteb n-numéro dyalek."; return; }
+  if (!apikey && !(NOTIF && NOTIF.hasKey)){ $("#nErr").textContent = "Kteb l-APIKEY li sift lik l-bot."; return; }
+  const btn = op === "testnotif" ? $("#nTest") : $("#nSave"), lab = btn.textContent;
+  btn.disabled = true; btn.textContent = op === "testnotif" ? "Kansifto test…" : "…";
+  try {
+    const j = await call(op, { phone, apikey, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked });
+    if (j.ok){ NOTIF = { ...(NOTIF || {}), phone: j.phone, hasKey: true, book: $("#nBook").checked, cancel: $("#nCancel").checked, wait: $("#nWait").checked }; paintNotif();
+      toast(op === "testnotif" ? "Tsift ✓ · chouf WhatsApp dyalek" : "Tsjjel ✓"); }
+    else $("#nErr").textContent = j.error === "phone" ? "Numéro machi sa7i7." : j.error === "apikey" ? "Kteb l-APIKEY." :
+      j.error === "send" ? "Ma wslch l-msg. Tchecki l-APIKEY w n-numéro (khass ykoun nefs n-numéro li sift mno l-bot)." + (j.detail ? " · " + j.detail : "") : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#nErr").textContent = "Ma kaynach connexion."; }
+  btn.disabled = false; btn.textContent = lab;
+}
+$("#nTest").addEventListener("click", () => sendNotif("testnotif"));
+$("#notifForm").addEventListener("submit", e => { e.preventDefault(); sendNotif("savenotif"); });
+$("#nCopy").addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText($("#nPhrase").textContent).then(() => toast("Tcopia ✓")); });
+
+function fillSalon(){
+  const s = CFG.salon || {};
+  if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
+  $("#iNom").value = s.nom || "Salon Test"; $("#iAdr").value = s.adresse || "Adresse test"; $("#iVille").value = s.ville || "Salé";
+  $("#iWa").value = fmtTel(s.whatsapp || "212655778899");
+  hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
+  setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
+  $("#iMaps").value = s.maps || ""; $("#iIg").value = s.instagram ? (s.instagram.startsWith("http") ? s.instagram : "@" + s.instagram) : ""; $("#iFb").value = s.facebook || "";
+  paintName();
+  try { localStorage.setItem("ob_admin_salon", JSON.stringify({ nom: s.nom || "", couleur: s.couleur || "" })); } catch(e){}
+}
+$("#salonForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#iErr").textContent = "";
+  const maps = $("#iMaps").value.trim(), fb = $("#iFb").value.trim(), wa = $("#iWa").value.replace(/\D/g, "");
+  if ((maps && !maps.startsWith("https://")) || (fb && !fb.startsWith("https://"))){ $("#iErr").textContent = "L-liens khasshom ybdaw b https://"; return; }
+  if (!$("#iNom").value.trim()){ $("#iErr").textContent = "Kteb smiyt l-ma7al."; return; }
+  if (!/^(0[5-7]\d{8}|212[5-7]\d{8})$/.test(wa)){ $("#iErr").textContent = "Numéro machi sa7i7 (ex: 06 55 77 88 99)."; return; }
+  const horaires = {}; let bad = false;
+  $("#hrs").querySelectorAll(".hr").forEach(r => { const on = r.querySelector(".tg").getAttribute("aria-pressed") === "true", [a, b] = r.querySelectorAll("input");
+    if (on && !(a.value && b.value && b.value > a.value)) bad = true; horaires[r.dataset.d] = on ? [a.value, b.value] : null; });
+  if (bad){ $("#iErr").textContent = "Tchecki l-wa9t: sa3a dyal l-bdya khass tkoun 9bel l-akhir."; return; }
+  if (!Object.values(horaires).some(Boolean)){ $("#iErr").textContent = "Khass nhar wa7ed 3la l-a9al ykoun m7loul."; return; }
+  $("#iSave").disabled = true;
+  try {
+    const j = await call("savesalon", { nom: $("#iNom").value.trim(), adresse: $("#iAdr").value.trim(), ville: $("#iVille").value.trim(),
+      whatsapp: wa, tel: fmtTel(wa), horaires, couleur: setCol, maps, instagram: $("#iIg").value.trim(), facebook: fb });
+    if (j.ok){ CFG.salon = j.salon; fillSalon(); toast("Tsjjel ✓ · l-site tbeddel"); } else $("#iErr").textContent = j.error === "horaires" ? "Tchecki l-wa9t." : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#iErr").textContent = "Ma kaynach connexion."; }
+  $("#iSave").disabled = false;
+});
+
+/* ---------- services ---------- */
+let svcs = [], openSvc = null;
+const sName = s => (s.nom && (s.nom.da || s.nom.fr || s.nom.ar)) || "Service jdid";
+const DUR = [10,15,20,25,30,35,40,45,50,60,75,90,105,120];
+function renderSvcs(){
+  if (!svcs.length){ $("#svcList").innerHTML = `<div class="empty">Ma kayn 7ta service. Zid wa7ed.</div>`; return; }
+  $("#svcList").innerHTML = svcs.map((s, i) => `
+    <article class="member ${s.actif ? "" : "off"}">
+      <div class="top">
+        <div class="order"><button type="button" data-up="${i}" ${i === 0 ? "disabled" : ""} aria-label="Tla3">▲</button><button type="button" data-down="${i}" ${i === svcs.length - 1 ? "disabled" : ""} aria-label="Hbet">▼</button></div>
+        <div class="svcthumb">${s.photo ? `<img src="${esc(s.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "✂"}</div>
+        <div class="tx"><div class="n">${esc(sName(s))} ${s.top ? '<span class="pill confirmé">Ktar talab</span>' : ""} ${s.actif ? "" : '<span class="pill">Mkhbbi</span>'}</div>
+          <div class="s">${s.duree} min</div></div>
+        <div class="price">${s.prix} DH</div>
+      </div>
+      <div style="padding:0 14px 14px"><button class="btn sm ghost" style="width:100%" type="button" data-sedit="${esc(s.id)}">${openSvc === s.id ? "Sedd" : "Bddel l-prix / tswira / smiya"}</button></div>
+      ${openSvc === s.id ? svcForm(s) : ""}
+    </article>`).join("");
+  $("#svcList").querySelectorAll("[data-sedit]").forEach(b => b.onclick = () => { openSvc = openSvc === b.dataset.sedit ? null : b.dataset.sedit; renderSvcs(); });
+  $("#svcList").querySelectorAll("[data-up],[data-down]").forEach(b => b.onclick = async () => {
+    const i = +(b.dataset.up ?? b.dataset.down), j = b.dataset.up != null ? i - 1 : i + 1;
+    [svcs[i], svcs[j]] = [svcs[j], svcs[i]]; renderSvcs(); await saveSvcs("Tbeddel t-tartib ✓");
+  });
+  if (openSvc) bindSvc(svcs.find(s => s.id === openSvc));
+}
+function svcForm(s){
+  const isNew = !CFG.services.some(x => x.id === s.id);
+  return `<div class="edit">
+    <div class="photo-pick"><div class="svcthumb" id="sThumb">${s.photo ? `<img src="${esc(s.photo)}" alt="" referrerpolicy="no-referrer">` : "✂"}</div>
+      <label class="btn sm ghost" for="sFile">📷 ${s.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="sFile" accept="image/*">
+      ${s.photo ? `<button class="btn sm ghost" type="button" id="sNoPhoto">7ayed</button>` : ""}</div>
+    <div class="two">
+      <div><label class="lbl" for="sPrix">Prix (DH)</label><input id="sPrix" type="number" inputmode="numeric" min="0" max="5000" value="${s.prix}"></div>
+      <div><label class="lbl" for="sDur">L-wa9t</label><select id="sDur">${DUR.concat(DUR.includes(s.duree) ? [] : [s.duree]).sort((a,b) => a-b).map(d => `<option value="${d}" ${d === s.duree ? "selected" : ""}>${d} min</option>`).join("")}</select></div>
+    </div>
+    <div class="three">
+      <span class="lbl" style="margin:0">Smiya</span>
+      <input id="sNda" value="${esc(s.nom.da)}" maxlength="40" placeholder="Darija · ex: Coupe" aria-label="Smiya b Darija">
+      <input id="sNfr" value="${esc(s.nom.fr)}" maxlength="40" placeholder="Français · ex: Coupe" aria-label="Nom en français">
+      <input id="sNar" value="${esc(s.nom.ar)}" maxlength="40" placeholder="العربية · مثال: حلاقة" dir="rtl" aria-label="الاسم بالعربية">
+    </div>
+    <div class="three">
+      <span class="lbl" style="margin:0">Description (sghira)</span>
+      <input id="sDda" value="${esc(s.desc.da)}" maxlength="90" placeholder="Darija · ex: Coupe + lavage" aria-label="Description b Darija">
+      <input id="sDfr" value="${esc(s.desc.fr)}" maxlength="90" placeholder="Français · ex: Coupe + shampoing" aria-label="Description en français">
+      <input id="sDar" value="${esc(s.desc.ar)}" maxlength="90" placeholder="العربية · مثال: قص وغسل" dir="rtl" aria-label="الوصف بالعربية">
+    </div>
+    <div class="toggle" role="group" aria-label="Ktar talab">
+      <button type="button" data-top="1" aria-pressed="${!!s.top}">⭐ Ktar talab</button>
+      <button type="button" data-top="0" aria-pressed="${!s.top}">3adi</button>
+    </div>
+    <div class="toggle" role="group" aria-label="Statut">
+      <button type="button" data-sact="1" aria-pressed="${s.actif}">Kayban f l-site</button>
+      <button type="button" data-sact="0" aria-pressed="${!s.actif}">Mkhbbi</button>
+    </div>
+    <button class="btn full" type="button" id="sSave">Sjjel</button>
+    ${isNew ? `<button class="btn ghost full" type="button" id="sCancel" style="margin-top:0">Lgha</button>` : ""}
+    <div class="err" id="sErr"></div>
+  </div>`;
+}
+async function saveSvcs(okMsg){
+  try {
+    const j = await call("saveservices", { services: svcs });
+    if (j.ok){ CFG.services = j.services; svcs = JSON.parse(JSON.stringify(j.services)); renderSvcs(); toast(okMsg || "Tsjjel ✓ · l-site tbeddel"); return true; }
+    toast("Ma tsjjelch"); return false;
+  } catch(e){ return false; }
+}
+function bindSvc(s){
+  $("#sFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#sThumb").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 900);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "service-" + sName(s) });
+      if (!j.ok) throw new Error("up");
+      s.photo = j.url; renderSvcs(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#sThumb").innerHTML = "✂"; $("#sErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#sNoPhoto")) $("#sNoPhoto").onclick = () => { s.photo = ""; renderSvcs(); };
+  const bind = (id, fn) => { $(id).oninput = $(id).onchange = e => fn(e.target.value); };
+  bind("#sPrix", v => s.prix = Number(v)); bind("#sDur", v => s.duree = Number(v));
+  bind("#sNda", v => s.nom.da = v); bind("#sNfr", v => s.nom.fr = v); bind("#sNar", v => s.nom.ar = v);
+  bind("#sDda", v => s.desc.da = v); bind("#sDfr", v => s.desc.fr = v); bind("#sDar", v => s.desc.ar = v);
+  document.querySelectorAll("[data-top]").forEach(b => b.onclick = () => { s.top = b.dataset.top === "1"; document.querySelectorAll("[data-top]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  document.querySelectorAll("[data-sact]").forEach(b => b.onclick = () => { s.actif = b.dataset.sact === "1"; document.querySelectorAll("[data-sact]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  if ($("#sCancel")) $("#sCancel").onclick = () => { svcs = svcs.filter(x => x.id !== s.id); openSvc = null; renderSvcs(); };
+  $("#sSave").onclick = async () => {
+    $("#sErr").textContent = "";
+    if (!(s.nom.da || s.nom.fr || s.nom.ar).trim()){ $("#sErr").textContent = "Kteb smiya dyal s-service (3la l-a9al b Darija)."; return; }
+    if (!(s.prix >= 0)){ $("#sErr").textContent = "Kteb prix sa7i7."; return; }
+    if (!s.actif && svcs.filter(x => x.actif).length === 0){ $("#sErr").textContent = "Khass service wa7ed 3la l-a9al ykoun kayban."; return; }
+    $("#sSave").disabled = true;
+    openSvc = null; const ok = await saveSvcs();
+    if (!ok){ openSvc = s.id; renderSvcs(); }
+  };
+}
+$("#addSvc").addEventListener("click", () => {
+  if (svcs.some(s => !CFG.services.some(x => x.id === s.id))) return;
+  const id = "s" + Date.now();
+  svcs.push({ id, prix: 0, duree: 30, top: false, actif: true, photo: "", nom: { fr:"", da:"", ar:"" }, desc: { fr:"", da:"", ar:"" } });
+  openSvc = id; renderSvcs();
+  setTimeout(() => { const n = $("#sNda"); if (n){ n.focus(); n.scrollIntoView({ behavior:"smooth", block:"center" }); } }, 50);
+});
+const reposTxt = r => r && r.length ? "Ra7a: " + ORDER.filter(d => r.includes(DAYKEYS[d])).map(d => DAYS[d]).join(", ") : "Kaykhdem kol nhar";
+const avatar = c => c.photo ? `<img src="${esc(c.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : esc((c.nom || "?")[0].toUpperCase());
+function renderTeam(){
+  if (!team.length){ $("#teamList").innerHTML = `<div class="empty">Ma kayn 7ta coiffeur. Zid wa7ed.</div>`; return; }
+  $("#teamList").innerHTML = team.map(c => `
+    <article class="member ${c.actif ? "" : "off"}" data-id="${esc(c.id)}">
+      <div class="top">
+        <div class="av">${avatar(c)}</div>
+        <div class="tx"><div class="n">${esc(c.nom || "Coiffeur jdid")} ${c.actif ? "" : '<span class="pill">Ma b9ach</span>'}</div>
+          <div class="s">${esc(c.de)}–${esc(c.a)} · ${esc(reposTxt(c.repos))}${c.hasPin ? " · 🔑 3ndo code" : ""}</div></div>
+        <button class="btn sm ghost" type="button" data-edit="${esc(c.id)}">${openId === c.id ? "Sedd" : "Bddel"}</button>
+      </div>
+      ${openId === c.id ? editForm(c) : ""}
+    </article>`).join("");
+  $("#teamList").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { openId = openId === b.dataset.edit ? null : b.dataset.edit; renderTeam(); });
+  if (openId) bindEdit(team.find(c => c.id === openId));
+}
+const canRename = () => (CFG.v || 0) >= 9;
+function editForm(c){
+  const isNew = !CFG.coiffeurs.some(x => x.id === c.id);
+  return `<div class="edit">
+    <div class="photo-pick"><div class="av" id="eAv">${avatar(c)}</div>
+      <label class="btn sm ghost" for="eFile">📷 ${c.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="eFile" accept="image/*">
+      ${c.photo ? `<button class="btn sm ghost" type="button" id="eNoPhoto">7ayed</button>` : ""}</div>
+    <div><label class="lbl" for="eName">Smiya</label><input id="eName" value="${esc(c.nom)}" maxlength="40" ${isNew || canRename() ? "" : "readonly"} placeholder="Ex: Hamza">
+      ${isNew ? "" : canRename() ? `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Ila beddelti s-smiya, les rendez-vous dyalo kaytbeddlo m3aha.</div>`
+        : `<div class="s" style="font-size:12px;color:var(--mute);margin-top:4px">Bach tbeddel s-smiya, khass t-mettre à jour Code.gs f Apps Script (v9).</div>`}</div>
+    <div class="pinbox"><label class="lbl" for="ePin">🔑 Code dyalo l l-admin</label>
+      <input id="ePin" inputmode="numeric" maxlength="8" autocomplete="off" value="${esc(c.pin || "")}" placeholder="${c.hasPin && !c.clearPin ? "•••• kayn — kteb jdid bach tbeddlo" : "4 7ta 8 ar9am (ikhtiyari)"}">
+      <div class="hint">B had l-code, ${esc(c.nom || "l-coiffeur")} ydkhol l l-admin w ychouf <b>ghir</b> les rendez-vous w l-flous dyalo. Ma ychoufch l-boutique wla les paramètres.</div>
+      ${(CFG.v || 0) < 11 ? `<div class="hint" style="color:var(--red)">${OLD_BACKEND}</div>` : ""}
+      ${c.hasPin && !c.clearPin ? `<button type="button" class="btn sm ghost" id="eNoPin">7ayed l-code</button>` : ""}</div>
+    <div class="two">
+      <div><label class="lbl" for="eDe">Kaybda m3a</label><input type="time" id="eDe" value="${esc(c.de)}" step="1800"></div>
+      <div><label class="lbl" for="eA">Kaysali m3a</label><input type="time" id="eA" value="${esc(c.a)}" step="1800"></div>
+    </div>
+    <div><span class="lbl">Nhar l-ra7a (fix kol simana)</span>
+      <div class="days7" role="group" aria-label="Nhar l-ra7a">${ORDER.map(d => `<button type="button" data-day="${DAYKEYS[d]}" aria-pressed="${(c.repos||[]).includes(DAYKEYS[d])}" aria-label="${DAYS[d]}">${D2[d]}</button>`).join("")}</div></div>
+    <div class="toggle" role="group" aria-label="Statut">
+      <button type="button" data-act="1" aria-pressed="${c.actif}">Kaykhdem</button>
+      <button type="button" data-act="0" aria-pressed="${!c.actif}">Ma b9ach (khbbih)</button>
+    </div>
+    <button class="btn full" type="button" id="eSave">Sjjel</button>
+    ${isNew ? `<button class="btn ghost full" type="button" id="eCancel" style="margin-top:0">Lgha</button>` : ""}
+    <div class="err" id="eErr"></div>
+  </div>`;
+}
+function bindEdit(c){
+  $("#eFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#eAv").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 600);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "coiffeur-" + (c.nom || c.id) });
+      if (!j.ok) throw new Error("up");
+      c.photo = j.url; renderTeam(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#eAv").innerHTML = avatar(c); $("#eErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#eNoPhoto")) $("#eNoPhoto").onclick = () => { c.photo = ""; renderTeam(); };
+  $("#eName").oninput = e => { c.nom = e.target.value; };
+  $("#ePin").oninput = e => { e.target.value = e.target.value.replace(/\D/g, ""); c.pin = e.target.value; if (c.pin) delete c.clearPin; };
+  if ($("#eNoPin")) $("#eNoPin").onclick = () => { c.pin = ""; c.clearPin = true; renderTeam(); toast("Ma tnsach Sjjel"); };
+  $("#eDe").onchange = e => { c.de = e.target.value; };
+  $("#eA").onchange = e => { c.a = e.target.value; };
+  document.querySelectorAll(".days7 button").forEach(b => b.onclick = () => {
+    const k = b.dataset.day; c.repos = c.repos || [];
+    c.repos = c.repos.includes(k) ? c.repos.filter(x => x !== k) : [...c.repos, k];
+    b.setAttribute("aria-pressed", c.repos.includes(k));
+  });
+  document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => { c.actif = b.dataset.act === "1"; document.querySelectorAll("[data-act]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  if ($("#eCancel")) $("#eCancel").onclick = () => { team = team.filter(x => x.id !== c.id); openId = null; renderTeam(); };
+  $("#eSave").onclick = async () => {
+    $("#eErr").textContent = "";
+    if (!String(c.nom || "").trim()){ $("#eErr").textContent = "Kteb smiya dyal l-coiffeur."; return; }
+    if (!c.de || !c.a || c.a <= c.de){ $("#eErr").textContent = "Sa3a dyal l-bdya khass tkoun 9bel sa3a dyal l-akhir."; return; }
+    if (c.pin && !/^\d{4,8}$/.test(c.pin)){ $("#eErr").textContent = "L-code khasso ykoun bin 4 w 8 ar9am."; return; }
+    if (c.repos && c.repos.length === 7){ $("#eErr").textContent = "Ma ymkench ykoun kol nhar ra7a. Ila ma b9ach, khtar \"Ma b9ach\"."; return; }
+    $("#eSave").disabled = true;
+    try {
+      const prev = (CFG.coiffeurs.find(x => x.id === c.id) || {}).nom;
+      const j = await call("saveteam", { coiffeurs: team });
+      if (j.ok && prev && prev !== c.nom.trim()){ toast(`${prev} → ${c.nom.trim()} ✓ · ${j.renamed || 0} rendez-vous tbeddlo`); }
+      else if (j.ok) toast("Tsjjel ✓ · l-site tbeddel");
+      if (j.ok){ CFG.coiffeurs = j.coiffeurs; team = JSON.parse(JSON.stringify(j.coiffeurs)); openId = null; fillBarberSelect(); renderTeam(); }
+      else $("#eErr").textContent = j.error === "dup" ? "Had s-smiya deja kayna." : j.error === "pindup" ? "Had l-code deja m3ti l chi wa7ed akhor (wla howa code dyal mol s-salon). Khtar wa7ed akhor." : j.error === "hours" ? "Tchecki les heures." : "Ma tsjjelch.";
+    } catch(err){ if (err.message !== "auth") $("#eErr").textContent = "Ma kaynach connexion."; }
+    if ($("#eSave")) $("#eSave").disabled = false;
+  };
+}
+$("#addMember").addEventListener("click", () => {
+  if (team.some(c => !CFG.coiffeurs.some(x => x.id === c.id))) return;          // deja kayn wa7ed jdid ma tsjjelch
+  const id = "c" + Date.now();
+  const base = CFG.coiffeurs[0] || { de:"11:00", a:"21:00" };
+  team.push({ id, nom:"", actif:true, photo:"", de: base.de, a: base.a, repos:[] });
+  openId = id; renderTeam();
+  setTimeout(() => { const n = $("#eName"); if (n){ n.focus(); n.scrollIntoView({ behavior:"smooth", block:"center" }); } }, 50);
+});
+
+/* ---------- photos ---------- */
+async function loadPhotos(){
+  $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
+  try { await loadConfig(); renderGallery(); }
+  catch(e){ if (e.message !== "auth") $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+}
+function renderGallery(){
+  const g = CFG.galerie;
+  if (!g.length){ $("#galGrid").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kayn 7ta tswira. Zid tsawer dyal l-khdma bach ybanou f l-site.</div>`; return; }
+  $("#galGrid").innerHTML = g.map((p, i) => `<div class="ph"><img src="${esc(p.url)}" alt="Tswira ${i+1}" loading="lazy" referrerpolicy="no-referrer">
+    <div class="ctl"><button class="x" data-del="${esc(p.id)}" aria-label="7ayed">🗑</button>
+      ${i > 0 ? `<button data-mv="${esc(p.id)}" data-dir="up" aria-label="9eddem">◀</button>` : ""}
+      ${i < g.length - 1 ? `<button data-mv="${esc(p.id)}" data-dir="down" aria-label="Wekh-khar">▶</button>` : ""}</div></div>`).join("");
+  $("#galGrid").querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
+    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "?"; b.style.background = "var(--red)"; b.style.color = "#fff"; setTimeout(() => { if (b.isConnected){ b.dataset.armed = ""; b.textContent = "🗑"; b.style.cssText = ""; } }, 3000); return; }
+    b.disabled = true;
+    try { const j = await call("delphoto", { id: b.dataset.del }); if (j.ok){ CFG.galerie = j.galerie; renderGallery(); toast("Tm7at ✓"); } } catch(e){ b.disabled = false; }
+  });
+  $("#galGrid").querySelectorAll("[data-mv]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try { const j = await call("movephoto", { id: b.dataset.mv, dir: b.dataset.dir }); if (j.ok){ CFG.galerie = j.galerie; renderGallery(); } } catch(e){ b.disabled = false; }
+  });
+}
+$("#galFile").addEventListener("change", async e => {
+  const files = [...e.target.files]; e.target.value = ""; if (!files.length) return;
+  $("#uplState").hidden = false; let done = 0, failed = 0;
+  for (const f of files){
+    try {
+      const data = await resizeImage(f, 1400);
+      const j = await call("addphoto", { data, mime:"image/jpeg", name:"khdma" });
+      if (j.ok){ CFG.galerie = j.galerie; renderGallery(); } else failed++;
+    } catch(err){ if (err.message === "auth") return; failed++; }
+    done++; $("#uplBar").style.width = Math.round(done / files.length * 100) + "%";
+  }
+  setTimeout(() => { $("#uplState").hidden = true; $("#uplBar").style.width = "0"; }, 600);
+  toast(failed ? `${done - failed} tzadou · ${failed} ma tzadouch` : `${done} tswira tzadat ✓`);
+});
+
+/* ---------- stats ---------- */
+let period = "week";
+function range(p){
+  const t = today(), d = new Date();
+  if (p === "week"){ const dow = (d.getDay() + 6) % 7; return [addDays(t, -dow), t]; }
+  if (p === "month") return [iso(new Date(d.getFullYear(), d.getMonth(), 1)), t];
+  if (p === "last") return [iso(new Date(d.getFullYear(), d.getMonth()-1, 1)), iso(new Date(d.getFullYear(), d.getMonth(), 0))];
+  return [addDays(t, -29), t];
+}
+function renderPeriods(){
+  const P = { week:"Had s-simana", month:"Had ch-chhar", last:"Ch-chhar li fat", d30:"30 yawm" };
+  $("#periodStrip").innerHTML = Object.entries(P).map(([k,v]) => `<button type="button" data-p="${k}" aria-pressed="${k===period}">${v}</button>`).join("");
+  $("#periodStrip").querySelectorAll("button").forEach(b => b.onclick = () => { period = b.dataset.p; loadStats(); });
+}
+function barsHtml(title, obj){
+  const e = Object.entries(obj).sort((a,b) => b[1]-a[1]); if (!e.length) return "";
+  const max = e[0][1];
+  return `<div class="bars"><h3>${title}</h3>${e.map(([k,v]) => `<div class="bar"><span class="l">${esc(k)}</span><span class="t"><i style="width:${Math.round(v/max*100)}%"></i></span><span class="n">${v}</span></div>`).join("")}</div>`;
+}
+/* ---------- BOUTIQUE ---------- */
+let SHOPC = null, PRODS = [], ORDERS = [], openProd = null, sseg = "ord", ordF = "open";
+const MODE_L = { whatsapp: "WhatsApp", salon: "F s-salon", livraison: "Livraison" };
+const ST_L = { nouvelle: "Jdida", confirmée: "Tconfirmat", prête: "Wajda", livrée: "Tsellmat", annulée: "Tlghat" };
+document.querySelectorAll("[data-sseg]").forEach(b => b.onclick = () => {
+  sseg = b.dataset.sseg;
+  document.querySelectorAll("[data-sseg]").forEach(x => x.setAttribute("aria-selected", x === b));
+  $("#sOrd").hidden = sseg !== "ord"; $("#sProd").hidden = sseg !== "prod"; $("#sSet").hidden = sseg !== "set";
+  loadShop();
+});
+function paintShopBadge(){
+  const n = ORDERS.filter(o => o.statut === "nouvelle").length, b = $("#shopBadge");
+  b.hidden = !n; b.textContent = n;
+}
+async function refreshShopBadge(){ try { const j = await call("orders"); if (j.ok){ ORDERS = j.list || []; paintShopBadge(); } } catch(e){} }
+async function loadShop(){
+  if (sseg === "ord") return loadOrders();
+  if (!SHOPC || sseg === "prod"){
+    if (sseg === "prod") $("#prodList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+    try {
+      const j = await call("getshop");
+      if (!j.ok){ const m = j.error === "op" ? "Backend 9dim: khass déploiement jdid f Apps Script (v10)." : "Ma kaynach connexion."; $("#prodList").innerHTML = `<div class="empty">${m}</div>`; $("#shErr").textContent = m; return; }
+      SHOPC = j.shop; PRODS = JSON.parse(JSON.stringify(j.produits || []));
+    } catch(e){ if (e.message !== "auth") $("#prodList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; return; }
+  }
+  if (sseg === "prod") renderProds(); else fillShopForm();
+}
+/* commandes */
+function ordMsg(o, kind){
+  const it = o.produits, tot = o.total + " DH";
+  return ({
+    confirmée: o.mode === "livraison" ? `Salam ${o.nom} 👋 commande dyalek #${o.id} tconfirmat ✅\\n📦 ${it}\\n💰 ${tot} (tkhelles mlli twslek)\\n📍 ${o.ville} — ${o.adresse}\\nGhadi twslek f a9rab wa9t. Choukran!` :
+      `Salam ${o.nom} 👋 commande dyalek #${o.id} tconfirmat ✅\\n📦 ${it}\\n💰 ${tot}\\nGhadi n3lmouk mlli twjed. Choukran!`,
+    prête: `Salam ${o.nom} 👋 commande dyalek #${o.id} wajda f s-salon 🛍️\\n📦 ${it}\\n💰 ${tot} (tkhelles f s-salon)\\nNtsennawk!`,
+    annulée: `Salam ${o.nom}, smeh lina 🙏 ma qdernach nwjjdou commande #${o.id}. Ila bghiti chi produit akhor golha lina.`,
+    hello: `Salam ${o.nom} 👋 b khsous commande dyalek #${o.id} (${it})…`
+  })[kind].replace(/\\n/g, "\n");
+}
+async function loadOrders(){
+  $("#ordList").innerHTML = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    const j = await call("orders");
+    if (!j.ok){ $("#ordList").innerHTML = `<div class="empty">${j.error === "op" ? "Backend 9dim: khass déploiement jdid f Apps Script (v10)." : "Ma kaynach connexion."}</div>`; return; }
+    ORDERS = j.list || []; paintShopBadge(); renderOrders();
+  } catch(e){ if (e.message !== "auth") $("#ordList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+function renderOrders(){
+  const live = ORDERS.filter(o => o.statut !== "annulée"), t0 = today();
+  const open = ORDERS.filter(o => o.statut === "nouvelle" || o.statut === "confirmée" || o.statut === "prête");
+  const month = t0.slice(0, 7), ca = live.filter(o => o.statut === "livrée" && o.date.slice(0, 7) === month).reduce((a, o) => a + o.total, 0);
+  $("#shopKpis").innerHTML = `<div><b>${ORDERS.filter(o => o.statut === "nouvelle").length}</b><span>Jdad</span></div><div><b>${open.length}</b><span>F l-khdma</span></div><div><b>${ca}<small style="font-size:14px"> DH</small></b><span>Tsellmo had chher</span></div>`;
+  const F = [["open", "F l-khdma (" + open.length + ")"], ["nouvelle", "Jdad"], ["livrée", "Tsellmo"], ["annulée", "Tlghaw"], ["all", "Kolchi"]];
+  $("#ordFilter").innerHTML = F.map(([k, l]) => `<button type="button" data-of="${k}" aria-pressed="${ordF === k}">${l}</button>`).join("");
+  $("#ordFilter").querySelectorAll("[data-of]").forEach(b => b.onclick = () => { ordF = b.dataset.of; renderOrders(); });
+  const list = ordF === "all" ? ORDERS : ordF === "open" ? open : ORDERS.filter(o => o.statut === ordF);
+  if (!list.length){ $("#ordList").innerHTML = `<div class="empty big"><span>🛍️</span><b>Ma kayn 7ta commande</b>${ordF === "open" ? "Les commandes jdad ghadi ybanou hna." : ""}</div>`; return; }
+  $("#ordList").innerHTML = list.map(o => {
+    const next = o.statut === "nouvelle" ? [["confirmée", "✓ Confirmer"], ["annulée", "✗ Lghi"]]
+      : o.statut === "confirmée" ? (o.mode === "livraison" ? [["livrée", "🚚 Tsellmat"]] : [["prête", "📦 Wajda"], ["livrée", "✓ Tsellmat"]]).concat([["annulée", "Lghi"]])
+      : o.statut === "prête" ? [["livrée", "✓ Tsellmat"], ["annulée", "Lghi"]] : o.statut === "annulée" ? [["nouvelle", "↺ Rjje3ha"]] : [];
+    return `<article class="ord ${esc(o.statut)}">
+      <div class="oh"><div><b>${esc(o.nom)}</b> <small>#${esc(o.id)} · ${esc(o.date.slice(5).replace(" ", " · "))}</small></div><span class="spill ${esc(o.statut)}">${ST_L[o.statut] || esc(o.statut)}</span></div>
+      <div class="om"><span class="mpill ${esc(o.mode)}">${MODE_L[o.mode] || esc(o.mode)}</span><span>${esc(o.tel)}</span></div>
+      <div class="oi">${(o.items.length ? o.items.map(i => `${i.q} × ${esc(i.n)} <span style="color:var(--mute)">· ${i.p * i.q} DH</span>`) : [esc(o.produits)]).join("<br>")}</div>
+      ${o.mode === "livraison" ? `<div class="oa">📍 ${esc(o.ville)} — ${esc(o.adresse)}</div>` : ""}
+      ${o.note ? `<div class="oa">📝 ${esc(o.note)}</div>` : ""}
+      <div class="om"><span class="ot">${o.total} DH</span>${o.livraison ? `<span>(livraison ${o.livraison} DH)</span>` : ""}</div>
+      <div class="ob">${next.map(([s2, l]) => `<button class="btn ${s2 === "annulée" ? "ghost" : ""}" type="button" data-os="${esc(s2)}" data-oid="${esc(o.id)}">${l}</button>`).join("")}
+        <div class="contact"><a href="tel:${esc(o.tel)}" aria-label="3ayet">📞</a><a class="wa" href="https://wa.me/${waNum(o.tel)}?text=${encodeURIComponent(ordMsg(o, "hello"))}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a></div></div>
+    </article>`;
+  }).join("");
+  $("#ordList").querySelectorAll("[data-os]").forEach(b => b.onclick = async () => {
+    const o = ORDERS.find(x => x.id === b.dataset.oid); if (!o) return;
+    b.disabled = true;
+    try {
+      const j = await call("orderstatus", { id: o.id, statut: b.dataset.os });
+      if (!j.ok){ toast("Ma tsjjelch"); b.disabled = false; return; }
+      o.statut = b.dataset.os; toast("Tsjjel ✓"); paintShopBadge(); renderOrders(); SHOPC = null;
+      if (["confirmée", "prête", "annulée"].includes(o.statut)) openOrdMsg(o);
+    } catch(e){ b.disabled = false; }
+  });
+}
+function openOrdMsg(o){
+  $("#mIcon").textContent = o.statut === "annulée" ? "✕" : "✓";
+  $("#mTitle").textContent = "Sift l-khbar l " + o.nom; $("#mSub").textContent = "Commande #" + o.id + " · " + (ST_L[o.statut] || o.statut);
+  $("#mText").value = ordMsg(o, o.statut);
+  const upd = () => $("#mSend").href = `https://wa.me/${waNum(o.tel)}?text=${encodeURIComponent($("#mText").value)}`;
+  upd(); $("#mText").oninput = upd;
+  $("#msgModal").hidden = false;
+}
+/* produits */
+const newProd = () => ({ id: "p" + Date.now().toString(36), nom: "", cat: "", prix: 0, ancien: 0, desc: "", photo: "", stock: null, actif: true });
+function renderProds(){
+  if (!PRODS.length){ $("#prodList").innerHTML = `<div class="empty big"><span>🛍️</span><b>Ma kayn 7ta produit</b>Brek 3la "Zid produit" bach tbda.</div>`; return; }
+  const cats = [...new Set(PRODS.map(p => p.cat).filter(Boolean))];
+  $("#prodList").innerHTML = `<datalist id="catList">${cats.map(c => `<option value="${esc(c)}">`).join("")}</datalist>` + PRODS.map((p, i) => `
+    <article class="member ${p.actif ? "" : "off"}">
+      <div class="top">
+        <div class="order"><button type="button" data-pup="${i}" ${i === 0 ? "disabled" : ""} aria-label="Tla3">▲</button><button type="button" data-pdown="${i}" ${i === PRODS.length - 1 ? "disabled" : ""} aria-label="Hbet">▼</button></div>
+        <div class="pthumb">${p.photo ? `<img src="${esc(p.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "🛍️"}</div>
+        <div class="tx"><div class="n" style="font-size:15.5px">${esc(p.nom || "Produit jdid")} ${p.actif ? "" : '<span class="pill">Mkhbbi</span>'}</div>
+          <div class="s">${esc(p.cat || "—")} · ${p.stock === null ? "Stock: bla 7did" : p.stock <= 0 ? '<span class="stock0">Ma b9ach</span>' : "Stock: " + p.stock}</div></div>
+        <div class="price">${p.prix} DH</div>
+      </div>
+      <div style="padding:0 14px 14px"><button class="btn sm ghost" style="width:100%" type="button" data-pedit="${esc(p.id)}">${openProd === p.id ? "Sedd" : "Bddel"}</button></div>
+      ${openProd === p.id ? prodForm(p) : ""}
+    </article>`).join("");
+  $("#prodList").querySelectorAll("[data-pedit]").forEach(b => b.onclick = () => { openProd = openProd === b.dataset.pedit ? null : b.dataset.pedit; renderProds(); });
+  $("#prodList").querySelectorAll("[data-pup],[data-pdown]").forEach(b => b.onclick = async () => {
+    const i = +(b.dataset.pup ?? b.dataset.pdown), j = b.dataset.pup != null ? i - 1 : i + 1;
+    [PRODS[i], PRODS[j]] = [PRODS[j], PRODS[i]]; renderProds(); await saveProds("Tbeddel t-tartib ✓");
+  });
+  if (openProd){ const p = PRODS.find(x => x.id === openProd); if (p) bindProd(p); }
+}
+function prodForm(p){
+  return `<div class="edit">
+    <div class="photo-pick"><div class="pthumb" id="pThumb">${p.photo ? `<img src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer">` : "🛍️"}</div>
+      <label class="btn sm ghost" for="pFile">📷 ${p.photo ? "Bddel tswira" : "Zid tswira"}</label><input class="file" type="file" id="pFile" accept="image/*">
+      ${p.photo ? `<button type="button" class="btn sm ghost" id="pNoPhoto">Msse7</button>` : ""}</div>
+    <div><label class="lbl" for="pNom">Smiya dyal l-produit</label><input id="pNom" maxlength="70" value="${esc(p.nom)}" placeholder="Ex: Cire coiffante mat"></div>
+    <div class="two">
+      <div><label class="lbl" for="pPrix">Prix (DH)</label><input id="pPrix" type="number" inputmode="numeric" min="0" value="${p.prix || ""}" placeholder="89"></div>
+      <div><label class="lbl" for="pOld">Prix 9dim (promo)</label><input id="pOld" type="number" inputmode="numeric" min="0" value="${p.ancien || ""}" placeholder="Ikhtiyari"></div>
+    </div>
+    <div class="two">
+      <div><label class="lbl" for="pCat">Catégorie</label><input id="pCat" maxlength="30" list="catList" value="${esc(p.cat)}" placeholder="Cheveux, Barbe…"></div>
+      <div><label class="lbl" for="pStock">Stock</label><input id="pStock" type="number" inputmode="numeric" min="0" value="${p.stock === null ? "" : p.stock}" placeholder="Khawi = bla 7did"></div>
+    </div>
+    <div><label class="lbl" for="pDesc">Description</label><textarea id="pDesc" maxlength="400" placeholder="Chno kaydir, l-7ajm, kifach yste3mlo…">${esc(p.desc)}</textarea></div>
+    <div class="nchk"><label><input type="checkbox" id="pActif" ${p.actif ? "checked" : ""}> Kayban f l-site</label></div>
+    <button class="btn full" type="button" id="pSave">Sjjel</button>
+    <button class="btn ghost full" type="button" id="pDel" style="color:var(--red)">Msse7 had l-produit</button>
+    <div class="err" id="pErr"></div>
+  </div>`;
+}
+function bindProd(p){
+  $("#pFile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("#pThumb").innerHTML = '<span class="spin" style="margin:0"></span>';
+    try {
+      const data = await resizeImage(f, 1000);
+      const j = await call("upload", { data, mime:"image/jpeg", name: "produit-" + (p.nom || p.id) });
+      if (!j.ok) throw new Error("up");
+      p.photo = j.url; renderProds(); toast("Tswira tzadat · ma tnsach Sjjel");
+    } catch(err){ if (err.message !== "auth"){ $("#pThumb").innerHTML = "🛍️"; $("#pErr").textContent = "Ma t-uploadatch tswira. 3awed."; } }
+  };
+  if ($("#pNoPhoto")) $("#pNoPhoto").onclick = () => { p.photo = ""; renderProds(); };
+  const bind = (id, fn) => { $(id).oninput = $(id).onchange = e => fn(e.target.value); };
+  bind("#pNom", v => p.nom = v); bind("#pPrix", v => p.prix = Number(v) || 0); bind("#pOld", v => p.ancien = Number(v) || 0);
+  bind("#pCat", v => p.cat = v); bind("#pStock", v => p.stock = v === "" ? null : Math.max(0, Math.round(Number(v) || 0))); bind("#pDesc", v => p.desc = v);
+  $("#pActif").onchange = e => p.actif = e.target.checked;
+  $("#pSave").onclick = async () => {
+    if (!p.nom.trim()){ $("#pErr").textContent = "Kteb smiya dyal l-produit."; return; }
+    if (!(p.prix > 0)){ $("#pErr").textContent = "Kteb l-prix."; return; }
+    if (p.ancien && p.ancien <= p.prix){ $("#pErr").textContent = "Prix 9dim khasso ykoun kbar mn l-prix."; return; }
+    $("#pSave").disabled = true;
+    if (await saveProds("Tsjjel ✓ · l-boutique tbeddlat")){ openProd = null; renderProds(); } else $("#pSave").disabled = false;
+  };
+  $("#pDel").onclick = async () => {
+    const b = $("#pDel");
+    if (!b.dataset.arm){ b.dataset.arm = 1; b.textContent = "Brek merra okhra bach tmse7"; setTimeout(() => { if (b.isConnected){ delete b.dataset.arm; b.textContent = "Msse7 had l-produit"; } }, 3500); return; }
+    PRODS = PRODS.filter(x => x.id !== p.id); openProd = null; renderProds(); await saveProds("Tmse7 ✓");
+  };
+}
+async function saveProds(okMsg){
+  try {
+    const j = await call("saveproducts", { produits: PRODS });
+    if (j.ok){ PRODS = JSON.parse(JSON.stringify(j.produits || [])); toast(okMsg || "Tsjjel ✓"); return true; }
+    toast(j.error === "op" ? "Backend 9dim: dir déploiement jdid" : "Ma tsjjelch"); return false;
+  } catch(e){ return false; }
+}
+$("#addProd").addEventListener("click", () => {
+  if (PRODS.some(p => !p.nom.trim())){ openProd = PRODS.find(p => !p.nom.trim()).id; renderProds(); return; }
+  const p = newProd(); PRODS.push(p); openProd = p.id; renderProds();
+  setTimeout(() => { const el = $("#pNom"); if (el){ el.scrollIntoView({ behavior:"smooth", block:"center" }); el.focus(); } }, 50);
+});
+/* réglages */
+function fillShopForm(){
+  const s = SHOPC || {};
+  $("#shActif").checked = s.actif !== false; $("#shWa").checked = s.whatsapp !== false; $("#shSalon").checked = s.salon !== false; $("#shLiv").checked = s.livraison !== false;
+  $("#shFrais").value = s.frais ?? 30; $("#shFree").value = s.gratuitDes ?? 300; $("#shDelai").value = s.delai || ""; $("#shErr").textContent = "";
+}
+$("#shopForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const shop = { actif: $("#shActif").checked, whatsapp: $("#shWa").checked, salon: $("#shSalon").checked, livraison: $("#shLiv").checked,
+    frais: Number($("#shFrais").value) || 0, gratuitDes: Number($("#shFree").value) || 0, delai: $("#shDelai").value.trim(), villes: "" };
+  if (!shop.whatsapp && !shop.salon && !shop.livraison){ $("#shErr").textContent = "Khtar 3la l-a9al tari9a wa7da."; return; }
+  try {
+    const j = await call("saveshop", { shop });
+    if (j.ok){ SHOPC = j.shop; toast("Tsjjel ✓ · l-site tbeddel"); $("#shErr").textContent = ""; }
+    else $("#shErr").textContent = j.error === "op" ? "Backend 9dim: dir déploiement jdid f Apps Script (v10)." : "Ma tsjjelch.";
+  } catch(err){ if (err.message !== "auth") $("#shErr").textContent = "Ma kaynach connexion."; }
+});
+
+/* =====================================================================
+   PRO: Lyoum (dashboard) · Planning · Fiche client · Zid RDV · Caisse
+   ===================================================================== */
+const money = n => (Number(n) || 0).toLocaleString("fr-FR").replace(/ | /g, " ");
+const telHref = t => { const x = String(t || ""); return x.length === 9 ? "0" + x : x; };
+const isLive = r => !String(r.statut).startsWith("annul");
+const isVenu = r => r.statut === "venu";
+const isAbs = r => String(r.statut).startsWith("absent");
+const isConf = r => r.statut === "confirmé";
+const ended = r => r.date < today() || (r.date === today() && hm2m(r.heure) + r.dur <= nowM());
+const m2hm = m => pad(Math.floor(m / 60)) + ":" + pad(m % 60);
+const svcName = s => (s.nom && (s.nom.fr || s.nom.da || s.nom.ar)) || "Service";
+const OLD_BACKEND = "Khass t-mettre à jour Code.gs (v11) f Apps Script bach tkhddem hadi.";
+async function ensureConfig(){ if (!CFG.coiffeurs.length) { try { await loadConfig(); } catch(e){} } }
+function activeTeam(){
+  const t = (CFG.coiffeurs || []).filter(c => c.actif);
+  if (!isOwner()) return t.filter(c => c.nom === ME).concat(t.some(c => c.nom === ME) ? [] : [{ nom: ME, de: "11:00", a: "21:00", repos: [] }]);
+  return t;
+}
+function ava(name, size){
+  const c = (CFG.coiffeurs || []).find(x => x.nom === name);
+  const st = `background:${barberColor(name)}${size ? `;width:${size}px;height:${size}px;flex-basis:${size}px` : ""}`;
+  return c && c.photo ? `<span class="ava" style="${st}"><img src="${esc(c.photo)}" alt="" referrerpolicy="no-referrer"></span>` : `<span class="ava" style="${st}">${esc((name || "?")[0].toUpperCase())}</span>`;
+}
+
+/* ---------- LYOUM ---------- */
+/* talab wa7ed l lyoum + ghedda (bla jouj) */
+function homeList(){
+  const t = today(), d = new Date(); d.setDate(d.getDate() + 1); const tmr = iso(d);
+  return call("list", { from: t, to: tmr }).then(j => { const h = { t, tmr, all: j.list || [] }; cSet("home", h); return h; });
+}
+function loadHome(){
+  setHello();
+  const p = homeList(); p.catch(() => {});        // l-awla: rendez-vous dyal lyoum
+  // kanbiyno dghya akhir données li kaynin, 7ta yjiw l-jdad
+  const h = cGet("home");
+  if (h && h.t === today() && CFG.coiffeurs.length){ paintHomeDay(h.all.filter(r => r.date === h.t)); paintReminders(h.all.filter(r => r.date === h.tmr)); }
+  const pe = cGet("pend"); if (pe) paintPending(pe, true);
+  const w = cGet("wait"); if (w) paintWait(w);
+  loadHomeDay(p, !!(h && h.t === today())); loadReminders(p); loadPending(); loadWait();
+}
+async function loadHomeDay(p, quiet){
+  if (!quiet) $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1"><span class="spin"></span>Kanjibou…</div>`;
+  try {
+    const [h] = await Promise.all([p || homeList(), ensureConfig()]);
+    paintHomeDay(h.all.filter(r => r.date === h.t));
+  } catch(e){ if (e.message !== "auth" && !quiet) $("#daySum").innerHTML = `<div class="empty" style="grid-column:1/-1">Ma kaynach connexion.</div>`; }
+}
+function paintHomeDay(list){
+  const t = today();
+  {
+    const live = list.filter(isLive);
+    const venu = live.filter(isVenu), enc = venu.reduce((a, r) => a + r.prix, 0);
+    const prevu = live.filter(r => !isAbs(r) && !isPend(r.statut)).reduce((a, r) => a + r.prix, 0);
+    $("#daySum").innerHTML = `
+      <div class="kp"><i class="k1">${ICO.cal}</i><b>${live.filter(r => !isAbs(r)).length}</b><span>Rendez-vous</span></div>
+      <div class="kp"><i class="k2">${ICO.check}</i><b>${venu.length}</b><span>Jaw</span></div>
+      <div class="kp main"><i class="k3">${ICO.cash}</i><b>${money(enc)}<small> DH</small></b><span>Tkhelless</span></div>
+      <div class="kp"><i class="k4">${ICO.clock}</i><b>${money(prevu)}<small> DH</small></b><span>Prévu lyoum</span></div>`;
+    renderNext(live);
+    const toClose = live.filter(r => isConf(r) && ended(r));
+    $("#closeBox").innerHTML = toClose.length ? `<button type="button" class="closebar" id="goClose"><span>💵 <b>${toClose.length}</b> ${toClose.length > 1 ? "clients fatou" : "client fat"} w mazal ma tsddouch f l-caisse</span><i>Sedd ›</i></button>` : "";
+    if (toClose.length) $("#goClose").onclick = () => { mseg = "cash"; cday = t; setTab("money"); };
+    const team = activeTeam();
+    if (isOwner() && team.length > 1){
+      const n = nowM();
+      $("#teamToday").innerHTML = `<div class="section-t">L-équipe lyoum</div><div class="tt">${team.map(c => {
+        const mine = live.filter(r => r.barber === c.nom && !isAbs(r));
+        const nx = mine.filter(r => !isVenu(r) && hm2m(r.heure) + r.dur > n).sort((a, b) => a.heure.localeCompare(b.heure))[0];
+        const busy = mine.some(r => hm2m(r.heure) <= n && hm2m(r.heure) + r.dur > n);
+        const off = (c.repos || []).includes(DAYKEYS[new Date().getDay()]);
+        return `<div class="ttc">${ava(c.nom, 38)}<div class="ttx"><b>${esc(c.nom)}</b>
+          <small>${off ? "Nhar ra7a" : busy ? "🟢 Khddam daba" : nx ? "Jay: " + esc(nx.heure) + " · " + esc(nx.nom) : "Khawi"}</small></div>
+          <div class="ttn"><b>${mine.length}</b><small>${money(mine.filter(isVenu).reduce((a, r) => a + r.prix, 0))} DH</small></div></div>`;
+      }).join("")}</div>`;
+    } else $("#teamToday").innerHTML = "";
+  }
+}
+document.querySelectorAll("#quick [data-q]").forEach(b => b.addEventListener("click", () => {
+  const q = b.dataset.q;
+  if (q === "add") openAdd({ date: today() });
+  else if (q === "plan"){ day = today(); setTab("rdv"); }
+  else if (q === "cash"){ mseg = "cash"; cday = today(); setTab("money"); }
+  else setTab("block", "home");
+}));
+
+/* ---------- PLANNING ---------- */
+let VIEW = "plan", BF = "", DAYLIST = [];
+try { VIEW = localStorage.getItem("ob_view") === "list" ? "list" : "plan"; } catch(e){}
+const PPM = 1.6;                        // pixels f d-dqi9a (30 min = 48px)
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
+  VIEW = b.dataset.view; try { localStorage.setItem("ob_view", VIEW); } catch(e){}
+  paintView(); renderDay();
+}));
+function paintView(){
+  document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x.dataset.view === VIEW));
+  $("#plan").hidden = VIEW !== "plan"; $("#rdvList").hidden = VIEW !== "list";
+}
+function renderFilter(){
+  const team = activeTeam();
+  if (!isOwner() || team.length < 2){ $("#bFilter").innerHTML = ""; return; }
+  $("#bFilter").innerHTML = [["", "Kolchi"]].concat(team.map(c => [c.nom, c.nom])).map(([k, l]) =>
+    `<button type="button" data-bf="${esc(k)}" aria-pressed="${BF === k}">${k ? `<i style="background:${barberColor(k)}"></i>` : ""}${esc(l)}</button>`).join("");
+  $("#bFilter").querySelectorAll("[data-bf]").forEach(b => b.onclick = () => { BF = b.dataset.bf; renderFilter(); renderDay(); });
+}
+let DAYBLOCKS = [];
+async function loadRdv(){
+  renderStrip(); paintView();
+  $("#dayTitle").textContent = day === today() ? "Lyoum" : label(day); $("#dayCount").textContent = "";
+  const busy = `<div class="empty"><span class="spin"></span>Kanjibou…</div>`;
+  $("#plan").innerHTML = busy; $("#rdvList").innerHTML = busy;
+  try {
+    await ensureConfig(); renderFilter();
+    const [j, bl] = await Promise.all([call("list", { from: day, to: day }), day >= today() ? call("blocks").catch(() => ({ list: [] })) : Promise.resolve({ list: [] })]);
+    DAYLIST = j.list || []; DAYBLOCKS = (bl.list || []).filter(b => b.date === day);
+    renderDay();
+  } catch(e){ if (e.message !== "auth"){ $("#plan").innerHTML = $("#rdvList").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; } }
+}
+function renderDay(){
+  const list = BF ? DAYLIST.filter(r => r.barber === BF) : DAYLIST, live = list.filter(isLive);
+  $("#dayCount").textContent = live.length ? `${live.length} rendez-vous · ${money(live.filter(r => !isAbs(r)).reduce((a, r) => a + r.prix, 0))} DH` : "";
+  if (VIEW === "list"){
+    if (!list.length){ $("#rdvList").innerHTML = `<div class="empty big"><span>${ICO.cal}</span><b>Ma kayn 7ta rendez-vous</b>${day === today() ? "lyoum" : "f had nhar"}. Brek 3la ＋ bach tzid wa7ed.</div>`; return; }
+    $("#rdvList").innerHTML = list.map(r => rdvCard(r, false)).join("");
+    bindCards($("#rdvList"), list, () => loadRdv());
+    $("#rdvList").querySelectorAll(".rdv").forEach(a => a.addEventListener("click", e => {
+      if (e.target.closest("button,a")) return;
+      const r = list.find(x => x.id === a.dataset.id); if (r) openDetail(r, () => loadRdv());
+    }));
+    return;
+  }
+  renderPlan(list);
+}
+function renderPlan(list){
+  let cols = activeTeam().map(c => c.nom);
+  if (BF) cols = [BF];
+  list.forEach(r => { if (!cols.includes(r.barber) && (!BF || r.barber === BF)) cols.push(r.barber); });
+  if (!cols.length){ $("#plan").innerHTML = `<div class="empty">Zid les coiffeurs f Plus → Salon → L-équipe.</div>`; return; }
+  const dk = DAYKEYS[fromIso(day).getDay()], hz = CFG.salon && CFG.salon.horaires, sd = hz && hz.hasOwnProperty(dk) ? hz[dk] : undefined;
+  const team = CFG.coiffeurs || [];
+  let lo = 24 * 60, hi = 0;
+  if (sd){ lo = hm2m(sd[0]); hi = hm2m(sd[1]); }
+  else cols.forEach(n => { const c = team.find(x => x.nom === n) || { de: "11:00", a: "21:00" }; lo = Math.min(lo, hm2m(c.de || "11:00")); hi = Math.max(hi, hm2m(c.a || "21:00")); });
+  list.forEach(r => { const m = hm2m(r.heure); lo = Math.min(lo, m); hi = Math.max(hi, m + r.dur); });
+  if (hi <= lo){ lo = 11 * 60; hi = 21 * 60; }
+  lo = Math.floor(lo / 60) * 60; hi = Math.ceil(hi / 60) * 60;
+  const H = (hi - lo) * PPM, y = m => (m - lo) * PPM;
+  const closed = sd === null && !list.length;
+  const hours = []; for (let m = lo; m <= hi; m += 60) hours.push(`<span style="top:${y(m)}px">${m2hm(m)}</span>`);
+  const head = cols.map(n => { const mine = list.filter(r => r.barber === n && isLive(r) && !isAbs(r));
+    return `<div class="pg-ch">${ava(n, 30)}<div><b>${esc(n)}</b><small>${mine.length} rdv · ${money(mine.reduce((a, r) => a + r.prix, 0))} DH</small></div></div>`; }).join("");
+  const body = cols.map(n => {
+    const c = team.find(x => x.nom === n) || {}, off = (c.repos || []).includes(dk);
+    const outs = [];
+    if (!off && c.de && c.a){ if (hm2m(c.de) > lo) outs.push([lo, hm2m(c.de)]); if (hm2m(c.a) < hi) outs.push([hm2m(c.a), hi]); }
+    const blks = DAYBLOCKS.filter(b => b.coiffeur === "tous" || b.coiffeur === n).map(b => {
+      const s = b.de ? hm2m(b.de) : lo, e = b.a ? hm2m(b.a) : hi;
+      return `<div class="pg-blk" style="top:${y(Math.max(s, lo))}px;height:${Math.max(18, (Math.min(e, hi) - Math.max(s, lo)) * PPM)}px"><span>⦸ ${esc(b.raison || "Msdod")}</span></div>`; }).join("");
+    const evs = list.filter(r => r.barber === n && isLive(r)).map(r => {
+      const m = hm2m(r.heure), h = Math.max(22, r.dur * PPM - 3), st = isPend(r.statut) ? "pend" : r.statut;
+      return `<button type="button" class="ev ${esc(st)}${h < 40 ? " tiny" : ""}" data-id="${esc(r.id)}" style="top:${y(m) + 1}px;height:${h}px;--bc:${barberColor(n)}">
+        <b>${esc(r.heure)} · ${esc(r.nom)}</b><small>${esc(r.services)} · ${r.prix} DH</small>${isVenu(r) ? '<i class="evk">✓</i>' : isPend(r.statut) ? '<i class="evk q">?</i>' : isAbs(r) ? '<i class="evk x">✗</i>' : ""}</button>`; }).join("");
+    return `<div class="pg-col${off ? " off" : ""}" data-b="${esc(n)}">${off ? `<div class="pg-offl">Nhar ra7a</div>` : ""}${outs.map(([a, b]) => `<div class="pg-out" style="top:${y(a)}px;height:${(b - a) * PPM}px"></div>`).join("")}${blks}${evs}</div>`;
+  }).join("");
+  const n = nowM(), now = day === today() && n >= lo && n <= hi ? `<div class="pg-now" style="top:${y(n)}px"><i>${m2hm(n)}</i></div>` : "";
+  $("#plan").innerHTML = (closed ? `<div class="empty" style="margin-bottom:10px">S-salon msdod had nhar (Paramètres). Tqder tzid rendez-vous b ＋.</div>` : "") +
+    `<div class="pg${cols.length > 4 ? " wide" : ""}" style="--cols:${cols.length};--slot:${30 * PPM}px"><div class="pg-head"><div class="pg-gut"></div>${head}</div>
+    <div class="pg-body" style="height:${H}px"><div class="pg-times">${hours.join("")}</div>${body}${now}</div></div>`;
+  $("#plan").querySelectorAll(".ev").forEach(b => b.onclick = e => { e.stopPropagation(); const r = list.find(x => x.id === b.dataset.id); if (r) openDetail(r, () => loadRdv()); });
+  $("#plan").querySelectorAll(".pg-col").forEach(col => col.onclick = e => {
+    if (e.target.closest(".ev")) return;
+    const rect = col.getBoundingClientRect(), m = lo + Math.floor((e.clientY - rect.top) / PPM / 30) * 30;
+    openAdd({ date: day, barber: col.dataset.b, start: Math.max(lo, Math.min(hi - 30, m)) });
+  });
+  if (day === today()){ const nl = $("#plan .pg-now"); if (nl && !renderPlan._scrolled){ renderPlan._scrolled = true; setTimeout(() => window.scrollTo({ top: Math.max(0, nl.getBoundingClientRect().top + window.scrollY - 260), behavior: "smooth" }), 80); } }
+}
+$("#fabAdd").addEventListener("click", () => openAdd({ date: day < today() ? today() : day }));
+
+/* ---------- FICHE dyal rendez-vous ---------- */
+function openDetail(r, reload){
+  actR = r; actReload = reload;
+  const pend = isPend(r.statut), canc = !isLive(r);
+  $("#aIcon").innerHTML = esc((r.nom || "?")[0].toUpperCase()); $("#aIcon").className = "mic"; $("#aIcon").style.background = barberColor(r.barber); $("#aIcon").style.color = "#fff";
+  $("#aTitle").textContent = r.nom;
+  $("#aSub").textContent = `${label(r.date)} · ${r.heure} · ${r.dur} min`;
+  let acts = "";
+  if (pend) acts = `<button class="btn" type="button" data-d="ok">✓ Valider</button><button class="btn ghost" type="button" data-d="no">✗ Refuser</button>`;
+  else if (isConf(r)) acts = `<button class="btn ok" type="button" data-d="pay">✓ Ja · Khelless</button><button class="btn ghost" type="button" data-d="abs">✗ Ma jach</button>`;
+  else if (isVenu(r)) acts = `<button class="btn ghost" type="button" data-d="pay">✎ Bddel l-prix</button><button class="btn ghost" type="button" data-d="undo">↺ Mazal ma ja</button>`;
+  else if (isAbs(r)) acts = `<button class="btn ghost" type="button" data-d="undo">↺ Ja f l-akhir</button>`;
+  $("#aBody").innerHTML = `
+    <div class="dt">
+      <div><span>Service</span><b>${esc(r.services || "—")}</b></div>
+      <div><span>Coiffeur</span><b><i class="dot" style="background:${barberColor(r.barber)}"></i>${esc(r.barber)}</b></div>
+      <div><span>Prix</span><b>${money(r.prix)} DH</b></div>
+      <div><span>Statut</span><b><span class="pill ${pend ? "attente" : esc(r.statut)}">${esc(r.statut)}</span></b></div>
+      ${r.tel ? `<div><span>Téléphone</span><b>${esc(telHref(r.tel))}</b></div>` : ""}
+    </div>
+    ${r.tel ? `<div class="dt-contact"><a href="tel:${esc(telHref(r.tel))}">📞 3ayet</a><a class="wa" href="https://wa.me/${waNum(r.tel)}" target="_blank" rel="noopener">💬 WhatsApp</a></div>` : ""}
+    ${acts ? `<div class="dt-acts">${acts}</div>` : ""}
+    ${canc ? `<div class="freebox">Had r-rendez-vous tlgha.</div>` : `<div class="opts">
+      <button class="opt" type="button" data-d="resched"><i>⏱</i><span><b>Reporter</b><small>Bddel n-nhar wla s-sa3a</small></span></button>
+      <button class="opt danger" type="button" data-d="cancel"><i>🗑</i><span><b>Lgha</b><small>L-blassa katwelli khawya</small></span></button>
+      ${isOwner() && r.tel ? `<button class="opt danger" type="button" data-d="block"><i>🚫</i><span><b>Bloqui had n-numéro</b><small>Ma y9derch yréservi men l-site</small></span></button>` : ""}
+    </div>`}`;
+  $("#aBody").querySelectorAll("[data-d]").forEach(b => b.onclick = () => detailAct(b.dataset.d, b));
+  openAct();
+}
+async function detailAct(a, btn){
+  const r = actR;
+  if (a === "resched") return reschedView(r.date);
+  if (a === "cancel") return freeSlot("annulé");
+  if (a === "abs") return freeSlot("absent");
+  if (a === "pay") return payView();
+  btn.disabled = true;
+  try {
+    if (a === "block"){
+      if (!btn.dataset.arm){ btn.dataset.arm = 1; btn.querySelector("b").textContent = "Brek merra okhra bach tbloqui"; btn.disabled = false; return; }
+      const j = await call("blockphone", { tel: r.tel, raison: "men l-admin" });
+      if (j.ok){ closeAct(); toast(`Tbloka ✓${j.cancelled ? " · " + j.cancelled + " réservation tlghat" : ""}`); actReload && actReload(); refreshPendingCount(); }
+      return;
+    }
+    const s = a === "ok" ? "confirmé" : a === "no" ? "annulé" : "confirmé";
+    const j = await call("status", { id: r.id, statut: s });
+    if (!j.ok){ toast("Ma tsjjelch"); btn.disabled = false; return; }
+    closeAct(); actReload && actReload();
+    if (a === "ok" || a === "no"){ refreshPendingCount(); if (r.tel) openMsgModal(r, a === "ok"); toast(a === "ok" ? "Tvalidat ✓" : "Trefdat"); }
+    else toast("Tsjjel ✓");
+  } catch(e){ btn.disabled = false; }
+}
+function payView(){
+  const r = actR;
+  $("#aIcon").textContent = "DH"; $("#aIcon").style.background = "var(--ok)";
+  $("#aTitle").textContent = "Khelless · " + r.nom;
+  $("#aSub").textContent = `${r.services} · ${r.barber}`;
+  $("#aBody").innerHTML = `<button class="back" type="button" id="pyBack">‹ Rje3</button>
+    <label class="lbl" for="pyAmt">Ch7al khelless (DH)</label>
+    <div class="payamt"><input id="pyAmt" type="number" inputmode="numeric" min="0" value="${r.prix}"><span>DH</span></div>
+    <div class="paychips">${[-10, +10, +20, +50].map(d => `<button type="button" data-dd="${d}">${d > 0 ? "+" : ""}${d}</button>`).join("")}<button type="button" data-dd="reset">${r.prix} DH</button></div>
+    <p class="hint" style="margin:6px 0 14px">Ila zad chi service wla 3ta pourboire, beddel l-montant. Kayt7sab f l-caisse w f les stats.</p>
+    <button class="btn full ok" type="button" id="pyGo">✓ Tkhelless</button><div class="err" id="pyErr"></div>`;
+  const amt = $("#pyAmt"), upd = () => $("#pyGo").textContent = `✓ Tkhelless ${money(amt.value || 0)} DH`;
+  upd(); amt.oninput = upd;
+  $("#aBody").querySelectorAll("[data-dd]").forEach(b => b.onclick = () => { amt.value = b.dataset.dd === "reset" ? r.prix : Math.max(0, (Number(amt.value) || 0) + Number(b.dataset.dd)); upd(); });
+  $("#pyBack").onclick = () => openDetail(r, actReload);
+  $("#pyGo").onclick = async () => {
+    const v = Math.round(Number(amt.value)); if (!(v >= 0)){ $("#pyErr").textContent = "Kteb l-montant."; return; }
+    $("#pyGo").disabled = true; $("#pyErr").textContent = "";
+    try {
+      if (v !== r.prix){
+        const p = await call("price", { id: r.id, prix: v });
+        if (!p.ok){ $("#pyErr").textContent = p.error === "op" ? OLD_BACKEND : "Ma tsjjelch l-prix."; $("#pyGo").disabled = false; return; }
+      }
+      if (!isVenu(r)){ const j = await call("status", { id: r.id, statut: "venu" }); if (!j.ok){ $("#pyErr").textContent = "Ma tsjjelch."; $("#pyGo").disabled = false; return; } }
+      closeAct(); toast(`Tkhelless ${money(v)} DH ✓`); actReload && actReload();
+    } catch(e){ if (e.message !== "auth"){ $("#pyErr").textContent = "Ma kaynach connexion."; $("#pyGo").disabled = false; } }
+  };
+  setTimeout(() => amt.select(), 60);
+}
+
+/* ---------- ZID RENDEZ-VOUS (men l-admin) ---------- */
+let addSel = [];
+function openAdd(pre){
+  pre = pre || {};
+  const team = activeTeam(), svc = (CFG.services || []).filter(s => s.actif !== false);
+  addSel = [];
+  const barber = pre.barber && team.some(c => c.nom === pre.barber) ? pre.barber : (team[0] || {}).nom || ME;
+  const start = pre.start != null ? pre.start : (() => { const m = Math.ceil((nowM() + 5) / 30) * 30; return Math.min(Math.max(m, 9 * 60), 22 * 60); })();
+  const times = []; for (let m = 7 * 60; m <= 23 * 60 + 30; m += 15) times.push(m);
+  $("#aIcon").textContent = "＋"; $("#aIcon").className = "mic"; $("#aIcon").style.background = ""; $("#aIcon").style.color = "";
+  $("#aTitle").textContent = "Rendez-vous jdid";
+  $("#aSub").textContent = "Client f s-salon, b telephone wla WhatsApp";
+  $("#aBody").innerHTML = `<form id="addForm" class="addf">
+    <div class="two">
+      <div><label class="lbl" for="adDate">Nhar</label><input type="date" id="adDate" value="${esc(pre.date || today())}" required></div>
+      <div><label class="lbl" for="adTime">Sa3a</label><select id="adTime">${times.map(m => `<option value="${m}" ${m === start ? "selected" : ""}>${m2hm(m)}</option>`).join("")}</select></div>
+    </div>
+    ${isOwner() ? `<div><span class="lbl">Coiffeur</span><div class="bpick" id="adBarber">${team.map(c => `<button type="button" data-b="${esc(c.nom)}" aria-pressed="${c.nom === barber}">${ava(c.nom, 24)}${esc(c.nom)}</button>`).join("")}</div></div>` : ""}
+    <div><span class="lbl">Services</span><div class="spick" id="adSvc">${svc.map(s => `<button type="button" data-s="${esc(s.id)}" aria-pressed="false">${esc(svcName(s))}<small>${s.prix} DH · ${s.duree} min</small></button>`).join("")}</div></div>
+    <div class="two">
+      <div><label class="lbl" for="adDur">Mudda</label><select id="adDur">${[15,20,30,45,60,75,90,120,150,180].map(d => `<option value="${d}" ${d === 30 ? "selected" : ""}>${d} min</option>`).join("")}</select></div>
+      <div><label class="lbl" for="adPrix">Prix (DH)</label><input id="adPrix" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+    </div>
+    <div class="two">
+      <div><label class="lbl" for="adNom">Smiyt l-client</label><input id="adNom" maxlength="80" placeholder="Ex: Yassine" autocomplete="off"></div>
+      <div><label class="lbl" for="adTel">Téléphone (ikhtiyari)</label><input id="adTel" type="tel" inputmode="tel" maxlength="17" placeholder="06…" autocomplete="off"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="adNow"> Client jalss daba f s-salon (ytsjjel "venu")</label>
+    <button class="btn full" type="submit" id="adGo">Zid r-rendez-vous</button>
+    <div class="err" id="adErr"></div>
+  </form>`;
+  let bSel = barber;
+  if (isOwner()) $("#adBarber").querySelectorAll("[data-b]").forEach(b => b.onclick = () => { bSel = b.dataset.b; $("#adBarber").querySelectorAll("[data-b]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  const sync = () => {
+    const ss = svc.filter(s => addSel.includes(s.id));
+    if (ss.length){
+      const d = ss.reduce((a, s) => a + (Number(s.duree) || 0), 0), opts = [...$("#adDur").options].map(o => +o.value);
+      if (!opts.includes(d)) $("#adDur").insertAdjacentHTML("beforeend", `<option value="${d}">${d} min</option>`);
+      $("#adDur").value = d; $("#adPrix").value = ss.reduce((a, s) => a + (Number(s.prix) || 0), 0);
+    }
+  };
+  $("#adSvc").querySelectorAll("[data-s]").forEach(b => b.onclick = () => {
+    const id = b.dataset.s; addSel = addSel.includes(id) ? addSel.filter(x => x !== id) : [...addSel, id];
+    b.setAttribute("aria-pressed", addSel.includes(id)); sync();
+  });
+  $("#adNow").onchange = e => { if (e.target.checked){ $("#adDate").value = today(); const m = Math.floor(nowM() / 15) * 15; $("#adTime").value = Math.max(7 * 60, Math.min(23 * 60 + 30, m)); } };
+  const submit = async force => {
+    $("#adErr").textContent = "";
+    const ss = svc.filter(s => addSel.includes(s.id));
+    const body = { date: $("#adDate").value, start: +$("#adTime").value, dur: +$("#adDur").value, barber: bSel,
+      services: ss.length ? ss.map(svcName).join(" + ") : "Service", prix: Number($("#adPrix").value) || 0,
+      nom: $("#adNom").value.trim(), tel: $("#adTel").value.replace(/[^\d+]/g, ""), statut: $("#adNow").checked ? "venu" : "confirmé", force: !!force };
+    if (!body.date){ $("#adErr").textContent = "Khtar n-nhar."; return; }
+    if (!body.nom){ $("#adErr").textContent = "Kteb smiyt l-client."; $("#adNom").focus(); return; }
+    $("#adGo").disabled = true;
+    try {
+      const j = await call("add", body);
+      if (j.ok){ closeAct(); toast("Rendez-vous tzad ✓"); if (tab === "rdv"){ day = body.date; loadRdv(); } else load(); return; }
+      if (j.error === "taken"){
+        $("#adErr").innerHTML = `Had l-wa9t m3emmer 3and ${esc(bSel)} (rendez-vous wla blocage). <button type="button" class="btn sm ghost" id="adForce">Zid b-sse7</button>`;
+        $("#adForce").onclick = () => submit(true);
+      } else $("#adErr").textContent = j.error === "op" ? OLD_BACKEND : "Ma tsjjelch. Tchecki les infos.";
+    } catch(e){ if (e.message !== "auth") $("#adErr").textContent = "Ma kaynach connexion."; }
+    if ($("#adGo")) $("#adGo").disabled = false;
+  };
+  $("#addForm").onsubmit = e => { e.preventDefault(); submit(false); };
+  openAct();
+  setTimeout(() => { if (!svc.length) $("#adNom").focus(); }, 80);
+}
+
+/* ---------- FLOUS: caisse + stats ---------- */
+let mseg = "cash", cday = today();
+document.querySelectorAll("[data-mseg]").forEach(b => b.addEventListener("click", () => {
+  mseg = b.dataset.mseg; loadMoney();
+}));
+function loadMoney(){
+  document.querySelectorAll("[data-mseg]").forEach(x => x.setAttribute("aria-selected", x.dataset.mseg === mseg));
+  $("#mCash").hidden = mseg !== "cash"; $("#mStats").hidden = mseg !== "stats";
+  if (mseg === "cash") loadCash(); else loadStats();
+}
+$("#cPrev").addEventListener("click", () => { cday = addDays(cday, -1); loadCash(); });
+$("#cNext").addEventListener("click", () => { if (cday < today()){ cday = addDays(cday, 1); loadCash(); } });
+$("#cDay").addEventListener("change", e => { if (e.target.value){ cday = e.target.value > today() ? today() : e.target.value; loadCash(); } });
+async function loadCash(){
+  $("#cDayL").textContent = cday === today() ? "Lyoum" : label(cday); $("#cDay").value = cday; $("#cDay").max = today();
+  $("#cNext").disabled = cday >= today();
+  $("#cashBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
+  try {
+    await ensureConfig();
+    const j = await call("list", { from: cday, to: cday }), live = (j.list || []).filter(isLive);
+    const venu = live.filter(isVenu), enc = venu.reduce((a, r) => a + r.prix, 0);
+    const conf = live.filter(isConf), late = conf.filter(ended), next = conf.filter(r => !ended(r));
+    const prevu = enc + conf.reduce((a, r) => a + r.prix, 0), abs = live.filter(isAbs);
+    const pct = prevu ? Math.round(enc / prevu * 100) : 0;
+    const team = [...new Set(live.map(r => r.barber))];
+    let h = `<div class="cash-hero"><small>Tkhelless ${cday === today() ? "lyoum" : label(cday)}</small><b>${money(enc)}<span> DH</span></b>
+      <div class="cbar"><i style="width:${pct}%"></i></div>
+      <div class="cmeta"><span>${venu.length} client${venu.length > 1 ? "s" : ""}</span><span>Prévu: ${money(prevu)} DH</span>${abs.length ? `<span>${abs.length} ma jawch</span>` : ""}</div></div>`;
+    if (isOwner() && team.length > 1){
+      h += `<div class="section-t">Kol coiffeur</div><div class="ctab">${team.map(n => { const v = venu.filter(r => r.barber === n), rest = conf.filter(r => r.barber === n);
+        return `<div>${ava(n, 30)}<b>${esc(n)}</b><span>${v.length} client${v.length > 1 ? "s" : ""}${rest.length ? ` · ${rest.length} mazal` : ""}</span><strong>${money(v.reduce((a, r) => a + r.prix, 0))} DH</strong></div>`; }).join("")}
+        <div class="tot"><b>Total</b><span></span><strong>${money(enc)} DH</strong></div></div>`;
+    }
+    if (late.length) h += `<div class="section-t warn">Fatou w mazal ma tsddouch (${late.length})</div><div class="clist">${late.map(r => cashRow(r, "late")).join("")}</div>`;
+    if (venu.length) h += `<div class="section-t">Les paiements (${venu.length})</div><div class="clist">${venu.sort((a, b) => a.heure.localeCompare(b.heure)).map(r => cashRow(r, "paid")).join("")}</div>`;
+    if (next.length) h += `<div class="section-t">Mazal jayin (${next.length}) · ${money(next.reduce((a, r) => a + r.prix, 0))} DH</div><div class="clist">${next.map(r => cashRow(r, "next")).join("")}</div>`;
+    if (!live.length) h += `<div class="empty big"><span>${ICO.cash}</span><b>Ma kayn 7ta 7aja f had nhar</b>Mlli tsjjel client "Ja", kayban hna.</div>`;
+    $("#cashBox").innerHTML = h;
+    const all = live;
+    $("#cashBox").querySelectorAll("[data-cid]").forEach(el => el.onclick = e => {
+      const r = all.find(x => x.id === el.dataset.cid); if (!r) return;
+      if (e.target.closest("[data-q]")) return;
+      openDetail(r, () => loadCash());
+    });
+    $("#cashBox").querySelectorAll("[data-q]").forEach(b => b.onclick = async e => {
+      e.stopPropagation();
+      const r = all.find(x => x.id === b.dataset.id); if (!r) return;
+      if (b.dataset.q === "pay"){ actR = r; actReload = () => loadCash(); payView(); openAct(); return; }
+      b.disabled = true;
+      try { const j = await call("status", { id: r.id, statut: b.dataset.q === "ok" ? "venu" : "absent" }); if (j.ok){ toast(b.dataset.q === "ok" ? `+${r.prix} DH ✓` : "Tsjjel absent"); loadCash(); } else b.disabled = false; }
+      catch(err){ b.disabled = false; }
+    });
+  } catch(e){ if (e.message !== "auth") $("#cashBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+function cashRow(r, kind){
+  return `<div class="crow ${kind}" data-cid="${esc(r.id)}" role="button" tabindex="0">
+    <span class="ch">${esc(r.heure)}</span>
+    <span class="cn"><b>${esc(r.nom)}</b><small><i class="dot" style="background:${barberColor(r.barber)}"></i>${esc(r.barber)} · ${esc(r.services)}</small></span>
+    ${kind === "late" ? `<span class="cq"><button type="button" data-q="ok" data-id="${esc(r.id)}" aria-label="Ja">✓ ${r.prix}</button><button type="button" data-q="no" data-id="${esc(r.id)}" class="x" aria-label="Ma jach">✗</button></span>`
+      : kind === "paid" ? `<button type="button" class="camt" data-q="pay" data-id="${esc(r.id)}">${money(r.prix)} DH <i>✎</i></button>`
+      : `<span class="camt muted">${money(r.prix)} DH</span>`}</div>`;
+}
+
+/* ---------- stats (pro) ---------- */
+function prevRange(from, to){
+  const n = Math.round((fromIso(to) - fromIso(from)) / 864e5) + 1;
+  return [addDays(from, -n), addDays(from, -1)];
+}
+function delta(cur, prev){
+  if (prev == null) return "";
+  if (!prev) return cur ? `<em class="up">jdid</em>` : "";
+  const p = Math.round((cur - prev) / prev * 100);
+  return `<em class="${p >= 0 ? "up" : "down"}">${p >= 0 ? "▲" : "▼"} ${Math.abs(p)}%</em>`;
+}
+async function loadStats(){
+  renderPeriods();
+  $("#statsBox").innerHTML = `<div class="empty"><span class="spin"></span>Kan7esbou…</div>`;
+  const [from, to] = range(period), [pf, pt] = prevRange(from, to);
+  try {
+    await ensureConfig();
+    const j = await call("stats", { from, to, prevFrom: pf, prevTo: pt }), s = j.stats;
+    const days = []; for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+    const maxV = Math.max(1, ...days.map(d => s.days[d] || 0));
+    const done = Object.values(s.barbers || {}).reduce((a, n) => a + n, 0);
+    const ticket = done ? Math.round(s.revenue / done) : 0;
+    const absRate = s.confirmed ? Math.round(s.absent / s.confirmed * 100) : 0;
+    const team = s.team || null;
+    const hrs = s.hours ? Object.entries(s.hours).map(([h, n]) => [+h, n]).sort((a, b) => a[0] - b[0]) : [];
+    const maxH = Math.max(1, ...hrs.map(x => x[1]));
+    $("#statsBox").innerHTML = `
+      <div class="kpis">
+        <div class="kpi main"><b>${money(s.revenue)} DH</b><span>Dkhal ${delta(s.revenue, s.prev)}${s.prev != null ? ` <small>· 9bel: ${money(s.prev)} DH</small>` : ""}</span></div>
+        <div class="kpi"><b>${done}</b><span>Clients khddmo</span></div>
+        <div class="kpi"><b>${money(ticket)} DH</b><span>Moyenne l kol client</span></div>
+        <div class="kpi"><b>${s.clients}</b><span>Clients mkhtalfin${s.newClients != null ? ` · ${s.newClients} jdad` : ""}</span></div>
+        <div class="kpi"><b>${absRate}%</b><span>Ma jawch (${s.absent}) · ${s.cancelled} tlghaw</span></div>
+        ${s.shop != null && isOwner() ? `<div class="kpi"><b>${money(s.shop)} DH</b><span>Boutique (tsellmo)</span></div>` : ""}
+      </div>
+      ${team && Object.keys(team).length ? `<div class="bars"><h3>${isOwner() ? "L-équipe" : "L-khdma dyalek"}</h3><div class="ttab">
+        <div class="th"><span>Coiffeur</span><span>Clients</span><span>Dkhal</span><span>Abs.</span></div>
+        ${Object.entries(team).sort((a, b) => b[1].ca - a[1].ca).map(([n, k]) => `<div>${ava(n, 26)}<b>${esc(n)}</b><span>${k.n}</span><strong>${money(k.ca)}</strong><span class="${k.absent ? "warn" : ""}">${k.absent}</span></div>`).join("")}
+      </div></div>` : barsHtml("Les coiffeurs", s.barbers || {})}
+      ${days.length <= 31 ? `<div class="bars"><h3>Dkhal kol nhar (DH)</h3>
+        <div class="chart">${days.map(d => `<div style="height:${Math.round((s.days[d]||0)/maxV*100)}%" data-v="${label(d)}: ${s.days[d]||0} DH"></div>`).join("")}</div>
+        <div class="chartx">${days.map((d,i) => `<span>${i % Math.ceil(days.length/7) === 0 ? fromIso(d).getDate() : ""}</span>`).join("")}</div></div>` : ""}
+      ${hrs.length ? `<div class="bars"><h3>Swaye3 li fihom l-khdma</h3>
+        <div class="chart">${hrs.map(([h, n]) => `<div style="height:${Math.round(n / maxH * 100)}%" data-v="${pad(h)}h: ${n} clients"></div>`).join("")}</div>
+        <div class="chartx">${hrs.map(([h]) => `<span>${h}h</span>`).join("")}</div></div>` : ""}
+      ${barsHtml("Les services", s.services || {})}`;
+  } catch(e){ if (e.message !== "auth") $("#statsBox").innerHTML = `<div class="empty">Ma kaynach connexion.</div>`; }
+}
+
+/* ---------- start ---------- */
+async function start(){
+  $("#login").hidden = true; $("#app").hidden = false;
+  if (!ROLE){ try { const j = await call("login"); if (!j.ok) return; setWho(j); } catch(e){ if (e.message !== "auth") $("#loginErr").textContent = "Ma kaynach connexion."; return; } }
+  else applyRole();
+  if (location.hash === "#boutique" && isOwner()) setTab("shop"); else setTab("home");
+  loadConfig().catch(() => {});
+  if (isOwner()) setTimeout(refreshShopBadge, 4000);
+  if (location.hash === "#pending") setTimeout(() => { if (!$("#pendBox").hidden) $("#pendBox").scrollIntoView({ behavior:"smooth" }); }, 1500);
+  clearInterval(window._poll); window._poll = setInterval(() => { refreshPendingCount(); if (isOwner()) refreshShopBadge(); if (tab === "rdv" && day === today() && VIEW === "plan") renderDay(); }, 60000);
+  if (!start._vis){ start._vis = true; document.addEventListener("visibilitychange", () => { if (!document.hidden && PIN){ refreshPendingCount(); if (tab === "home") loadHome(); } }); }
+  try { if (window.Notification && Notification.permission === "default") document.addEventListener("click", () => Notification.requestPermission(), { once:true }); } catch(e){}
+}
+if (PIN) start();
+})();
+</script>
+</body>
+</html>
