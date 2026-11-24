@@ -83,7 +83,7 @@
     };
   }
   let DB;
-  function load(){ try { DB = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ DB = null; } if (!DB || DB.v !== 2) { DB = seed(); save(); } }
+  function load(){ try { DB = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ DB = null; } if (!DB || DB.v !== 2) { try { Object.keys(localStorage).filter(k => k.indexOf('dm_') === 0).forEach(k => localStorage.removeItem(k)); } catch(e){} DB = seed(); save(); } }
   function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ /* quota: photos kbar */ } }
   load();
 
