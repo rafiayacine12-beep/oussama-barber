@@ -12,12 +12,12 @@
   const HOURS = ['10:00', '21:00'];
   const TEAM = ['Karim', 'Anas', 'Hamza'];
   const SERVICES = [
-    { id: 's1', prix: 40, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Coupe', da: 'Coupe', ar: 'حلاقة الشعر' }, desc: { fr: 'Coupe + shampoing', da: 'Coupe + lavage', ar: 'قص وغسل' } },
-    { id: 's2', prix: 50, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Dégradé', da: 'Dégradé', ar: 'ديغرادي' }, desc: { fr: 'Fade bas, mid ou high', da: 'Fade bas, mid wla high', ar: 'منخفض، متوسط أو عالي' } },
-    { id: 's3', prix: 25, duree: 20, top: false, actif: true, photo: '', nom: { fr: 'Barbe', da: 'Barbe', ar: 'اللحية' }, desc: { fr: 'Taille, contours et serviette chaude', da: 'Taille, contours w serviette skhouna', ar: 'تشذيب وتحديد ومنشفة ساخنة' } },
-    { id: 's4', prix: 60, duree: 45, top: true,  actif: true, photo: '', nom: { fr: 'Coupe + Barbe', da: 'Coupe + Barbe', ar: 'شعر + لحية' }, desc: { fr: 'La formule complète', da: 'L-pack kamel', ar: 'الباقة الكاملة' } },
-    { id: 's5', prix: 60, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Soin visage', da: 'Soin visage', ar: 'عناية بالوجه' }, desc: { fr: 'Masque et nettoyage', da: 'Masque w nettoyage', ar: 'قناع وتنظيف' } },
-    { id: 's6', prix: 30, duree: 30, top: false, actif: true, photo: '', nom: { fr: 'Coupe enfant', da: 'Coupe enfant', ar: 'حلاقة الأطفال' }, desc: { fr: 'Moins de 12 ans', da: '9el mn 12 3am', ar: 'أقل من 12 سنة' } }
+    { id: 's1', prix: 40, duree: 30, top: false, actif: true, photo: 'https://images.unsplash.com/photo-1657105052497-f996284ffff8?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Coupe', da: 'Coupe', ar: 'حلاقة الشعر' }, desc: { fr: 'Coupe + shampoing', da: 'Coupe + lavage', ar: 'قص وغسل' } },
+    { id: 's2', prix: 50, duree: 30, top: false, actif: true, photo: 'https://images.unsplash.com/photo-1568339434343-2a640a1a9946?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Dégradé', da: 'Dégradé', ar: 'ديغرادي' }, desc: { fr: 'Fade bas, mid ou high', da: 'Fade bas, mid wla high', ar: 'منخفض، متوسط أو عالي' } },
+    { id: 's3', prix: 25, duree: 20, top: false, actif: true, photo: 'https://images.unsplash.com/photo-1599011176306-4a96f1516d4d?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Barbe', da: 'Barbe', ar: 'اللحية' }, desc: { fr: 'Taille, contours et serviette chaude', da: 'Taille, contours w serviette skhouna', ar: 'تشذيب وتحديد ومنشفة ساخنة' } },
+    { id: 's4', prix: 60, duree: 45, top: true,  actif: true, photo: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Coupe + Barbe', da: 'Coupe + Barbe', ar: 'شعر + لحية' }, desc: { fr: 'La formule complète', da: 'L-pack kamel', ar: 'الباقة الكاملة' } },
+    { id: 's5', prix: 60, duree: 30, top: false, actif: true, photo: 'https://images.unsplash.com/photo-1542848285-4777eb2a621e?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Soin visage', da: 'Soin visage', ar: 'عناية بالوجه' }, desc: { fr: 'Masque et nettoyage', da: 'Masque w nettoyage', ar: 'قناع وتنظيف' } },
+    { id: 's6', prix: 30, duree: 30, top: false, actif: true, photo: 'https://images.unsplash.com/photo-1599351431613-18ef1fdd27e1?w=900&h=1125&fit=crop&crop=faces,entropy&q=80&auto=format', nom: { fr: 'Coupe enfant', da: 'Coupe enfant', ar: 'حلاقة الأطفال' }, desc: { fr: 'Moins de 12 ans', da: '9el mn 12 3am', ar: 'أقل من 12 سنة' } }
   ];
   const REQUIRE_VALIDATION = true, MAX_ACTIVE_PER_PHONE = 1, ABSENT_LIMIT = 2;
 
@@ -76,7 +76,7 @@
       notif: {},
       config: {
         coiffeurs: TEAM.map((n, i) => ({ id: 'c' + (i + 1), nom: n, actif: true, photo: '', de: HOURS[0], a: HOURS[1], repos: i === 2 ? ['lundi'] : [] })),
-        galerie: [],
+        galerie: [{ id: 'g1', url: 'https://drive.google.com/thumbnail?id=1VSoB2tWWloRsslGaUm6_53gOg63G14yn&sz=w1200' }],
         services: clone(SERVICES),
         salon: { nom: SALON, adresse: 'Votre adresse', ville: 'Votre ville', whatsapp: '', tel: '', horaires: null, couleur: '', maps: '', instagram: '', facebook: '' }
       }

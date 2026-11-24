@@ -57,6 +57,11 @@ def build_index():
 <a class="dm-fab" href="admin.html">🔐 Chouf l-admin</a>
 """
     s = sub(s, '<body>', '<body>' + bar)
+    # produits dyal l-boutique: nefs tsawer dyal s-site l-7a9i9i
+    DEMO_PRODUCTS = '  { id:"p1", nom:"Huile pour barbe Cannabeard · FXB", cat:"Barbe", prix:229, ancien:0, desc:"Huile pour barbe bio au chanvre : nourrit le poil, adoucit la barbe et apaise la peau en dessous.", photo:"https://drive.google.com/thumbnail?id=16Gn6ErRG42gTOsqIG7Fo24SG87zQxZPC&sz=w1200", stock:null },\n  { id:"p2", nom:"Baume pour barbe Beardmingo · FXB", cat:"Barbe", prix:229, ancien:0, desc:"Baume coiffant pour barbe aux notes fruitées tropicales : discipline les poils rebelles et hydrate.", photo:"https://drive.google.com/thumbnail?id=1sAnhvf6mSgG9MWMbzrNONznvOmC-E2Ye&sz=w1200", stock:null },\n  { id:"p3", nom:"Tondeuse de finition Reign · StyleCraft", cat:"Tondeuses", prix:1950, ancien:0, desc:"Tondeuse de finition pro : puissante et silencieuse, pour des contours nets et précis.", photo:"https://drive.google.com/thumbnail?id=1aTY-Xwb9svWI--L3Jdmxv5Ux8guLCNZO&sz=w1200", stock:null },\n  { id:"p4", nom:"Tondeuse de coupe Boosted Up · Gamma+", cat:"Tondeuses", prix:1990, ancien:0, desc:"Tondeuse de coupe pro, moteur rotatif 7200 tr/min et lame carbone DLC.", photo:"https://drive.google.com/thumbnail?id=1KyLeC5ABSoc7Q9T-2NTXVLraOrBOCXk7&sz=w1200", stock:null }'
+    s, n = re.subn(r'\{ id:"d1".*?\n\] \};', lambda m: DEMO_PRODUCTS + "\n] };", s, count=1, flags=re.S)
+    if n != 1: sys.exit("build.py: ma l9itch l-produits dyal l-démo")
+
     return s
 
 
