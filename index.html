@@ -1276,10 +1276,18 @@ function applyTrial(t){
   ["trialBar", "trialLock"].forEach(id => { const x = document.getElementById(id); if (x) x.remove(); });
   if (!t) return;
   if (!t.expired){
-    const n = t.days + 1, bar = document.createElement("div"); bar.id = "trialBar";
+    const bar = document.createElement("div"); bar.id = "trialBar";
     bar.style.cssText = "background:#17140F;color:#fff;text-align:center;font:600 13px/1.3 system-ui,sans-serif;padding:8px 12px";
-    bar.textContent = "🎁 Essai gratuit · " + (n <= 1 ? "akher nhar" : n + " iyyam b9aw");
     document.body.insertBefore(bar, document.body.firstChild);
+    const p = String(t.end).split("-").map(Number), endMs = new Date(p[0], p[1] - 1, p[2] + 1).getTime();
+    const z = n => String(n).padStart(2, "0");
+    const tick = () => {
+      const ms = endMs - Date.now();
+      if (ms <= 0){ clearInterval(iv); location.reload(); return; }
+      const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4), sc = Math.floor(ms % 6e4 / 1e3);
+      bar.textContent = "🎁 Essai gratuit · tsala f " + (d ? d + "j " : "") + z(h) + ":" + z(m) + ":" + z(sc);
+    };
+    const iv = setInterval(tick, 1000); tick();
     return;
   }
   const o = document.createElement("div"); o.id = "trialLock";
