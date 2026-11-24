@@ -31,7 +31,7 @@ def common(s):
     s = OLD_API.sub(API, s)
     s = s.replace('"ob_', '"dm_')                        # storage dyal démo bo7do, ma ykhltch m3a s-site l-asli
     s = s.replace('href="icons/', 'href="../icons/').replace('icon:"icons/', 'icon:"../icons/')
-    s = sub(s, '<meta charset="UTF-8">', '<meta charset="UTF-8">\n<meta name="robots" content="noindex">\n<script src="mock-api.js"></script>')
+    s = sub(s, '<meta charset="UTF-8">', '<meta charset="UTF-8">\n<meta name="robots" content="noindex">\n<script src="mock-api.js?v=2"></script>')
     return s
 
 

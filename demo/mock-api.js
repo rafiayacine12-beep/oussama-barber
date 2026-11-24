@@ -68,7 +68,7 @@
     const d1 = new Date(); d1.setDate(d1.getDate() + 1);
     const d3 = new Date(); d3.setDate(d3.getDate() + 3);
     return {
-      v: 1,
+      v: 2,
       res,
       blocks: [{ date: iso(d3), de: '13:00', a: '14:30', coiffeur: 'tous', raison: 'Pause déjeuner', id: id_() }],
       wait: [{ date: iso(d1), nom: 'Anouar', tel: '0677889900', services: 'Dégradé', barber: 'Ay wa7ed', statut: 'en attente', id: id_() }],
@@ -83,7 +83,7 @@
     };
   }
   let DB;
-  function load(){ try { DB = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ DB = null; } if (!DB || DB.v !== 1) { DB = seed(); save(); } }
+  function load(){ try { DB = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ DB = null; } if (!DB || DB.v !== 2) { DB = seed(); save(); } }
   function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ /* quota: photos kbar */ } }
   load();
 
