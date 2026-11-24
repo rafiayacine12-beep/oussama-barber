@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
-<meta name="description" content="Réservi f Oussama Barber, Tabriquet Salé. 24h/24, f 30 seconde.">
-<title>Oussama Barber · Réservation</title>
+<meta name="description" content="Réservi f Barber Junior, Tabriquet Salé. 24h/24, f 30 seconde.">
+<title>Barber Junior · Réservation</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Barber Junior">
+<meta property="og:title" content="Barber Junior · Réservation">
+<meta property="og:description" content="Réservi f Barber Junior, Tabriquet Salé. 24h/24, f 30 seconde.">
+<meta property="og:url" content="https://barber-junior.vercel.app/">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -19,11 +24,11 @@
    CONFIG — BEDDEL GHIR HNA. Ma t9ich l-code li ta7t.
    ===================================================================== */
 const CONFIG = {
-  salon:    "Oussama Barber",
+  salon:    "Barber Junior",
   ville:    "Salé",
   adresse:  "Tabriquet, Salé",
-  mapsUrl:  "https://maps.google.com/?q=Oussama+Barber+Tabriquet+Sal%C3%A9",
-  instagram: "",                   // ex: "oussama.barber" (bla @). Khawi = ma kayban. (katbeddel men l-admin → Salon → Infos)
+  mapsUrl:  "https://maps.google.com/?q=Barber+Junior+Tabriquet+Sal%C3%A9",
+  instagram: "",                   // ex: "barber.junior" (bla @). Khawi = ma kayban. (katbeddel men l-admin → Salon → Infos)
   facebook: "",                    // lien dyal la page Facebook (katbeddel men l-admin → Salon → Infos)
   whatsapp: "212655778899",        // 212 + numéro bla 0
   telAffiche: "06 55 77 88 99",
@@ -61,7 +66,7 @@ const CONFIG = {
 
   // L-équipe (photos, wa9t, nhar l-ra7a) w tsawer dyal l-galerie katbeddlo men page admin.
   // Had l-liste katkhdem ghir ila ma t-chargatch l-config men l-admin.
-  coiffeurs: ["Oussama", "Yassine", "Aymane"],
+  coiffeurs: ["Junior", "Yassine", "Aymane"],
 
   // Nhar l-ra7a dyal kol coiffeur. Ex: { "Aymane": ["lundi"], "Yassine": ["vendredi"] }
   reposCoiffeurs: {},
@@ -999,7 +1004,7 @@ const I18N = {
     rebook:"Réservi wa9t akhor", reviewT:"Kifach kant l-coupe?", reviewB:"3tina rayek f Google",
     waitT:"Bghiti nkhbbrouk ila t7llat blassa had nhar?", waitB:"Khbbrouni", waitOk:"Tsjjelti f liste d'attente. Ghadi ntsslo bik ila t7llat blassa.",
     galleryT:"L-khdma dyalna", teamT:"L-équipe",
-    doneHPending:"Réservation dyalek wslat ⏳", pendingNote:"Oussama ghadi yconfirmiha lik f a9rab wa9t. Ghadi tchouf l-confirmation hna f l-site w f WhatsApp.",
+    doneHPending:"Réservation dyalek wslat ⏳", pendingNote:"Salon ghadi yconfirmiha lik f a9rab wa9t. Ghadi tchouf l-confirmation hna f l-site w f WhatsApp.",
     stPending:"Kaytsenna l-confirmation", stConfirmed:"Mconfirmé ✅", stRefused:"Tlghat",
     errBlocked:"Ma ymkench tréservi b had n-numéro. Tsel b salon f WhatsApp.", errLimit:"3endek deja réservation jaya b had n-numéro. Lghiha 9bel ma tdir wa7da jdida.",
     welcomeT:"Mrehba bik 👋", welcomeS:"Réservi l-blassa dyalek f 30 seconde, bla ma t3ayet wla ttsenna f s-salon.",
@@ -2039,8 +2044,8 @@ async function renderLyoum(){
 function icsData(tk){
   const d = fromIso(tk.date), s = tk.start, e = s + tk.dur;
   const f = m => iso(d).replace(/-/g,"") + "T" + pad(Math.floor(m/60)) + pad(m%60) + "00";
-  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Oussama Barber//FR","BEGIN:VEVENT",
-    "UID:" + tk.id + "@oussama-barber", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
+  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Barber Junior//FR","BEGIN:VEVENT",
+    "UID:" + tk.id + "@barber-junior", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
     "DTSTART:" + f(s), "DTEND:" + f(e),
     "SUMMARY:" + CONFIG.salon + " – " + tk.items.map(i => i.n).join(" + "),
     "LOCATION:" + CONFIG.adresse, "DESCRIPTION:" + t("tBarber") + ": " + tk.barber + " · #" + tk.id,

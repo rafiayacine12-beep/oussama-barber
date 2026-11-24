@@ -1,7 +1,7 @@
 {
-  "name": "Oussama Barber · Réservation",
-  "short_name": "Oussama Barber",
-  "description": "Réservi f Oussama Barber, Tabriquet Salé, 24h/24.",
+  "name": "Barber Junior · Réservation",
+  "short_name": "Barber Junior",
+  "description": "Réservi f Barber Junior, Tabriquet Salé, 24h/24.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

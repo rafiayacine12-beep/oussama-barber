@@ -22,7 +22,7 @@ const CONFIG = {
   ville:    "Salé",
   adresse:  "Adresse test",
   mapsUrl:  "https://maps.google.com/?q=Salon%20Test%20Adresse%20test%20Sal%C3%A9",
-  instagram: "",                   // ex: "oussama.barber" (bla @). Khawi = ma kayban. (katbeddel men l-admin → Salon → Infos)
+  instagram: "",                   // ex: "barber.junior" (bla @). Khawi = ma kayban. (katbeddel men l-admin → Salon → Infos)
   facebook: "",                    // lien dyal la page Facebook (katbeddel men l-admin → Salon → Infos)
   whatsapp: "212600000000",        // 212 + numéro bla 0
   telAffiche: "06 00 00 00 00",
@@ -2029,7 +2029,7 @@ function icsData(tk){
   const d = fromIso(tk.date), s = tk.start, e = s + tk.dur;
   const f = m => iso(d).replace(/-/g,"") + "T" + pad(Math.floor(m/60)) + pad(m%60) + "00";
   const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Salon Test//FR","BEGIN:VEVENT",
-    "UID:" + tk.id + "@oussama-barber", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
+    "UID:" + tk.id + "@barber-junior", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
     "DTSTART:" + f(s), "DTEND:" + f(e),
     "SUMMARY:" + CONFIG.salon + " – " + tk.items.map(i => i.n).join(" + "),
     "LOCATION:" + CONFIG.adresse, "DESCRIPTION:" + t("tBarber") + ": " + tk.barber + " · #" + tk.id,

@@ -5,7 +5,7 @@
  *   Reservations · Blocages · Attente · Produits · Commandes
  *
  * Statut d'une réservation (colonne "statut"): en attente · confirmé · venu · absent · annulé
- *   - "en attente" => l-client sifet, Oussama khasso yvalidi men l-admin (l-crénau msdod).
+ *   - "en attente" => l-client sifet, Salon khasso yvalidi men l-admin (l-crénau msdod).
  *   - "annulé" => l-crénau kayrje3 khawi.
  *
  * Blocages (pause, congé, 3id…): date | de | a | coiffeur | raison
@@ -18,20 +18,20 @@ const ADMIN_PIN = 'CHANGE_MOI';          // ⚠️ code dyal mol s-salon: beddlo
 // (Codes dyal les coiffeurs kaytsjjlo men l-admin → Salon → L-équipe)
 const NOTIFY_EMAIL = '';                  // khawi = email dyal compte Google li dar déploiement
 const TELEGRAM_TOKEN = '';                // optionnel: token dyal bot Telegram (@BotFather)
-const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal Oussama
+const TELEGRAM_CHAT_ID = '';              // optionnel: chat id dyal salon
 // Notification f WhatsApp (gratuit, CallMeBot): numéro (212…) + apikey li katwsel men CallMeBot
 const WHATSAPP_PHONE = '';                // ex: '212655778899'
 const WHATSAPP_APIKEY = '';               // ex: '1234567'
 // Notification push b l-application ntfy (gratuit): smiya dyal topic (sirriya!)
-const NTFY_TOPIC = '';                    // ex: 'oussama-barber-x7k2p9'
+const NTFY_TOPIC = '';                    // ex: 'barber-junior-x7k2p9'
 
 // Validation & anti-fake
 const REQUIRE_VALIDATION = true;          // true = kol réservation katbda "en attente" 7ta tvalidiha
 const MAX_ACTIVE_PER_PHONE = 1;           // ch7al mn réservation jaya y9der ykoun 3and nefs n-numéro
 const ABSENT_LIMIT = 2;                   // men b3d ch7al mn "absent" kaytbloka n-numéro automatiquement (0 = la)
-const SALON = 'Oussama Barber';
+const SALON = 'Barber Junior';
 // Équipe par défaut (mra lowla). Mn b3d kolchi katbeddlo men page admin → onglet "Équipe".
-const DEFAULT_TEAM = ['Oussama', 'Yassine', 'Aymane'];
+const DEFAULT_TEAM = ['Junior', 'Yassine', 'Aymane'];
 const DEFAULT_HOURS = ['11:00', '21:00'];
 const DAYKEYS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
 // Services par défaut (mra lowla). Mn b3d katbeddlo men page admin → "Salon" → "Services".
