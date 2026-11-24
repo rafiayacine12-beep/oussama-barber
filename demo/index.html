@@ -6,13 +6,15 @@
 <script src="mock-api.js?v=3"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
+<!-- SEO:START -->
 <meta name="description" content="Démo — site de réservation l salon dyalek.">
 <title>Votre Salon · Démo</title>
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Barber Junior">
-<meta property="og:title" content="Barber Junior · Réservation">
-<meta property="og:description" content="Réservi f Barber Junior, Tabriquet Salé. 24h/24, f 30 seconde.">
-<meta property="og:url" content="https://barber-junior.vercel.app/">
+<meta property="og:site_name" content="Votre Salon">
+<meta property="og:title" content="Votre Salon · Démo">
+<meta property="og:description" content="Démo — site de réservation l salon dyalek.">
+<meta property="og:url" content="https://barber-junior.vercel.app/demo/">
+<!-- SEO:END -->
 <link rel="icon" href="../icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="../icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,6 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Sans:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;800&display=swap" rel="stylesheet">
+
 <script>
 /* =====================================================================
    CONFIG — BEDDEL GHIR HNA. Ma t9ich l-code li ta7t.
@@ -97,6 +100,7 @@ const CONFIG = {
     dimanche: ["10:00", "21:00"]
   }
 };
+Object.assign(CONFIG, window.SITE_CONFIG || {});
 /* ===================================================================== */
 </script>
 <style>
@@ -2072,7 +2076,7 @@ async function renderLyoum(){
 function icsData(tk){
   const d = fromIso(tk.date), s = tk.start, e = s + tk.dur;
   const f = m => iso(d).replace(/-/g,"") + "T" + pad(Math.floor(m/60)) + pad(m%60) + "00";
-  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Votre Salon//FR","BEGIN:VEVENT",
+  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//" + CONFIG.salon + "//FR","BEGIN:VEVENT",
     "UID:" + tk.id + "@barber-junior", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z",
     "DTSTART:" + f(s), "DTEND:" + f(e),
     "SUMMARY:" + CONFIG.salon + " – " + tk.items.map(i => i.n).join(" + "),

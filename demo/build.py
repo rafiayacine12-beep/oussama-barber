@@ -29,6 +29,7 @@ BANNER_CSS = """
 
 def common(s):
     s = OLD_API.sub(API, s)
+    s = s.replace('<script src="config.js"></script>', '')
     s = s.replace('"ob_', '"dm_')                        # storage dyal démo bo7do, ma ykhltch m3a s-site l-asli
     s = s.replace('href="icons/', 'href="../icons/').replace('icon:"icons/', 'icon:"../icons/')
     s = sub(s, '<meta charset="UTF-8">', '<meta charset="UTF-8">\n<meta name="robots" content="noindex">\n<script src="mock-api.js?v=3"></script>')
@@ -42,13 +43,16 @@ def build_index():
     s = sub(s, 'content="Réservi f Barber Junior, Tabriquet Salé. 24h/24, f 30 seconde."', 'content="Démo — site de réservation l salon dyalek."')
     s = sub(s, '<title>Barber Junior · Réservation</title>', '<title>Votre Salon · Démo</title>')
     s = sub(s, 'salon:    "Barber Junior"', 'salon:    "Votre Salon"')
+    s = s.replace('<meta property="og:site_name" content="Barber Junior">', '<meta property="og:site_name" content="Votre Salon">')
+    s = s.replace('<meta property="og:title" content="Barber Junior · Réservation">', '<meta property="og:title" content="Votre Salon · Démo">')
+    s = s.replace('<meta property="og:description" content="Réservi f Barber Junior, Tabriquet Salé. 24h/24, f 30 seconde.">', '<meta property="og:description" content="Démo — site de réservation l salon dyalek.">')
+    s = s.replace('<meta property="og:url" content="https://barber-junior.vercel.app/">', '<meta property="og:url" content="https://barber-junior.vercel.app/demo/">')
     s = sub(s, 'ville:    "Salé"', 'ville:    "Votre ville"')
     s = sub(s, 'adresse:  "Tabriquet, Salé"', 'adresse:  "Votre adresse"')
     s = re.sub(r'mapsUrl:  "[^"]*"', 'mapsUrl:  "https://maps.google.com/"', s, count=1)
     s = sub(s, 'coiffeurs: ["Junior", "Yassine", "Aymane"]', 'coiffeurs: ["Karim", "Anas", "Hamza"]')
     s = re.sub(r'(\b(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche):\s*)\["11:00", "21:00"\]', r'\1["10:00", "21:00"]', s)
     s = sub(s, 'pendingNote:"Salon ghadi', 'pendingNote:"Salon ghadi')
-    s = sub(s, 'PRODID:-//Barber Junior//FR', 'PRODID:-//Votre Salon//FR')
     # service worker: la f démo
     s = re.sub(r'\nif \("serviceWorker" in navigator[^\n]*', '', s, count=1)
     bar = BANNER_CSS + """
@@ -68,14 +72,14 @@ def build_index():
 def build_admin():
     s = open(os.path.join(ROOT, "admin.html"), encoding="utf-8").read()
     s = common(s)
-    s = sub(s, '<title>Admin · Barber Junior</title>', '<title>Admin · Votre Salon (démo)</title>')
-    s = sub(s, '<h1><span id="lgName">Barber Junior</span><small>Admin</small></h1>', '<h1><span id="lgName">Votre Salon</span><small>Admin</small></h1>')
+    s = sub(s, '<title>Admin</title>', '<title>Admin · Votre Salon (démo)</title>')
+    s = sub(s, '<h1><span id="lgName">Admin</span><small>Admin</small></h1>', '<h1><span id="lgName">Votre Salon</span><small>Admin</small></h1>')
     s = sub(s, '<span>Barber<small>Admin</small></span>', '<span>Démo<small>Admin</small></span>')
     s = s.replace('"Barber Junior"', '"Votre Salon"')
     s = sub(s, '<p>Dkhel l-code dyalek</p>', '<p>Dkhel l-code dyalek</p>\n    <div class="dm-hint">🎬 Démo · Code: <b>1234</b></div>')
     s = s.replace('"Barber Junior"', '"Votre Salon"').replace("Admin · Barber Junior", "Admin · Votre Salon")
     s = s.replace('"Tabriquet, Salé"', '"Votre adresse"').replace('placeholder="Salé"', 'placeholder="Votre ville"').replace('|| "Salé"', '|| "Votre ville"')
-    s = sub(s, 'placeholder="Barber Junior"', 'placeholder="Votre Salon"', required=False)
+    s = sub(s, 'placeholder="Smiyt s-salon"', 'placeholder="Votre Salon"', required=False)
     s = s.replace("https://maps.google.com/?q=Barber+Junior+Tabriquet+Sal%C3%A9", "https://maps.google.com/")
     # nefs l-onglet: f WhatsApp, onglet jdid kayt7el f navigateur akhor w l-data ma katbanch
     s = s.replace('href="./" target="_blank" rel="noopener"', 'href="./"')

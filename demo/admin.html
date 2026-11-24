@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FFFFFF">
 <title>Admin · Votre Salon (démo)</title>
+
 <link rel="icon" href="../icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="../icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +17,7 @@
 <script>
 /* Nefs l-URL li f index.html */
 const ADMIN = {
-  apiUrl: "https://demo.api/exec"
+  apiUrl: (window.SITE_CONFIG && window.SITE_CONFIG.apiUrl) || "https://demo.api/exec"
 };
 </script>
 <script>
@@ -1033,7 +1034,7 @@ function cGet(k){ try { return JSON.parse(localStorage.getItem(cKey(k)) || "null
 function cSet(k, v){ try { localStorage.setItem(cKey(k), JSON.stringify(v)); } catch(e){} }
 function cClear(){ try { Object.keys(localStorage).filter(k => k.indexOf("dm_c_") === 0).forEach(k => localStorage.removeItem(k)); } catch(e){} }
 { const c = cGet("cfg"); if (c && c.coiffeurs) CFG = c; }
-const SN = () => (CFG.salon && CFG.salon.nom) || "Votre Salon";
+const SN = () => (CFG.salon && CFG.salon.nom) || (window.SITE_CONFIG && window.SITE_CONFIG.salon) || "Salon";
 function paintName(){
   const n = SN();
   document.querySelector(".brand span").firstChild.textContent = n.split(/\s+/)[0];
@@ -1589,7 +1590,7 @@ $("#nCopy").addEventListener("click", () => { navigator.clipboard && navigator.c
 function fillSalon(){
   const s = CFG.salon || {};
   if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
-  $("#iNom").value = s.nom || "Votre Salon"; $("#iAdr").value = s.adresse || "Votre adresse"; $("#iVille").value = s.ville || "Votre ville";
+  $("#iNom").value = s.nom || ""; $("#iAdr").value = s.adresse || ""; $("#iVille").value = s.ville || "";
   $("#iWa").value = fmtTel(s.whatsapp || "212655778899");
   hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
   setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();

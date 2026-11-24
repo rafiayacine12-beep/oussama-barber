@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FFFFFF">
-<title>Admin · Barber Junior</title>
+<title>Admin</title>
+<script src="config.js"></script>
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +15,7 @@
 <script>
 /* Nefs l-URL li f index.html */
 const ADMIN = {
-  apiUrl: "https://script.google.com/macros/s/AKfycbzBna68m3uYB009UEVxlTisv_vr2G3eAaMUGQg0eeThgE43x_TUKor1Frhb1s8a-8NmIQ/exec"
+  apiUrl: (window.SITE_CONFIG && window.SITE_CONFIG.apiUrl) || "https://script.google.com/macros/s/AKfycbzBna68m3uYB009UEVxlTisv_vr2G3eAaMUGQg0eeThgE43x_TUKor1Frhb1s8a-8NmIQ/exec"
 };
 </script>
 <script>
@@ -669,7 +670,7 @@ body[data-tab=rdv] .toast{bottom:calc(166px + env(safe-area-inset-bottom))}
 <section class="login" id="login">
   <div class="lg-top">
     <div class="lg-pole" aria-hidden="true"></div>
-    <h1><span id="lgName">Barber Junior</span><small>Admin</small></h1>
+    <h1><span id="lgName">Admin</span><small>Admin</small></h1>
   </div>
   <form id="loginForm" class="lg-body">
     <p>Dkhel l-code dyalek</p>
@@ -826,7 +827,7 @@ body[data-tab=rdv] .toast{bottom:calc(166px + env(safe-area-inset-bottom))}
         <p class="sub">Smiya, numéro, adresse, l-wa9t w lon dyal l-site. Ay tbdil kayban f l-site direct.</p>
         <form class="form" id="salonForm">
           <div class="fsec">🏪 L-ma7al</div>
-          <div><label for="iNom">Smiyt l-ma7al</label><input id="iNom" maxlength="40" placeholder="Barber Junior"></div>
+          <div><label for="iNom">Smiyt l-ma7al</label><input id="iNom" maxlength="40" placeholder="Smiyt s-salon"></div>
           <div class="two">
             <div><label for="iAdr">Adresse</label><input id="iAdr" maxlength="80" placeholder="Tabriquet, Salé"></div>
             <div><label for="iVille">L-mdina</label><input id="iVille" maxlength="40" placeholder="Salé"></div>
@@ -1019,7 +1020,7 @@ function cGet(k){ try { return JSON.parse(localStorage.getItem(cKey(k)) || "null
 function cSet(k, v){ try { localStorage.setItem(cKey(k), JSON.stringify(v)); } catch(e){} }
 function cClear(){ try { Object.keys(localStorage).filter(k => k.indexOf("ob_c_") === 0).forEach(k => localStorage.removeItem(k)); } catch(e){} }
 { const c = cGet("cfg"); if (c && c.coiffeurs) CFG = c; }
-const SN = () => (CFG.salon && CFG.salon.nom) || "Barber Junior";
+const SN = () => (CFG.salon && CFG.salon.nom) || (window.SITE_CONFIG && window.SITE_CONFIG.salon) || "Salon";
 function paintName(){
   const n = SN();
   document.querySelector(".brand span").firstChild.textContent = n.split(/\s+/)[0];
@@ -1027,7 +1028,7 @@ function paintName(){
   const sn = document.getElementById("sideName"); if (sn) sn.textContent = n;
 }
 paintName();
-const MAPS_DEFAULT = "https://maps.google.com/?q=Barber+Junior+Tabriquet+Sal%C3%A9";
+const MAPS_DEFAULT = "https://maps.google.com/";
 
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => t.hidden = true, 2200); }
 async function call(op, extra){
@@ -1575,7 +1576,7 @@ $("#nCopy").addEventListener("click", () => { navigator.clipboard && navigator.c
 function fillSalon(){
   const s = CFG.salon || {};
   if (document.activeElement && document.activeElement.closest && document.activeElement.closest("#salonForm")) return;
-  $("#iNom").value = s.nom || "Barber Junior"; $("#iAdr").value = s.adresse || "Tabriquet, Salé"; $("#iVille").value = s.ville || "Salé";
+  $("#iNom").value = s.nom || ""; $("#iAdr").value = s.adresse || ""; $("#iVille").value = s.ville || "";
   $("#iWa").value = fmtTel(s.whatsapp || "212655778899");
   hrsRows(s.horaires || Object.fromEntries(DK.map(d => [d, ["11:00", "21:00"]])));
   setCol = s.couleur || "#E2560A"; $("#iCol").value = setCol; applyColor(setCol); swatches();
