@@ -30,6 +30,9 @@ const REQUIRE_VALIDATION = true;          // true = kol réservation katbda "en 
 const MAX_ACTIVE_PER_PHONE = 1;           // ch7al mn réservation jaya y9der ykoun 3and nefs n-numéro
 const ABSENT_LIMIT = 2;                   // men b3d ch7al mn "absent" kaytbloka n-numéro automatiquement (0 = la)
 const SALON = 'Barber Junior';
+// ESSAI GRATUIT: 'YYYY-MM-DD' = akher nhar dyal l-essai. Men b3dou l-réservations w l-admin kaytsddo. Khawi = bla limite (client li khlles).
+const TRIAL_END = '';
+const TRIAL_CONTACT = '';                 // numéro WhatsApp dyalek (212…) bach l-client yt3awd m3ak mli ytsala l-essai
 // Équipe par défaut (mra lowla). Mn b3d kolchi katbeddlo men page admin → onglet "Équipe".
 const DEFAULT_TEAM = ['Junior', 'Yassine', 'Aymane'];
 const DEFAULT_HOURS = ['11:00', '21:00'];
@@ -79,6 +82,12 @@ function toMin_(s) { const p = s.split(':'); return Number(p[0]) * 60 + Number(p
 function hh_(m) { return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); }
 function phone_(p) { let d = String(p || '').replace(/\D/g, ''); if (d.indexOf('212') === 0) d = '0' + d.slice(3); return d; }
 function txt_(v) { return "'" + v; }
+function trial_() {
+  if (!TRIAL_END) return null;
+  const p = String(TRIAL_END).split('-').map(Number), q = today_().split('-').map(Number);
+  const days = Math.round((Date.UTC(p[0], p[1] - 1, p[2]) - Date.UTC(q[0], q[1] - 1, q[2])) / 86400000);
+  return { end: TRIAL_END, days: days, expired: days < 0, contact: TRIAL_CONTACT };
+}
 function today_() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd'); }
 function id_() { return Utilities.getUuid().slice(0, 8).toUpperCase(); }
 function isDate_(s) { return /^\d{4}-\d{2}-\d{2}$/.test(String(s)); }
@@ -133,6 +142,7 @@ function publicConfig_() {
   return { ok: true, coiffeurs: c.coiffeurs.filter(x => x.actif).map(x => ({ id: x.id, nom: x.nom, photo: x.photo || '', de: x.de, a: x.a, repos: x.repos || [] })),
     galerie: c.galerie.map(g => g.url),
     salon: c.salon,
+    trial: trial_(),
     services: c.services.filter(s => s.actif).map(s => ({ id: s.id, nom: s.nom, desc: s.desc, prix: s.prix, duree: s.duree, top: !!s.top, photo: s.photo || '' })),
     boutique: (() => { try { return publicShop_(); } catch (e) { return null; } })() };
 }
@@ -285,6 +295,8 @@ function doGet(e) {
     const r = reservations_().find(x => x.id.toUpperCase() === id && phone_(x.tel) === ph);
     return json_(r ? { ok: true, statut: r.statut, date: r.date, heure: hh_(r.start), barber: r.barber } : { ok: false, error: 'notfound' });
   }
+  const tr = trial_();
+  if (tr && tr.expired) return json_({ ok: false, error: 'trial' });
   if (!isDate_(p.date)) return json_({ ok: false, error: 'date' });
   return json_({ ok: true, bookings: busyFor_(p.date) });
 }
@@ -302,6 +314,8 @@ const READ_OPS = ['login', 'list', 'pending', 'blocked', 'blocks', 'waitlist', '
 function doPost(e) {
   let b;
   try { b = JSON.parse(e.postData.contents); } catch (err) { return json_({ ok: false, error: 'json' }); }
+  const tr = trial_();
+  if (tr && tr.expired && ['book', 'order', 'waitlist', 'admin'].indexOf(b.action || 'book') >= 0) return json_({ ok: false, error: 'trial' });
   // L-9raya (admin) ma kat7tajch lock: kaytjbdo b jouj f nefs l-wa9t → l-admin kayt7el dghya
   if (b.action === 'admin' && READ_OPS.indexOf(b.op) >= 0) return json_(admin_(b));
   const lock = LockService.getScriptLock();

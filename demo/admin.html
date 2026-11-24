@@ -1047,6 +1047,7 @@ function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = fals
 async function call(op, extra){
   const r = await fetch(ADMIN.apiUrl, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify({ action:"admin", pin: PIN, op, ...(extra||{}) }) });
   const j = await r.json();
+  if (!j.ok && j.error === "trial"){ logout("L-essai tsala. Kellem l-mol l-système bach ykml."); throw new Error("auth"); }
   if (!j.ok && (j.error === "pin" || j.error === "locked")){ logout(j.error === "locked" ? "Bzaf dyal l-mo7awalat. Tsenna 15 dqi9a." : "Code ghalat."); throw new Error("auth"); }
   return j;
 }

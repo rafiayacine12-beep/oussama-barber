@@ -1280,11 +1280,28 @@ function worksAt(name, date, m, dur){
 }
 const workers = date => names().filter(n => !repos(n).includes(DAYKEYS[fromIso(date).getDay()]));
 const candFor = date => (st.barber === ANY ? names() : [st.barber]).filter(n => workers(date).includes(n));
+function applyTrial(t){
+  ["trialBar", "trialLock"].forEach(id => { const x = document.getElementById(id); if (x) x.remove(); });
+  if (!t) return;
+  if (!t.expired){
+    const n = t.days + 1, bar = document.createElement("div"); bar.id = "trialBar";
+    bar.style.cssText = "background:#17140F;color:#fff;text-align:center;font:600 13px/1.3 system-ui,sans-serif;padding:8px 12px";
+    bar.textContent = "🎁 Essai gratuit · " + (n <= 1 ? "akher nhar" : n + " iyyam b9aw");
+    document.body.insertBefore(bar, document.body.firstChild);
+    return;
+  }
+  const o = document.createElement("div"); o.id = "trialLock";
+  o.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(23,20,15,.96);color:#fff;display:grid;place-items:center;padding:24px;text-align:center;font-family:system-ui,sans-serif";
+  const wa = t.contact ? '<a href="https://wa.me/' + String(t.contact).replace(/\D/g, "") + '" style="display:inline-block;margin-top:18px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:999px">Kellemna f WhatsApp</a>' : "";
+  o.innerHTML = '<div style="max-width:340px"><div style="font-size:40px">⏳</div><h2 style="margin:10px 0 6px;font-size:22px">L-essai tsala</h2><p style="margin:0;opacity:.8;line-height:1.5">L-essai gratuit dyal 3 iyyam wsel l-nhayto. Bach ykml s-site, kellem l-mol l-système.</p>' + wa + '</div>';
+  document.body.appendChild(o);
+}
 async function loadConfig(){
   if (DEMO) return;
   try {
     const r = await fetch(CONFIG.apiUrl + "?action=config", { cache:"no-store" });
     const j = await r.json();
+    applyTrial(j.trial);
     if (!j.ok || !Array.isArray(j.coiffeurs) || !j.coiffeurs.length) return;
     TEAM = j.coiffeurs; GALLERY = j.galerie || [];
     if (Array.isArray(j.services) && j.services.length) SERVICES = j.services;
